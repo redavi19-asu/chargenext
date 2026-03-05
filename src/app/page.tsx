@@ -37,7 +37,7 @@ type StickyProps = {
 
 const Sticky = ({ children, className = "", innerClass = "" }: StickyProps) => (
   <div
-    className={`relative md:sticky md:top-0 min-h-[100dvh] md:h-[100vh] flex items-start md:items-center pt-[calc(env(safe-area-inset-top)+7rem)] md:pt-0 pb-8 md:pb-0 ${className}`}
+    className={`relative lg:sticky lg:top-0 min-h-[100dvh] lg:h-[100vh] flex items-start lg:items-center pt-[calc(env(safe-area-inset-top)+7rem)] lg:pt-0 pb-8 lg:pb-0 ${className}`}
   >
     <div className={`w-full ${innerClass}`}>{children}</div>
   </div>
@@ -87,7 +87,7 @@ function Hero() {
             className="mx-auto max-w-6xl px-6 text-center"
           >
             {/* ===== CINEMATIC HERO COLLISION SEQUENCE ===== */}
-            <div className="mb-8 sm:mb-12 md:mb-16 flex items-center justify-center relative h-40 sm:h-56 md:h-64 lg:h-96 overflow-hidden">
+            <div className="mb-8 sm:mb-12 md:mb-16 flex items-center justify-center relative h-52 sm:h-64 md:h-72 lg:h-96 overflow-visible lg:overflow-hidden pt-2 sm:pt-3">
               
               {/* ===== CENTER ENERGY CORE - Pre-impact pulse ===== */}
               <motion.div
