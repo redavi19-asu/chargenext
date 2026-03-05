@@ -9,6 +9,9 @@ type StepOneMapProps = {
 
 export function StepOneMap({ defaultEmbedUrl }: StepOneMapProps) {
   const { location, isLoading, error } = useGeolocation(true);
+  const mapsUrl = location
+    ? `https://www.google.com/maps?q=${location.lat},${location.lng}`
+    : null;
 
   const formatCoordinates = (lat: number, lng: number) => {
     const latDir = lat >= 0 ? "N" : "S";
@@ -16,13 +19,6 @@ export function StepOneMap({ defaultEmbedUrl }: StepOneMapProps) {
     const latAbs = Math.abs(lat).toFixed(2);
     const lngAbs = Math.abs(lng).toFixed(2);
     return `${latAbs}°${latDir}, ${lngAbs}°${lngDir}`;
-  };
-
-  const handleViewLocation = () => {
-    if (location) {
-      const mapsUrl = `https://www.google.com/maps?q=${location.lat},${location.lng}`;
-      window.open(mapsUrl, "_blank", "noopener,noreferrer");
-    }
   };
 
   return (
@@ -47,14 +43,16 @@ export function StepOneMap({ defaultEmbedUrl }: StepOneMapProps) {
                 <span className="text-white/60"> (±{Math.round(location.accuracy)}m)</span>
               )}
             </p>
-            <button
-              onClick={handleViewLocation}
+            <a
+              href={mapsUrl ?? "#"}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-lg bg-cyan-600 hover:bg-cyan-500 px-4 py-2 text-white font-semibold text-sm transition-colors"
               title="Open Google Maps with your location"
             >
               <MapPin className="h-4 w-4" />
               View My Location
-            </button>
+            </a>
           </div>
         )}
 

@@ -14,7 +14,6 @@ import { BatteryMeter } from "@/components/ui/battery-meter";
 import { FloatingEmergencyButton } from "@/components/ui/floating-button";
 import { StepOneMap } from "@/components/step-one-map";
 import { CHARGENEXT_URLS } from "@/lib/constants";
-import { useGeolocation } from "@/lib/useGeolocation";
 
 const googleMapsEmbedUrl =
   "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3105.001839478255!2d-77.0368703!3d38.9071923!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89b7b7bcdf572b1f%3A0xefbdfd5714d0c857!2sWashington%2C%20DC!5e0!3m2!1sen!2sus!4v1730590800000!5m2!1sen!2sus";
@@ -68,16 +67,6 @@ function Hero() {
   const opacity = useTransform(scrollYProgress, [0, 0.6, 1], [1, 1, 0]);
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
 
-  const containerVariants = {
-    hidden: {},
-    visible: {
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0,
-      },
-    },
-  };
-
   return (
     <Section className="bg-black text-white overflow-hidden">
       <div ref={ref} className="relative h-[160vh]" style={{ position: "relative" }}>
@@ -87,7 +76,7 @@ function Hero() {
             className="mx-auto max-w-6xl px-6 text-center"
           >
             {/* ===== CINEMATIC HERO COLLISION SEQUENCE ===== */}
-            <div className="mb-8 sm:mb-12 md:mb-16 flex items-center justify-center relative h-52 sm:h-64 md:h-72 lg:h-96 overflow-visible lg:overflow-hidden pt-2 sm:pt-3">
+            <div className="mb-8 sm:mb-12 md:mb-16 flex items-center justify-center relative h-52 sm:h-64 md:h-72 lg:h-96 overflow-visible lg:overflow-hidden pt-2 sm:pt-3 pointer-events-none">
               
               {/* ===== CENTER ENERGY CORE - Pre-impact pulse ===== */}
               <motion.div
@@ -375,12 +364,14 @@ function Hero() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <Button
+                  <a
+                    href={CHARGENEXT_URLS.whatsappEmergency}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="rounded-xl px-8 py-6 text-base font-semibold bg-gradient-to-r from-cyan-500 to-sky-600 hover:from-cyan-400 hover:to-sky-500 shadow-lg shadow-cyan-500/50 transition-all"
-                    onClick={() => window.open(CHARGENEXT_URLS.whatsappEmergency, "_blank")}
                   >
                     🚨 Emergency Charge Now
-                  </Button>
+                  </a>
                 </motion.div>
                 <motion.div
                   whileHover={{ scale: 1.05 }}
@@ -665,12 +656,14 @@ function Pricing() {
                   <div className="mt-8 pt-6 border-t border-slate-200">
                     {tier.isEmergency ? (
                       <>
-                        <Button 
+                        <a
+                          href={CHARGENEXT_URLS.whatsappEmergency}
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className={`w-full rounded-xl py-3 font-semibold ${tier.accentColor} bg-red-100 hover:bg-red-200 transition-all`}
-                          onClick={() => window.open(CHARGENEXT_URLS.whatsappEmergency, '_blank')}
                         >
                           Open WhatsApp → Share Location
-                        </Button>
+                        </a>
                         <p className="mt-2 text-xs text-slate-600">
                           On WhatsApp: tap the 📎 → Location → Send Current Location
                         </p>
@@ -727,12 +720,14 @@ function FinalCTA() {
           </p>
           
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Button
+            <a
+              href={CHARGENEXT_URLS.whatsappEmergency}
+              target="_blank"
+              rel="noopener noreferrer"
               className="rounded-2xl px-8 py-6 text-base font-semibold"
-              onClick={() => window.open(CHARGENEXT_URLS.whatsappEmergency, '_blank')}
             >
               Emergency Request
-            </Button>
+            </a>
             <Button
               variant="secondary"
               className="rounded-2xl px-8 py-6 text-base font-semibold bg-white/10 text-white transition hover:bg-white/20"
@@ -754,7 +749,7 @@ function CTA() {
         <div>
           <h3 className="text-3xl font-semibold tracking-tight md:text-4xl">Ready when you are.</h3>
           <p className="mt-3 max-w-xl text-white/80">
-            Book a mobile charge in under a minute. We'll meet you where you are — parking lot, roadside, or driveway.
+            Book a mobile charge in under a minute. We&apos;ll meet you where you are — parking lot, roadside, or driveway.
           </p>
           <div className="mt-6 flex gap-3">
             <Button className="rounded-2xl px-6 py-6 text-base">Book a Charge</Button>
@@ -813,15 +808,15 @@ function MobileMenu({ onSchedule }: MobileMenuProps) {
           </nav>
 
           <div className="mt-4 space-y-2 border-t border-white/15 pt-4">
-            <Button
-              className="w-full rounded-lg bg-gradient-to-r from-cyan-500 to-sky-600 text-sm font-semibold"
-              onClick={() => {
-                window.open(CHARGENEXT_URLS.whatsappEmergency, "_blank");
-                closeMenu();
-              }}
+            <a
+              href={CHARGENEXT_URLS.whatsappEmergency}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={closeMenu}
+              className="inline-flex w-full items-center justify-center rounded-lg bg-gradient-to-r from-cyan-500 to-sky-600 px-4 py-2 text-sm font-semibold text-white"
             >
               Emergency
-            </Button>
+            </a>
             <Button
               variant="secondary"
               className="w-full rounded-lg border border-cyan-300/40 bg-white/10 text-sm font-semibold text-white transition hover:bg-white/20"
@@ -908,7 +903,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div id="top" className="bg-white text-slate-900">
+    <div id="top" className="relative bg-white text-slate-900">
       <ProgressBar />
       <MobileMenu onSchedule={() => window.dispatchEvent(new CustomEvent("openChargeModal"))} />
       <FloatingEmergencyButton whatsappLink={CHARGENEXT_URLS.whatsappEmergency} />

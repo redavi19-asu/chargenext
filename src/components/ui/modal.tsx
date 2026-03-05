@@ -12,7 +12,7 @@ type ModalProps = {
   selectedTier?: string | null;
 };
 
-export function Modal({ isOpen, onClose, children, title, selectedTier }: ModalProps) {
+export function Modal({ isOpen, onClose, children, title }: ModalProps) {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();

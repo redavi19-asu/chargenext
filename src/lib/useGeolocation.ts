@@ -73,8 +73,14 @@ export function useGeolocation(autoRequest = true): GeolocationState {
 
   useEffect(() => {
     if (autoRequest) {
-      requestLocation();
+      const timeoutId = window.setTimeout(() => {
+        requestLocation();
+      }, 0);
+
+      return () => window.clearTimeout(timeoutId);
     }
+
+    return undefined;
   }, [autoRequest, requestLocation]);
 
   return state;
