@@ -5,7 +5,7 @@ import type { ReactNode } from "react";
 import { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
-import { Zap, Plug, Car, MapPin, Smartphone, ShieldCheck } from "lucide-react";
+import { Zap, Plug, Car, MapPin, Smartphone, ShieldCheck, Menu, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -419,6 +419,7 @@ function Hero() {
 }
 
 type StoryPanelProps = {
+  id?: string;
   step: number;
   title: string;
   subtitle: string;
@@ -428,7 +429,7 @@ type StoryPanelProps = {
   invert?: boolean;
 };
 
-function StoryPanel({ step, title, subtitle, icon: Icon, image, media, invert }: StoryPanelProps) {
+function StoryPanel({ id, step, title, subtitle, icon: Icon, image, media, invert }: StoryPanelProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
   const yImg = useTransform(scrollYProgress, [0, 1], [60, -60]);
@@ -436,7 +437,7 @@ function StoryPanel({ step, title, subtitle, icon: Icon, image, media, invert }:
   const opacity = useTransform(scrollYProgress, [0, 0.25, 0.75, 1], [0, 1, 1, 0]);
 
   return (
-    <Section className="bg-white">
+    <Section id={id} className="bg-white">
       <div ref={ref} className="relative mx-auto max-w-6xl px-6 py-24 md:py-36">
         <div className={`grid items-center gap-10 md:grid-cols-2 ${invert ? "md:[&>*:first-child]:order-2" : ""}`}>
           <motion.div style={{ y: yTxt, opacity }}>
@@ -484,7 +485,7 @@ function Features() {
   ];
 
   return (
-    <Section className="bg-slate-50">
+    <Section id="features" className="bg-slate-50">
       <div className="mx-auto max-w-6xl px-6 py-24 md:py-32">
         <div className="mx-auto max-w-2xl text-center">
           <h3 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">Built for reliability</h3>
@@ -781,6 +782,63 @@ function CTA() {
   );
 }
 
+type MobileMenuProps = {
+  onSchedule: () => void;
+};
+
+function MobileMenu({ onSchedule }: MobileMenuProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const closeMenu = () => setIsOpen(false);
+
+  return (
+    <div className="fixed right-4 top-4 z-[60] lg:hidden">
+      <button
+        type="button"
+        aria-label={isOpen ? "Close menu" : "Open menu"}
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen((prev) => !prev)}
+        className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-cyan-300/40 bg-black/65 text-white backdrop-blur-md"
+      >
+        {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+      </button>
+
+      {isOpen ? (
+        <div className="mt-3 w-[260px] rounded-2xl border border-cyan-300/30 bg-slate-950/95 p-4 text-white shadow-2xl backdrop-blur-xl">
+          <nav className="space-y-2 text-sm">
+            <a href="#top" onClick={closeMenu} className="block rounded-lg px-3 py-2 transition hover:bg-white/10">Home</a>
+            <a href="#how-it-works" onClick={closeMenu} className="block rounded-lg px-3 py-2 transition hover:bg-white/10">How it works</a>
+            <a href="#features" onClick={closeMenu} className="block rounded-lg px-3 py-2 transition hover:bg-white/10">Features</a>
+            <a href="#pricing" onClick={closeMenu} className="block rounded-lg px-3 py-2 transition hover:bg-white/10">Pricing</a>
+          </nav>
+
+          <div className="mt-4 space-y-2 border-t border-white/15 pt-4">
+            <Button
+              className="w-full rounded-lg bg-gradient-to-r from-cyan-500 to-sky-600 text-sm font-semibold"
+              onClick={() => {
+                window.open(CHARGENEXT_URLS.whatsappEmergency, "_blank");
+                closeMenu();
+              }}
+            >
+              Emergency
+            </Button>
+            <Button
+              variant="secondary"
+              className="w-full rounded-lg border border-cyan-300/40 bg-white/10 text-sm font-semibold text-white transition hover:bg-white/20"
+              onClick={() => {
+                onSchedule();
+                closeMenu();
+              }}
+            >
+              Schedule
+            </Button>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPullUpModalOpen, setIsPullUpModalOpen] = useState(false);
@@ -850,12 +908,14 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="bg-white text-slate-900">
+    <div id="top" className="bg-white text-slate-900">
       <ProgressBar />
+      <MobileMenu onSchedule={() => window.dispatchEvent(new CustomEvent("openChargeModal"))} />
       <FloatingEmergencyButton whatsappLink={CHARGENEXT_URLS.whatsappEmergency} />
       
       <Hero />
       <StoryPanel
+        id="how-it-works"
         step={1}
         title="We find you fast"
         subtitle="Need help right now? Use WhatsApp to share your live location and message us for emergency charging. Just planning ahead? Use the request form for non-emergency service. Once we confirm the request, we'll send you a secure payment link for your deposit or service confirmation, and then we dispatch a tech."
