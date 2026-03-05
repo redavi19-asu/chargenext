@@ -2,13 +2,19 @@
 
 import Image from "next/image";
 import type { ReactNode } from "react";
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import { Zap, Plug, Car, MapPin, Smartphone, ShieldCheck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Modal } from "@/components/ui/modal";
+import { BatteryMeter } from "@/components/ui/battery-meter";
+import { FloatingEmergencyButton } from "@/components/ui/floating-button";
+import { StepOneMap } from "@/components/step-one-map";
+import { CHARGENEXT_URLS } from "@/lib/constants";
+import { useGeolocation } from "@/lib/useGeolocation";
 
 const googleMapsEmbedUrl =
   "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3105.001839478255!2d-77.0368703!3d38.9071923!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89b7b7bcdf572b1f%3A0xefbdfd5714d0c857!2sWashington%2C%20DC!5e0!3m2!1sen!2sus!4v1730590800000!5m2!1sen!2sus";
@@ -59,37 +65,299 @@ function Hero() {
   const opacity = useTransform(scrollYProgress, [0, 0.6, 1], [1, 1, 0]);
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
 
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0,
+      },
+    },
+  };
+
   return (
-    <Section className="bg-black text-white">
-      <div ref={ref} className="relative h-[160vh]">
-        <Sticky className="bg-[radial-gradient(90%_60%_at_50%_40%,rgba(56,189,248,0.20),rgba(0,0,0,0)_70%)]">
+    <Section className="bg-black text-white overflow-hidden">
+      <div ref={ref} className="relative h-[160vh]" style={{ position: "relative" }}>
+        <Sticky className="bg-[radial-gradient(ellipse_80%_60%_at_50%_40%,rgba(34,211,238,0.08),rgba(0,0,0,0)_70%)]">
           <motion.div
             style={{ y, opacity, scale }}
             className="mx-auto max-w-6xl px-6 text-center"
           >
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm">
-              <Zap className="h-4 w-4 text-cyan-300" />
-              <span className="text-white/90">Charge • Connect • Care</span>
-            </div>
-            <h1 className="text-4xl font-bold tracking-tight leading-[1.05] md:text-6xl">
-              Mobile EV charging, on demand —
-              <span className="bg-gradient-to-r from-cyan-300 via-sky-400 to-blue-500 bg-clip-text text-transparent">
-                {" "}
-                anywhere in the DMV
-              </span>
-            </h1>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-white/80 md:text-xl">
-              Triple C Emergency Charging Services brings the charge to you. Smooth dispatch, secure payment, real-time ETA.
-            </p>
-            <div className="mt-8 flex items-center justify-center gap-3">
-              <Button className="rounded-2xl px-6 py-6 text-base">Request a Charge</Button>
-              <Button
-                variant="secondary"
-                className="rounded-2xl px-6 py-6 text-base bg-white/10 text-white transition hover:bg-white/20"
+            {/* ===== CINEMATIC HERO COLLISION SEQUENCE ===== */}
+            <div className="mb-8 sm:mb-12 md:mb-16 flex items-center justify-center relative h-40 sm:h-56 md:h-64 lg:h-96 overflow-hidden">
+              
+              {/* ===== CENTER ENERGY CORE - Pre-impact pulse ===== */}
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20"
               >
-                How it works
-              </Button>
+                <motion.div
+                  animate={{ scale: [1, 1.08, 1] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+                  className="core-pulse relative"
+                  style={{
+                    width: "32px",
+                    height: "32px",
+                    borderRadius: "50%",
+                    background: "radial-gradient(circle, rgba(34, 211, 238, 0.9) 0%, rgba(56, 189, 248, 0.4) 100%)",
+                    backdropFilter: "blur(2px)",
+                  }}
+                />
+              </motion.div>
+
+              {/* ===== LIGHTNING ARC LINES - Strike on collision ===== */}
+              <motion.svg
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 1, 0.6, 0] }}
+                transition={{ duration: 0.7, delay: 1.3, ease: "easeOut" }}
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 pointer-events-none z-15"
+                viewBox="0 0 400 400"
+              >
+                {/* Vertical lightning strike */}
+                <motion.line
+                  x1="200"
+                  y1="50"
+                  x2="200"
+                  y2="350"
+                  stroke="rgba(34, 211, 238, 0.8)"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  filter="drop-shadow(0 0 10px rgba(34, 211, 238, 0.6))"
+                  animate={{ strokeDashoffset: [1000, 0, 0] }}
+                  transition={{ duration: 0.5, delay: 1.3 }}
+                  strokeDasharray="1000"
+                />
+                {/* Diagonal arc left */}
+                <motion.path
+                  d="M 200 200 Q 100 150, 80 100"
+                  stroke="rgba(56, 189, 248, 0.7)"
+                  strokeWidth="2"
+                  fill="none"
+                  strokeLinecap="round"
+                  filter="drop-shadow(0 0 8px rgba(56, 189, 248, 0.5))"
+                  animate={{ strokeDashoffset: [800, 0] }}
+                  transition={{ duration: 0.5, delay: 1.35 }}
+                  strokeDasharray="800"
+                />
+                {/* Diagonal arc right */}
+                <motion.path
+                  d="M 200 200 Q 300 150, 320 100"
+                  stroke="rgba(56, 189, 248, 0.7)"
+                  strokeWidth="2"
+                  fill="none"
+                  strokeLinecap="round"
+                  filter="drop-shadow(0 0 8px rgba(56, 189, 248, 0.5))"
+                  animate={{ strokeDashoffset: [800, 0] }}
+                  transition={{ duration: 0.5, delay: 1.35 }}
+                  strokeDasharray="800"
+                />
+              </motion.svg>
+
+              {/* ===== SCREEN FLASH OVERLAY - Blinding impact ===== */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 1, 0.5, 0] }}
+                transition={{ duration: 0.6, delay: 1.35, ease: "easeOut" }}
+                className="absolute inset-0 bg-white/70 pointer-events-none z-40"
+              />
+
+              {/* ===== SHOCKWAVE RING - Expanding circle ===== */}
+              <motion.div
+                initial={{ scale: 0.1, opacity: 1 }}
+                animate={{ scale: [0.1, 2.8, 3.5], opacity: [1, 0.5, 0] }}
+                transition={{ duration: 0.9, delay: 1.3, ease: "easeOut" }}
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-18"
+              >
+                <div
+                  className="rounded-full border-2 border-cyan-400"
+                  style={{
+                    width: "120px",
+                    height: "120px",
+                    boxShadow: "0 0 30px rgba(34, 211, 238, 0.6)",
+                  }}
+                />
+              </motion.div>
+
+              {/* ===== ELECTRIC BURST GLOW - Radiant energy ===== */}
+              <motion.div
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: [0.5, 2, 3], opacity: [0, 1, 0] }}
+                transition={{ duration: 0.8, delay: 1.32, ease: "easeOut" }}
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-17"
+              >
+                <div
+                  className="rounded-full blur-3xl"
+                  style={{
+                    width: "300px",
+                    height: "300px",
+                    background: "radial-gradient(circle, rgba(34, 211, 238, 0.6) 0%, rgba(56, 189, 248, 0.3) 50%, transparent 100%)",
+                  }}
+                />
+              </motion.div>
+
+              {/* ===== PARTICLE BURST - Sparks scatter ===== */}
+              {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => {
+                const angle = (i / 8) * Math.PI * 2;
+                const distance = 280;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                return (
+                  <motion.div
+                    key={`particle-${i}`}
+                    initial={{ x: 0, y: 0, opacity: 0, scale: 1 }}
+                    animate={{ x: tx, y: ty, opacity: [1, 0], scale: [1, 0] }}
+                    transition={{ duration: 1, delay: 1.35, ease: "easeOut" }}
+                    className="absolute top-1/2 left-1/2 w-3 h-3 rounded-full pointer-events-none z-25"
+                    style={{
+                      background: "radial-gradient(circle, rgba(34, 211, 238, 1) 0%, rgba(56, 189, 248, 0.5) 100%)",
+                      boxShadow: "0 0 12px rgba(34, 211, 238, 0.8)",
+                      marginLeft: "-6px",
+                      marginTop: "-6px",
+                    }}
+                  />
+                );
+              })}
+
+              {/* ===== RESIDUAL GLOW AURA - Lingers after impact ===== */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.6 }}
+                animate={{ opacity: [0, 1, 0.2], scale: [0.6, 1.5, 2] }}
+                transition={{ duration: 2, delay: 1.35, ease: "easeOut" }}
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-14"
+              >
+                <div
+                  className="rounded-full blur-3xl"
+                  style={{
+                    width: "500px",
+                    height: "500px",
+                    background: "radial-gradient(circle, rgba(34, 211, 238, 0.25) 0%, rgba(56, 189, 248, 0.1) 40%, transparent 100%)",
+                  }}
+                />
+              </motion.div>
+
+              {/* ===== LEFT TEXT - "Charge" ===== */}
+              <motion.div
+                initial={{ x: -800, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{
+                  duration: 1.3,
+                  ease: "easeIn",
+                  type: "tween",
+                }}
+                className="relative flex-shrink-0 z-30"
+              >
+                <h1 className="font-orbitron text-5xl sm:text-6xl md:text-8xl lg:text-[10rem] font-black tracking-tighter sm:tracking-tight text-white drop-shadow-2xl"
+                  style={{
+                    textShadow: "0 0 30px rgba(34, 211, 238, 0.3), 0 0 60px rgba(56, 189, 248, 0.1)",
+                    lineHeight: "1.1",
+                  }}
+                >
+                  Charge
+                </h1>
+              </motion.div>
+
+              {/* ===== RIGHT TEXT - "Next" ===== */}
+              <motion.div
+                initial={{ x: 800, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{
+                  duration: 1.3,
+                  ease: "easeIn",
+                  type: "tween",
+                }}
+                className="relative flex-shrink-0 z-30"
+              >
+                <motion.h1
+                  className="font-orbitron text-5xl sm:text-6xl md:text-8xl lg:text-[10rem] font-black tracking-tighter sm:tracking-tight bg-gradient-to-r from-cyan-200 via-cyan-300 to-sky-400 bg-clip-text text-transparent drop-shadow-2xl text-electric-shimmer idle-glow"
+                  animate={{ scale: [0.95, 1] }}
+                  transition={{ duration: 0.2, delay: 1.3 }}
+                  style={{
+                    lineHeight: "1.1",
+                  }}
+                >
+                  Next
+                </motion.h1>
+              </motion.div>
+
+              {/* ===== POST-COLLISION GLOW AROUND LOGO ===== */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: [0, 0.6, 0.2], scale: [0.8, 1.2, 1.1] }}
+                transition={{ duration: 1.5, delay: 1.5, ease: "easeOut" }}
+                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10 post-collision-pulse"
+                style={{
+                  width: "600px",
+                  height: "200px",
+                }}
+              >
+                <div
+                  className="w-full h-full rounded-full blur-2xl"
+                  style={{
+                    background: "radial-gradient(ellipse, rgba(34, 211, 238, 0.3) 0%, transparent 70%)",
+                  }}
+                />
+              </motion.div>
             </div>
+
+            {/* ===== CTA AND DESCRIPTION SECTION ===== */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 2.2 }}
+              className="mt-12"
+            >
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm backdrop-blur-sm border border-cyan-500/20">
+                <Zap className="h-4 w-4 text-cyan-300 animate-pulse" />
+                <span className="text-white/90">Emergency EV Charging • On Demand</span>
+              </div>
+              
+              <p className="mx-auto max-w-3xl text-2xl md:text-3xl font-orbitron font-bold text-white drop-shadow-lg mb-4">
+                <span className="bg-gradient-to-r from-cyan-200 to-sky-400 bg-clip-text text-transparent">
+                  Power When You Need It Most
+                </span>
+              </p>
+              
+              <p className="mx-auto max-w-2xl text-lg text-white/80 md:text-xl mb-6">
+                Mobile EV charging that comes to you — anywhere in the DMV region
+              </p>
+              <p className="mx-auto max-w-2xl text-base text-white/70 md:text-lg">
+                Real-time dispatch • Secure payment • Live tracking • Minutes, not hours
+              </p>
+
+              {/* ===== HERO CTA BUTTONS ===== */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 2.5 }}
+                className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
+              >
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Button
+                    className="rounded-xl px-8 py-6 text-base font-semibold bg-gradient-to-r from-cyan-500 to-sky-600 hover:from-cyan-400 hover:to-sky-500 shadow-lg shadow-cyan-500/50 transition-all"
+                    onClick={() => window.open(CHARGENEXT_URLS.whatsappEmergency, "_blank")}
+                  >
+                    🚨 Emergency Charge Now
+                  </Button>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Button
+                    variant="secondary"
+                    className="rounded-xl px-8 py-6 text-base font-semibold bg-white/15 text-white border border-cyan-400/40 hover:bg-white/25 hover:border-cyan-400/60 transition-all backdrop-blur-sm"
+                    onClick={() => window.dispatchEvent(new CustomEvent("openChargeModal"))}
+                  >
+                    📅 Schedule a Charge
+                  </Button>
+                </motion.div>
+              </motion.div>
+            </motion.div>
           </motion.div>
         </Sticky>
       </div>
@@ -116,7 +384,7 @@ function StoryPanel({ step, title, subtitle, icon: Icon, image, media, invert }:
 
   return (
     <Section className="bg-white">
-      <div ref={ref} className="mx-auto max-w-6xl px-6 py-24 md:py-36">
+      <div ref={ref} className="relative mx-auto max-w-6xl px-6 py-24 md:py-36">
         <div className={`grid items-center gap-10 md:grid-cols-2 ${invert ? "md:[&>*:first-child]:order-2" : ""}`}>
           <motion.div style={{ y: yTxt, opacity }}>
             <div className="mb-4 inline-flex items-center gap-2 text-sm text-sky-700">
@@ -217,15 +485,62 @@ function Pricing() {
                 <li>• Live ETA and updates</li>
                 <li>• Adapter included (popular EVs)</li>
               </ul>
-              <div className="mt-6 flex justify-center gap-3">
-                <Button className="rounded-xl py-5">Request Now</Button>
-                <Button variant="secondary" className="rounded-xl py-5">
-                  Talk to us
+              <div className="mt-6 flex flex-col gap-3">
+                <Button 
+                  className="rounded-xl py-5"
+                  onClick={() => window.open(CHARGENEXT_URLS.whatsappEmergency, '_blank')}
+                >
+                  Emergency Request (WhatsApp)
+                </Button>
+                <Button 
+                  variant="secondary" 
+                  className="rounded-xl py-5"
+                  onClick={() => window.dispatchEvent(new CustomEvent('openChargeModal'))}
+                >
+                  Non-Emergency Request
                 </Button>
               </div>
             </CardContent>
           </Card>
         </div>
+      </div>
+    </Section>
+  );
+}
+
+function FinalCTA() {
+  return (
+    <Section className="bg-slate-900 text-white">
+      <div className="mx-auto max-w-4xl px-6 py-24 text-center md:py-32">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.6 }}
+          transition={{ duration: 0.6 }}
+        >
+          <h2 className="text-4xl font-bold tracking-tight md:text-5xl">
+            Ready when you need power
+          </h2>
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-300">
+            Get emergency EV charging fast through WhatsApp, or schedule a non-emergency charge using our request form.
+          </p>
+          
+          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Button
+              className="rounded-2xl px-8 py-6 text-base font-semibold"
+              onClick={() => window.open(CHARGENEXT_URLS.whatsappEmergency, '_blank')}
+            >
+              Emergency Request
+            </Button>
+            <Button
+              variant="secondary"
+              className="rounded-2xl px-8 py-6 text-base font-semibold bg-white/10 text-white transition hover:bg-white/20"
+              onClick={() => window.dispatchEvent(new CustomEvent('openChargeModal'))}
+            >
+              Schedule a Charge
+            </Button>
+          </div>
+        </motion.div>
       </div>
     </Section>
   );
@@ -238,7 +553,7 @@ function CTA() {
         <div>
           <h3 className="text-3xl font-semibold tracking-tight md:text-4xl">Ready when you are.</h3>
           <p className="mt-3 max-w-xl text-white/80">
-            Book a mobile charge in under a minute. We’ll meet you where you are — parking lot, roadside, or driveway.
+            Book a mobile charge in under a minute. We'll meet you where you are — parking lot, roadside, or driveway.
           </p>
           <div className="mt-6 flex gap-3">
             <Button className="rounded-2xl px-6 py-6 text-base">Book a Charge</Button>
@@ -252,7 +567,7 @@ function CTA() {
         </div>
         <div className="relative w-full overflow-hidden rounded-3xl shadow-2xl ring-1 ring-white/10">
           <Image
-            src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1600&q=80"
+            src="https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1600&q=80"
             alt="EV charging at night"
             width={1280}
             height={960}
@@ -267,44 +582,147 @@ function CTA() {
 }
 
 export default function Home() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    const handleOpenModal = () => {
+      setIsModalOpen(true);
+    };
+
+    window.addEventListener('openChargeModal', handleOpenModal);
+    return () => window.removeEventListener('openChargeModal', handleOpenModal);
+  }, []);
+
   return (
     <div className="bg-white text-slate-900">
       <ProgressBar />
+      <FloatingEmergencyButton whatsappLink={CHARGENEXT_URLS.whatsappEmergency} />
+      
       <Hero />
       <StoryPanel
         step={1}
         title="We find you fast"
-        subtitle="Pin your location and tell us about your EV. Our dispatcher locks your ETA and sends a tech."
+        subtitle="Need help right now? Use WhatsApp to share your live location and message us for emergency charging. Just planning ahead? Use the request form for non-emergency service. Once we confirm the request, we'll send you a secure payment link for your deposit or service confirmation, and then we dispatch a tech."
         icon={MapPin}
         media={
-          <iframe
-            src={googleMapsEmbedUrl}
-            title="Washington DC coverage map"
-            className="h-[320px] w-full border-0 md:h-[420px]"
-            loading="lazy"
-            allowFullScreen
-            referrerPolicy="no-referrer-when-downgrade"
-          />
+          <StepOneMap defaultEmbedUrl={googleMapsEmbedUrl} />
         }
       />
       <StoryPanel
         step={2}
         title="We connect the charge"
-        subtitle="The tech arrives, verifies safety, and connects the right adapter — no fuss."
+        subtitle="The tech arrives with professional equipment, verifies safety protocols, and connects the right adapter for your EV."
         icon={Plug}
-        image="https://images.unsplash.com/photo-1522770179533-24471fcdba45?auto=format&fit=crop&w=1600&q=80"
+        image="https://images.unsplash.com/photo-1593941707882-a5bba14938c7?auto=format&fit=crop&w=1600&q=80"
         invert
       />
       <StoryPanel
         step={3}
         title="Power up and go"
-        subtitle="Top up enough to reach your next charger or get back on your route."
+        subtitle="Watch your battery come back to life. Get enough charge to reach your destination or the nearest charging station."
         icon={Car}
-        image="https://images.unsplash.com/photo-1518458028785-8fbcd101ebb9?auto=format&fit=crop&w=1600&q=80"
+        media={<BatteryMeter />}
       />
       <Features />
       <Pricing />
+      <FinalCTA />
       <CTA />
+
+      <Modal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)}
+        title="Request a Charge"
+      >
+        <form 
+          action={CHARGENEXT_URLS.formspreeEndpoint} 
+          method="POST"
+          className="space-y-4"
+        >
+          <div>
+            <label htmlFor="form-name" className="block text-sm font-medium text-slate-700">
+              Full Name
+            </label>
+            <input
+              type="text"
+              id="form-name"
+              name="name"
+              required
+              className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="form-email" className="block text-sm font-medium text-slate-700">
+              Email
+            </label>
+            <input
+              type="email"
+              id="form-email"
+              name="email"
+              required
+              className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="form-phone" className="block text-sm font-medium text-slate-700">
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              id="form-phone"
+              name="phone"
+              required
+              className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="form-location" className="block text-sm font-medium text-slate-700">
+              Location
+            </label>
+            <input
+              type="text"
+              id="form-location"
+              name="location"
+              required
+              placeholder="Street address or landmark"
+              className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="form-vehicle" className="block text-sm font-medium text-slate-700">
+              Vehicle Make & Model
+            </label>
+            <input
+              type="text"
+              id="form-vehicle"
+              name="vehicle"
+              required
+              placeholder="e.g., Tesla Model 3, Nissan Leaf"
+              className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="form-message" className="block text-sm font-medium text-slate-700">
+              Additional Details
+            </label>
+            <textarea
+              id="form-message"
+              name="message"
+              rows={3}
+              className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+              placeholder="Any special requirements or information..."
+            />
+          </div>
+
+          <Button type="submit" className="w-full rounded-xl py-6 text-base">
+            Submit Request
+          </Button>
+        </form>
+      </Modal>
     </div>
   );
 }

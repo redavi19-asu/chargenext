@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Orbitron } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,16 +12,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const orbitron = Orbitron({
-  variable: "--font-orbitron",
-  subsets: ["latin"],
-  weight: ["400", "700", "900"],
-});
-
 export const metadata: Metadata = {
-  title: "ChargeNext - Mobile EV Emergency Charging",
+  title: "ChargeNext | Mobile EV Charging",
   description:
-    "ChargeNext brings mobile EV charging to you across DC, Maryland, and Virginia with real-time dispatch and secure service.",
+    "ChargeNext delivers mobile EV charging across DC, Maryland, and Virginia with fast response and easy emergency contact.",
 };
 
 export default function RootLayout({
@@ -32,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${orbitron.variable} bg-white text-slate-900 antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} bg-white text-slate-900 antialiased`}
       >
         {children}
       </body>
