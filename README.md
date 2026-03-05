@@ -28,28 +28,22 @@ Open `http://localhost:3000` to preview the site. The primary implementation liv
 ### Deploying to GitHub Pages
 The project is configured for static export so it can run on GitHub Pages.
 
-1. Build the site (this also runs the export step):
+Recommended setup (root-friendly): GitHub Actions deployment
 
-	```bash
-	npm run build
-	```
+1. Commit and push `.github/workflows/deploy-pages.yml`.
+2. In GitHub: Settings -> Pages -> Build and deployment -> Source, choose `GitHub Actions`.
+3. Push to `main` and GitHub Actions will build and deploy `out/` automatically.
 
-	The fully static site will be written to `out/`.
+The build automatically sets `basePath`/`assetPrefix` to `/chargenext` in production. If you fork this repo under a different name, update `basePath` in `next.config.ts` to match your repository slug.
 
-2. To deploy from the `main` branch using GitHub Pages’ **docs** option, run:
+Legacy option (main/docs)
 
-	```bash
-	npm run build:pages
-	git add docs
-	git commit -m "Publish GitHub Pages build"
-	git push
-	```
-
-	The build script drops a `.nojekyll` file into `docs/` so GitHub Pages serves the `_next` assets correctly. Then configure GitHub Pages (Settings → Pages) to serve from the `main` branch `/docs` folder. The static site will resolve at `https://<username>.github.io/triplecccnew/`.
-
-	If you prefer using a dedicated `gh-pages` branch, continue pushing the `out/` folder contents to that branch instead.
-
-The build automatically sets `basePath`/`assetPrefix` to `/triplecccnew` in production. If you fork this repo under a different name, update `basePath` in `next.config.ts` to match your repository slug.
+```bash
+npm run build:pages
+git add docs
+git commit -m "Publish GitHub Pages build"
+git push
+```
 
 ### Project Notes
 - UI primitives such as `Button` and `Card` are in `src/components/ui`.
