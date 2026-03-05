@@ -36,7 +36,9 @@ type StickyProps = {
 };
 
 const Sticky = ({ children, className = "", innerClass = "" }: StickyProps) => (
-  <div className={`sticky top-0 h-[100vh] flex items-center ${className}`}>
+  <div
+    className={`sticky top-0 h-[100svh] sm:h-[100vh] flex items-start sm:items-center pt-[calc(env(safe-area-inset-top)+6rem)] sm:pt-0 ${className}`}
+  >
     <div className={`w-full ${innerClass}`}>{children}</div>
   </div>
 );
