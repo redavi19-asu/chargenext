@@ -9,8 +9,8 @@ const nextConfig: NextConfig = {
   },
   ...(isProd
     ? {
-        basePath: "/triplecccnew",
-        assetPrefix: "/triplecccnew/",
+        basePath: "/chargenext",
+        assetPrefix: "/chargenext/",
       }
     : {}),
 };

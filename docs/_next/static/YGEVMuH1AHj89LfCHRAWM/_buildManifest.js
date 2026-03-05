@@ -3,8 +3,8 @@ self.__BUILD_MANIFEST = {
     "afterFiles": [],
     "beforeFiles": [
       {
-        "source": "/triplecccnew//_next/:path+",
-        "destination": "/triplecccnew/_next/:path+"
+        "source": "/chargenext//_next/:path+",
+        "destination": "/chargenext/_next/:path+"
       }
     ],
     "fallback": []
