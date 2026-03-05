@@ -317,3 +317,55 @@ body {
     animation-delay: 1.2s;
   }
 }
+
+/* ===== RESPONSIVE OVERFLOW FIXES ===== */
+
+html,
+body {
+  overflow-x: hidden;
+}
+
+/* iPad portrait ONLY: prevent hero logo/title from clipping */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+  .hero,
+  .hero * {
+    max-width: 100%;
+  }
+
+  .hero-title, 
+  .brand-title,
+  .logo-text {
+    font-size: 64px;      /* adjust if needed */
+    line-height: 1.05;
+    letter-spacing: 0;
+    transform: none;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: center;
+  }
+
+  .hero {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+@keyframes wa-alert-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(245, 158, 11, 0.2), 0 10px 24px rgba(15, 23, 42, 0.16);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(245, 158, 11, 0.38), 0 12px 28px rgba(15, 23, 42, 0.2);
+  }
+}
+
+.wa-alert-banner {
+  animation: wa-alert-pulse 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wa-alert-banner {
+    animation: none;
+  }
+}

@@ -22,10 +22,11 @@ const googleMapsEmbedUrl =
 type SectionProps = {
   children: ReactNode;
   className?: string;
+  id?: string;
 };
 
-const Section = ({ children, className = "" }: SectionProps) => (
-  <section className={`relative w-full ${className}`}>{children}</section>
+const Section = ({ children, className = "", id }: SectionProps) => (
+  <section id={id} className={`relative w-full ${className}`}>{children}</section>
 );
 
 type StickyProps = {
@@ -306,8 +307,43 @@ function Hero() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 2.2 }}
-              className="mt-12"
+              className="mt-10"
             >
+              <div className="wa-alert-banner mx-auto mb-5 w-full max-w-[760px] rounded-2xl border border-amber-300/60 bg-gradient-to-r from-amber-100 to-yellow-100 px-4 py-3 text-center shadow-lg">
+                <h3 className="text-sm font-semibold text-amber-900 sm:text-base">
+                  ⚠️ Emergency Requests Use WhatsApp
+                </h3>
+                <p className="mt-1 text-xs text-amber-900/90 sm:text-[13px]">
+                  Fastest way to share your exact location so we can navigate to you.
+                </p>
+
+                <div className="mt-3 flex flex-col items-center justify-center gap-2 sm:flex-row">
+                  <a
+                    href="https://apps.apple.com/app/whatsapp-messenger/id310633997"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex h-8 w-full items-center justify-center rounded-lg border border-amber-400 bg-white/80 px-3 text-xs font-semibold text-amber-900 transition hover:bg-white sm:w-auto"
+                  >
+                    Get WhatsApp (iPhone)
+                  </a>
+                  <a
+                    href="https://play.google.com/store/apps/details?id=com.whatsapp"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex h-8 w-full items-center justify-center rounded-lg border border-amber-400 bg-white/80 px-3 text-xs font-semibold text-amber-900 transition hover:bg-white sm:w-auto"
+                  >
+                    Get WhatsApp (Android)
+                  </a>
+                </div>
+
+                <p className="mt-2 text-xs text-amber-900/80">
+                  Already have WhatsApp? Tap Emergency Charge Now.
+                </p>
+                <p className="mt-0.5 text-xs font-medium text-amber-900">
+                  No WhatsApp? Call/Text: (###) ###-####
+                </p>
+              </div>
+
               <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm backdrop-blur-sm border border-cyan-500/20">
                 <Zap className="h-4 w-4 text-cyan-300 animate-pulse" />
                 <span className="text-white/90">Emergency EV Charging • On Demand</span>
@@ -331,7 +367,7 @@ function Hero() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 2.5 }}
-                className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row"
+                className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row flex-wrap"
               >
                 <motion.div
                   whileHover={{ scale: 1.05 }}
@@ -354,6 +390,21 @@ function Hero() {
                     onClick={() => window.dispatchEvent(new CustomEvent("openChargeModal"))}
                   >
                     📅 Schedule a Charge
+                  </Button>
+                </motion.div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <Button
+                    variant="secondary"
+                    className="rounded-xl px-8 py-6 text-base font-semibold bg-white/15 text-white border border-cyan-400/40 hover:bg-white/25 hover:border-cyan-400/60 transition-all backdrop-blur-sm"
+                    onClick={() => {
+                      const pricingElement = document.getElementById("pricing");
+                      pricingElement?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                  >
+                    💰 View Service Tiers
                   </Button>
                 </motion.div>
               </motion.div>
@@ -462,46 +513,193 @@ function Features() {
 }
 
 function Pricing() {
+  const pricingTiers = [
+    {
+      id: "emergency-boost",
+      name: "Emergency Boost",
+      price: "$59",
+      priceNote: "per session",
+      description: "For immediate assistance",
+      bullets: [
+        "Dispatch within standard hours",
+        "Live ETA and updates",
+        "Adapter included",
+      ],
+      caution: null,
+      isEmergency: true,
+      bgColor: "bg-red-50",
+      borderColor: "border-red-200",
+      accentColor: "text-red-600",
+    },
+    {
+      id: "extended-boost",
+      name: "Extended Boost",
+      price: "$89",
+      priceNote: "per session",
+      description: "Extra range for longer drives",
+      bullets: [
+        "Up to 60 minutes charging",
+        "Live tracking included",
+        "Ideal for continuing your trip",
+        "All connectors available",
+      ],
+      caution: null,
+      isEmergency: false,
+      bgColor: "bg-orange-50",
+      borderColor: "border-orange-200",
+      accentColor: "text-orange-600",
+    },
+    {
+      id: "full-charge-session",
+      name: "Full Charge Session",
+      price: "$129",
+      priceNote: "per session",
+      description: "Scheduled charging service",
+      bullets: [
+        "Up to 2–3 hours charging",
+        "Best for home or work",
+        "Scheduled convenience",
+        "Real-time monitoring",
+      ],
+      caution: "⚠ Charging time depends on vehicle battery size.",
+      isEmergency: false,
+      bgColor: "bg-blue-50",
+      borderColor: "border-blue-200",
+      accentColor: "text-blue-600",
+    },
+    {
+      id: "pull-up-boost",
+      name: "Pull-Up Boost",
+      price: "Starting at $25",
+      priceNote: "per session",
+      description: "Quick boost while you wait",
+      bullets: [
+        "10–20 mile quick boost",
+        "15–20 minute session",
+        "Perfect for top-ups",
+        "Available when our truck is nearby",
+      ],
+      caution: null,
+      isEmergency: false,
+      bgColor: "bg-green-50",
+      borderColor: "border-green-200",
+      accentColor: "text-green-600",
+    },
+    {
+      id: "fleet-services",
+      name: "Fleet Services",
+      price: "Custom Quote",
+      priceNote: "Contact for details",
+      description: "For multiple vehicles",
+      bullets: [
+        "Bulk service discounts",
+        "Dedicated support",
+        "Flexible scheduling",
+        "Invoice billing available",
+      ],
+      caution: null,
+      isEmergency: false,
+      bgColor: "bg-purple-50",
+      borderColor: "border-purple-200",
+      accentColor: "text-purple-600",
+    },
+  ];
+
   return (
-    <Section className="bg-white">
-      <div className="mx-auto max-w-6xl px-6 py-24 md:py-36">
-        <div className="mb-10 text-center">
+    <Section id="pricing" className="bg-white">
+      <div className="mx-auto max-w-7xl px-6 py-24 md:py-36">
+        <div className="mb-16 text-center">
           <h3 className="text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">
             Simple, transparent pricing
           </h3>
           <p className="mt-3 text-slate-600">Pay once dispatch is confirmed — no hidden fees.</p>
         </div>
-        <div className="flex justify-center">
-          <Card className="max-w-lg rounded-3xl border-slate-200 shadow-lg">
-            <CardContent className="p-8 text-center">
-              <Plug className="mx-auto h-8 w-8 text-sky-600" />
-              <h4 className="mt-4 font-semibold text-slate-900">Emergency Charge — Flat</h4>
-              <div className="mt-4 flex items-baseline justify-center gap-2">
-                <span className="text-4xl font-bold tracking-tight">$149</span>
-                <span className="text-slate-500">+ per-mile after 15mi</span>
-              </div>
-              <ul className="mt-6 space-y-2 text-left text-sm text-slate-600">
-                <li>• Dispatch within standard hours</li>
-                <li>• Live ETA and updates</li>
-                <li>• Adapter included (popular EVs)</li>
-              </ul>
-              <div className="mt-6 flex flex-col gap-3">
-                <Button 
-                  className="rounded-xl py-5"
-                  onClick={() => window.open(CHARGENEXT_URLS.whatsappEmergency, '_blank')}
-                >
-                  Emergency Request (WhatsApp)
-                </Button>
-                <Button 
-                  variant="secondary" 
-                  className="rounded-xl py-5"
-                  onClick={() => window.dispatchEvent(new CustomEvent('openChargeModal'))}
-                >
-                  Non-Emergency Request
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+        
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:gap-8">
+          {pricingTiers.map((tier, index) => (
+            <motion.div
+              key={tier.id}
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              viewport={{ once: true, amount: 0.6 }}
+              transition={{ duration: 0.5, delay: index * 0.08 }}
+            >
+              <Card className={`rounded-2xl h-full shadow-md transition-all hover:shadow-lg border-2 ${tier.borderColor} ${tier.bgColor}`}>
+                <CardContent className="p-6 flex flex-col h-full">
+                  <div className="flex-1">
+                    <div className={`inline-block rounded-lg px-3 py-1 text-xs font-semibold ${tier.accentColor} bg-white/60`}>
+                      {tier.description}
+                    </div>
+                    <h4 className="mt-4 text-2xl font-bold text-slate-900">{tier.name}</h4>
+                    
+                    <div className="mt-4 flex items-baseline gap-2">
+                      <span className="text-3xl font-bold tracking-tight text-slate-900">
+                        {tier.price}
+                      </span>
+                      {tier.priceNote && (
+                        <span className="text-sm text-slate-600">{tier.priceNote}</span>
+                      )}
+                    </div>
+                    
+                    <ul className="mt-6 space-y-3">
+                      {tier.bullets.map((bullet, i) => (
+                        <li key={i} className="flex items-start gap-3">
+                          <div className={`mt-1 rounded-full ${tier.accentColor} bg-white/70 flex-shrink-0`}>
+                            <svg className="h-4 w-4 p-0.5" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            </svg>
+                          </div>
+                          <span className="text-sm text-slate-700">{bullet}</span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    {tier.caution && (
+                      <p className="mt-4 text-xs text-slate-600 italic">{tier.caution}</p>
+                    )}
+                  </div>
+                  
+                  <div className="mt-8 pt-6 border-t border-slate-200">
+                    {tier.isEmergency ? (
+                      <>
+                        <Button 
+                          className={`w-full rounded-xl py-3 font-semibold ${tier.accentColor} bg-red-100 hover:bg-red-200 transition-all`}
+                          onClick={() => window.open(CHARGENEXT_URLS.whatsappEmergency, '_blank')}
+                        >
+                          Open WhatsApp → Share Location
+                        </Button>
+                        <p className="mt-2 text-xs text-slate-600">
+                          On WhatsApp: tap the 📎 → Location → Send Current Location
+                        </p>
+                      </>
+                    ) : tier.id === "pull-up-boost" ? (
+                      <Button
+                        variant="secondary"
+                        className={`w-full rounded-xl py-3 font-semibold ${tier.accentColor} bg-white border-2 ${tier.borderColor} hover:${tier.bgColor} transition-all`}
+                        onClick={() => window.dispatchEvent(new CustomEvent("openPullUpCheckIn"))}
+                      >
+                        I&apos;m Here Now
+                      </Button>
+                    ) : (
+                      <Button 
+                        variant="secondary"
+                        className={`w-full rounded-xl py-3 font-semibold ${tier.accentColor} bg-white border-2 ${tier.borderColor} hover:${tier.bgColor} transition-all`}
+                        onClick={() => window.dispatchEvent(new CustomEvent('openChargeModal', { detail: { tier: tier.id, tierName: tier.name } }))}
+                      >
+                        Request {tier.name}
+                      </Button>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="mt-12 text-center">
+          <p className="text-sm text-slate-500">
+            Pricing may vary depending on distance, vehicle type, battery size, and service time.
+          </p>
         </div>
       </div>
     </Section>
@@ -583,14 +781,70 @@ function CTA() {
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPullUpModalOpen, setIsPullUpModalOpen] = useState(false);
+  const [selectedTier, setSelectedTier] = useState<string | null>(null);
+  const [gpsLatitude, setGpsLatitude] = useState("");
+  const [gpsLongitude, setGpsLongitude] = useState("");
+  const [gpsAccuracy, setGpsAccuracy] = useState("");
+  const [gpsMapsLink, setGpsMapsLink] = useState("");
+  const [gpsDetected, setGpsDetected] = useState(false);
 
   useEffect(() => {
-    const handleOpenModal = () => {
+    const handleOpenModal = (event: Event) => {
+      const customEvent = event as CustomEvent;
+      setSelectedTier(customEvent.detail?.tier || null);
+      setIsPullUpModalOpen(false);
       setIsModalOpen(true);
+
+      setGpsDetected(false);
+      setGpsLatitude("");
+      setGpsLongitude("");
+      setGpsAccuracy("");
+      setGpsMapsLink("");
+
+      if (!navigator.geolocation) {
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const lat = position.coords.latitude.toFixed(6);
+          const lng = position.coords.longitude.toFixed(6);
+          const accuracy = Math.round(position.coords.accuracy).toString();
+
+          setGpsLatitude(lat);
+          setGpsLongitude(lng);
+          setGpsAccuracy(accuracy);
+          setGpsMapsLink(`https://www.google.com/maps?q=${lat},${lng}`);
+          setGpsDetected(true);
+        },
+        () => {
+          setGpsDetected(false);
+          setGpsLatitude("");
+          setGpsLongitude("");
+          setGpsAccuracy("");
+          setGpsMapsLink("");
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0,
+        }
+      );
+    };
+
+    const handleOpenPullUpCheckIn = () => {
+      setSelectedTier("pull-up-boost");
+      setIsModalOpen(false);
+      setIsPullUpModalOpen(true);
     };
 
     window.addEventListener('openChargeModal', handleOpenModal);
-    return () => window.removeEventListener('openChargeModal', handleOpenModal);
+    window.addEventListener("openPullUpCheckIn", handleOpenPullUpCheckIn);
+    return () => {
+      window.removeEventListener('openChargeModal', handleOpenModal);
+      window.removeEventListener("openPullUpCheckIn", handleOpenPullUpCheckIn);
+    };
   }, []);
 
   return (
@@ -630,14 +884,32 @@ export default function Home() {
 
       <Modal 
         isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)}
+        onClose={() => {
+          setIsModalOpen(false);
+          setSelectedTier(null);
+        }}
         title="Request a Charge"
+        selectedTier={selectedTier}
       >
         <form 
           action={CHARGENEXT_URLS.formspreeEndpoint} 
           method="POST"
           className="space-y-4"
         >
+          {selectedTier && (
+            <div className="mb-4 rounded-lg bg-sky-50 border border-sky-200 p-4">
+              <p className="text-sm font-medium text-sky-900">
+                Selected Service: <span className="font-bold capitalize">{selectedTier.replace(/-/g, ' ')}</span>
+              </p>
+            </div>
+          )}
+          
+          <input type="hidden" name="service_tier" value={selectedTier || ''} />
+          <input type="hidden" name="latitude" value={gpsLatitude} />
+          <input type="hidden" name="longitude" value={gpsLongitude} />
+          <input type="hidden" name="accuracy" value={gpsAccuracy} />
+          <input type="hidden" name="maps_link" value={gpsMapsLink} />
+
           <div>
             <label htmlFor="form-name" className="block text-sm font-medium text-slate-700">
               Full Name
@@ -689,6 +961,11 @@ export default function Home() {
               placeholder="Street address or landmark"
               className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
             />
+            {gpsDetected && (
+              <p className="mt-2 text-xs text-emerald-700">
+                Detected GPS saved with your request ✅ ({gpsLatitude}, {gpsLongitude})
+              </p>
+            )}
           </div>
 
           <div>
@@ -720,6 +997,99 @@ export default function Home() {
 
           <Button type="submit" className="w-full rounded-xl py-6 text-base">
             Submit Request
+          </Button>
+        </form>
+      </Modal>
+
+      <Modal
+        isOpen={isPullUpModalOpen}
+        onClose={() => setIsPullUpModalOpen(false)}
+        title="Pull-Up Boost Check-In"
+      >
+        <form
+          action={CHARGENEXT_URLS.formspreeEndpoint}
+          method="POST"
+          className="space-y-4"
+        >
+          <input type="hidden" name="service_tier" value="pull-up-boost" />
+
+          <p className="rounded-lg bg-sky-50 border border-sky-200 p-4 text-sm text-sky-900">
+            You&apos;re at the ChargeNext truck. Fill this quick check-in so we can start your charging session.
+          </p>
+
+          <div>
+            <label htmlFor="pullup-vehicle-type" className="block text-sm font-medium text-slate-700">
+              Vehicle Type
+            </label>
+            <select
+              id="pullup-vehicle-type"
+              name="vehicle_type"
+              required
+              defaultValue=""
+              className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+            >
+              <option value="" disabled>
+                Select vehicle type
+              </option>
+              <option value="Tesla">Tesla</option>
+              <option value="Ford">Ford</option>
+              <option value="Rivian">Rivian</option>
+              <option value="Hyundai">Hyundai</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="pullup-license-plate" className="block text-sm font-medium text-slate-700">
+              License Plate (optional)
+            </label>
+            <input
+              type="text"
+              id="pullup-license-plate"
+              name="license_plate"
+              className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="pullup-phone" className="block text-sm font-medium text-slate-700">
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              id="pullup-phone"
+              name="phone"
+              required
+              className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="pullup-email" className="block text-sm font-medium text-slate-700">
+              Email (for receipt)
+            </label>
+            <input
+              type="email"
+              id="pullup-email"
+              name="email"
+              className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="pullup-stall" className="block text-sm font-medium text-slate-700">
+              Parking Spot or Stall Number (optional)
+            </label>
+            <input
+              type="text"
+              id="pullup-stall"
+              name="parking_spot"
+              className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
+            />
+          </div>
+
+          <Button type="submit" className="w-full rounded-xl py-6 text-base">
+            Start Charging Session
           </Button>
         </form>
       </Modal>

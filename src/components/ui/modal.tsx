@@ -9,9 +9,10 @@ type ModalProps = {
   onClose: () => void;
   children: ReactNode;
   title?: string;
+  selectedTier?: string | null;
 };
 
-export function Modal({ isOpen, onClose, children, title }: ModalProps) {
+export function Modal({ isOpen, onClose, children, title, selectedTier }: ModalProps) {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
