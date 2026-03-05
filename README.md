@@ -1,4 +1,4 @@
-## Triple C Emergency Charging Services
+## ChargeNext
 
 This repository contains the ChargeNext marketing site: a scroll-driven story that showcases on-demand EV charging across the DC, Maryland, and Virginia region. The experience features a sticky hero, animated story panels, feature highlights, transparent pricing, and clear calls to action.
 
