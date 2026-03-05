@@ -1,7 +1,11 @@
 const nextConfig = {
   output: "export",
-  basePath: "/chargenext",
-  assetPrefix: "/chargenext/",
+  ...(process.env.NODE_ENV === "production"
+    ? {
+        basePath: "/chargenext",
+        assetPrefix: "/chargenext/",
+      }
+    : {}),
   images: {
     unoptimized: true,
   },
