@@ -660,7 +660,7 @@ function Pricing() {
                           href={CHARGENEXT_URLS.whatsappEmergency}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={`w-full rounded-xl py-3 font-semibold ${tier.accentColor} bg-red-100 hover:bg-red-200 transition-all`}
+                          className="cta-btn cta-btn--danger"
                         >
                           Open WhatsApp → Share Location
                         </a>
@@ -671,7 +671,7 @@ function Pricing() {
                     ) : tier.id === "pull-up-boost" ? (
                       <Button
                         variant="secondary"
-                        className={`w-full rounded-xl py-3 font-semibold ${tier.accentColor} bg-white border-2 ${tier.borderColor} hover:${tier.bgColor} transition-all`}
+                        className="cta-btn cta-btn--blue"
                         onClick={() => window.dispatchEvent(new CustomEvent("openPullUpCheckIn"))}
                       >
                         I&apos;m Here Now
@@ -679,7 +679,7 @@ function Pricing() {
                     ) : (
                       <Button 
                         variant="secondary"
-                        className={`w-full rounded-xl py-3 font-semibold ${tier.accentColor} bg-white border-2 ${tier.borderColor} hover:${tier.bgColor} transition-all`}
+                        className="cta-btn cta-btn--blue"
                         onClick={() => window.dispatchEvent(new CustomEvent('openChargeModal', { detail: { tier: tier.id, tierName: tier.name } }))}
                       >
                         Request {tier.name}
