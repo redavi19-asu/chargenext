@@ -14,6 +14,7 @@ import { BatteryMeter } from "@/components/ui/battery-meter";
 import { FloatingEmergencyButton } from "@/components/ui/floating-button";
 import { StepOneMap } from "@/components/step-one-map";
 import { CHARGENEXT_URLS } from "@/lib/constants";
+import { startEmergencyCharge } from "@/lib/checkout";
 
 const googleMapsEmbedUrl =
   "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3105.001839478255!2d-77.0368703!3d38.9071923!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89b7b7bcdf572b1f%3A0xefbdfd5714d0c857!2sWashington%2C%20DC!5e0!3m2!1sen!2sus!4v1730590800000!5m2!1sen!2sus";
@@ -364,14 +365,12 @@ function Hero() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <a
-                    href={CHARGENEXT_URLS.whatsappEmergency}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Button
                     className="rounded-xl px-8 py-6 text-base font-semibold bg-gradient-to-r from-cyan-500 to-sky-600 hover:from-cyan-400 hover:to-sky-500 shadow-lg shadow-cyan-500/50 transition-all"
+                    onClick={startEmergencyCharge}
                   >
                     🚨 Emergency Charge Now
-                  </a>
+                  </Button>
                 </motion.div>
                 <motion.div
                   whileHover={{ scale: 1.05 }}
@@ -656,16 +655,14 @@ function Pricing() {
                   <div className="mt-8 pt-6 border-t border-slate-200">
                     {tier.isEmergency ? (
                       <>
-                        <a
-                          href={CHARGENEXT_URLS.whatsappEmergency}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <Button
+                          onClick={startEmergencyCharge}
                           className="cta-btn cta-btn--danger"
                         >
-                          Open WhatsApp → Share Location
-                        </a>
+                          Emergency Charge Now
+                        </Button>
                         <p className="mt-2 text-xs text-slate-600">
-                          On WhatsApp: tap the 📎 → Location → Send Current Location
+                          Instant checkout and driver dispatch
                         </p>
                       </>
                     ) : tier.id === "pull-up-boost" ? (
@@ -720,14 +717,12 @@ function FinalCTA() {
           </p>
           
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <a
-              href={CHARGENEXT_URLS.whatsappEmergency}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Button
+              onClick={startEmergencyCharge}
               className="rounded-2xl px-8 py-6 text-base font-semibold"
             >
               Emergency Request
-            </a>
+            </Button>
             <Button
               variant="secondary"
               className="rounded-2xl px-8 py-6 text-base font-semibold bg-white/10 text-white transition hover:bg-white/20"
@@ -808,15 +803,15 @@ function MobileMenu({ onSchedule }: MobileMenuProps) {
           </nav>
 
           <div className="mt-4 space-y-2 border-t border-white/15 pt-4">
-            <a
-              href={CHARGENEXT_URLS.whatsappEmergency}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={closeMenu}
+            <Button
+              onClick={() => {
+                startEmergencyCharge();
+                closeMenu();
+              }}
               className="inline-flex w-full items-center justify-center rounded-lg bg-gradient-to-r from-cyan-500 to-sky-600 px-4 py-2 text-sm font-semibold text-white"
             >
               Emergency
-            </a>
+            </Button>
             <Button
               variant="secondary"
               className="w-full rounded-lg border border-cyan-300/40 bg-white/10 text-sm font-semibold text-white transition hover:bg-white/20"
@@ -843,6 +838,13 @@ export default function Home() {
   const [gpsAccuracy, setGpsAccuracy] = useState("");
   const [gpsMapsLink, setGpsMapsLink] = useState("");
   const [gpsDetected, setGpsDetected] = useState(false);
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    if (searchParams.get('paid') === '1') {
+      alert('Payment received. We are now dispatching a driver.');
+    }
+  }, []);
 
   useEffect(() => {
     const handleOpenModal = (event: Event) => {
@@ -906,7 +908,7 @@ export default function Home() {
     <div id="top" className="relative bg-white text-slate-900">
       <ProgressBar />
       <MobileMenu onSchedule={() => window.dispatchEvent(new CustomEvent("openChargeModal"))} />
-      <FloatingEmergencyButton whatsappLink={CHARGENEXT_URLS.whatsappEmergency} />
+      <FloatingEmergencyButton />
       
       <Hero />
       <StoryPanel
