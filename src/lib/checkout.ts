@@ -4,8 +4,9 @@ import { readEmergencyCheckoutDraft, saveCheckoutSessionId } from "@/lib/emergen
 export async function startEmergencyCharge() {
   try {
     const draft = readEmergencyCheckoutDraft();
-    const successUrl = new URL("payment/success", window.location.href.endsWith("/") ? window.location.href : `${window.location.href}/`).toString();
-    const cancelUrl = window.location.href;
+    const currentUrl = new URL(window.location.href);
+    const successUrl = `${currentUrl.origin}${currentUrl.pathname}?payment=success&session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${currentUrl.origin}${currentUrl.pathname}`;
 
     const data = await createEmergencyCheckoutSession({
       successUrl,

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { useRef, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import { Zap, Plug, Car, MapPin, Smartphone, ShieldCheck, Menu, X } from "lucide-react";
@@ -10,12 +11,14 @@ import { Zap, Plug, Car, MapPin, Smartphone, ShieldCheck, Menu, X } from "lucide
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Modal } from "@/components/ui/modal";
+import { PaymentVerificationModal } from "@/components/payment-verification-modal";
 import { BatteryMeter } from "@/components/ui/battery-meter";
 import { FloatingEmergencyButton } from "@/components/ui/floating-button";
 import { StepOneMap } from "@/components/step-one-map";
 import { CHARGENEXT_URLS } from "@/lib/constants";
 import { startEmergencyCharge } from "@/lib/checkout";
-import { saveDetectedEmergencyLocation } from "@/lib/emergency-flow";
+import { readCheckoutSessionId, readEmergencyCheckoutDraft, saveDetectedEmergencyLocation, type EmergencyLocation, type EmergencyVerificationRecord } from "@/lib/emergency-flow";
+import { verifyStripeCheckoutSession } from "@/lib/emergency-api";
 
 const googleMapsEmbedUrl =
   "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3105.001839478255!2d-77.0368703!3d38.9071923!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89b7b7bcdf572b1f%3A0xefbdfd5714d0c857!2sWashington%2C%20DC!5e0!3m2!1sen!2sus!4v1730590800000!5m2!1sen!2sus";
@@ -828,6 +831,7 @@ function MobileMenu({ onSchedule }: MobileMenuProps) {
 }
 
 export default function Home() {
+  const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPullUpModalOpen, setIsPullUpModalOpen] = useState(false);
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
@@ -836,6 +840,13 @@ export default function Home() {
   const [gpsAccuracy, setGpsAccuracy] = useState("");
   const [gpsMapsLink, setGpsMapsLink] = useState("");
   const [gpsDetected, setGpsDetected] = useState(false);
+  const [paymentVerificationOpen, setPaymentVerificationOpen] = useState(false);
+  const [paymentVerificationLoading, setPaymentVerificationLoading] = useState(false);
+  const [paymentVerificationError, setPaymentVerificationError] = useState("");
+  const [paymentSessionId, setPaymentSessionId] = useState("");
+  const [paymentRequestTimestamp, setPaymentRequestTimestamp] = useState("");
+  const [paymentStatus, setPaymentStatus] = useState("paid");
+  const [paymentLocation, setPaymentLocation] = useState<EmergencyLocation | null>(null);
 
   useEffect(() => {
     const handleOpenModal = (event: Event) => {
@@ -902,11 +913,109 @@ export default function Home() {
     };
   }, []);
 
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const hasReturnParams = ["session_id", "checkout_session_id", "paid", "payment"].some((key) => searchParams.has(key));
+
+    if (!hasReturnParams) {
+      return;
+    }
+
+    const sessionId = searchParams.get("session_id") || searchParams.get("checkout_session_id") || readCheckoutSessionId();
+
+    if (!sessionId) {
+      setPaymentVerificationError("Stripe returned without a checkout session id.");
+      return;
+    }
+
+    let isActive = true;
+
+    const verifyReturnedPayment = async () => {
+      setPaymentVerificationLoading(true);
+      setPaymentVerificationError("");
+
+      try {
+        const response = await verifyStripeCheckoutSession(sessionId);
+        const paid = response.paid === true || response.valid === true || response.paymentStatus === "paid" || response.status === "paid";
+
+        if (!paid) {
+          throw new Error(response.message || "Payment was not confirmed by the backend.");
+        }
+
+        if (!isActive) {
+          return;
+        }
+
+        const draft = readEmergencyCheckoutDraft();
+        const returnedLocation = response.location || draft?.location || null;
+
+        if (returnedLocation) {
+          saveDetectedEmergencyLocation(returnedLocation);
+        }
+
+        setPaymentSessionId(response.stripeSessionId || response.sessionId || sessionId);
+        setPaymentRequestTimestamp(response.requestTimestamp || draft?.capturedAt || new Date().toISOString());
+        setPaymentStatus(response.paymentStatus || "paid");
+        setPaymentLocation(returnedLocation);
+
+        const cleanUrl = new URL(window.location.href);
+        cleanUrl.searchParams.delete("session_id");
+        cleanUrl.searchParams.delete("checkout_session_id");
+        cleanUrl.searchParams.delete("paid");
+        cleanUrl.searchParams.delete("payment");
+        window.history.replaceState({}, "", `${cleanUrl.pathname}${cleanUrl.search}${cleanUrl.hash}`);
+
+        setPaymentVerificationOpen(true);
+      } catch (paymentError) {
+        if (!isActive) {
+          return;
+        }
+
+        setPaymentVerificationError(paymentError instanceof Error ? paymentError.message : "Unable to verify payment.");
+      } finally {
+        if (isActive) {
+          setPaymentVerificationLoading(false);
+        }
+      }
+    };
+
+    void verifyReturnedPayment();
+
+    return () => {
+      isActive = false;
+    };
+  }, []);
+
+  const handleVerifiedPayment = (record: EmergencyVerificationRecord) => {
+    const nextRequestId = record.requestId || record.stripeSessionId || paymentSessionId;
+    router.push(`/emergency/status?requestId=${encodeURIComponent(nextRequestId)}`);
+  };
+
   return (
     <div id="top" className="relative bg-white text-slate-900">
       <ProgressBar />
       <MobileMenu onSchedule={() => window.dispatchEvent(new CustomEvent("openChargeModal"))} />
       <FloatingEmergencyButton />
+
+      {(paymentVerificationLoading || paymentVerificationError) && (
+        <div className="fixed left-1/2 top-20 z-[68] w-[calc(100%-1.5rem)] max-w-2xl -translate-x-1/2 px-3">
+          <Card className="border-slate-200 bg-white/95 shadow-xl backdrop-blur">
+            <CardContent className="flex items-start gap-3 p-4 text-sm text-slate-700">
+              {paymentVerificationLoading ? (
+                <>
+                  <div className="mt-1 h-4 w-4 animate-spin rounded-full border-2 border-sky-500 border-t-transparent" />
+                  Verifying your Stripe payment on the backend...
+                </>
+              ) : (
+                <>
+                  <div className="mt-1 h-4 w-4 rounded-full bg-rose-500" />
+                  {paymentVerificationError}
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
       
       <Hero />
       <StoryPanel
@@ -1150,6 +1259,16 @@ export default function Home() {
           </Button>
         </form>
       </Modal>
+
+      <PaymentVerificationModal
+        isOpen={paymentVerificationOpen}
+        stripeSessionId={paymentSessionId}
+        requestTimestamp={paymentRequestTimestamp}
+        initialLocation={paymentLocation}
+        paymentStatus={paymentStatus}
+        onClose={() => setPaymentVerificationOpen(false)}
+        onVerified={handleVerifiedPayment}
+      />
     </div>
   );
 }

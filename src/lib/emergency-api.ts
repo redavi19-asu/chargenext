@@ -121,6 +121,67 @@ export async function confirmEmergencyVerificationCode(params: {
   });
 }
 
+export async function verifyStripeCheckoutSession(sessionId: string) {
+  return getJson<{
+    valid?: boolean;
+    paid?: boolean;
+    paymentStatus?: string;
+    status?: string;
+    sessionId?: string;
+    stripeSessionId?: string;
+    requestId?: string;
+    requestTimestamp?: string;
+    location?: EmergencyLocation | null;
+    message?: string;
+  }>(`/checkout-session?session_id=${encodeURIComponent(sessionId)}`);
+}
+
+export async function sendCustomerVerificationCode(params: {
+  sessionId: string;
+  phone: string;
+  lat: number;
+  lng: number;
+}) {
+  return postJson<{
+    ok?: boolean;
+    verificationRequestId?: string;
+    requestId?: string;
+    message?: string;
+  }>("/customer-verification/send", {
+    sessionId: params.sessionId,
+    phone: params.phone,
+    lat: params.lat,
+    lng: params.lng,
+  });
+}
+
+export async function confirmCustomerVerificationCode(params: {
+  sessionId: string;
+  phone: string;
+  code: string;
+  lat: number;
+  lng: number;
+}) {
+  return postJson<{
+    ok?: boolean;
+    verified?: boolean;
+    requestId?: string;
+    stripeSessionId?: string;
+    paymentStatus?: string;
+    requestTimestamp?: string;
+    providerStatus?: string;
+    estimatedArrivalMinutes?: number | null;
+    location?: EmergencyLocation | null;
+    message?: string;
+  }>("/customer-verification/confirm", {
+    sessionId: params.sessionId,
+    phone: params.phone,
+    code: params.code,
+    lat: params.lat,
+    lng: params.lng,
+  });
+}
+
 export async function fetchEmergencyRequestStatus(requestId: string) {
   return getJson<{
     requestId: string;
