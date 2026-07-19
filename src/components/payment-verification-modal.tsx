@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { MapPin, MessageCircle, Phone, RefreshCw, ShieldCheck, Smartphone } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { MapPin, MessageCircle, Minus, Phone, RefreshCw, ShieldCheck, Smartphone } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,12 +11,16 @@ import { confirmCustomerVerificationCode, sendCustomerVerificationCode } from "@
 import {
   buildEmergencyMapsEmbedUrl,
   buildEmergencyMapsUrl,
+  clearPendingPaymentVerificationState,
   formatEmergencyCoordinates,
   getEmergencyLocationLabel,
   saveDetectedEmergencyLocation,
+  savePendingPaymentVerificationState,
   saveVerifiedEmergencyRequest,
   type EmergencyLocation,
   type EmergencyVerificationRecord,
+  type PendingPaymentVerificationState,
+  type PendingPaymentVerificationStep,
 } from "@/lib/emergency-flow";
 
 type PaymentVerificationModalProps = {
@@ -25,12 +29,39 @@ type PaymentVerificationModalProps = {
   requestTimestamp: string;
   initialLocation: EmergencyLocation | null;
   paymentStatus?: string;
-  onClose: () => void;
+  pendingState: PendingPaymentVerificationState | null;
+  onMinimize: () => void;
+  onStateChange: (state: PendingPaymentVerificationState) => void;
   onVerified: (record: EmergencyVerificationRecord) => void;
 };
 
 function normalizePhoneNumber(phoneNumber: string) {
   return phoneNumber.replace(/[^\d+]/g, "").trim();
+}
+
+function createStateFromInputs(params: {
+  stripeSessionId: string;
+  requestTimestamp: string;
+  paymentStatus?: string;
+  location: EmergencyLocation | null;
+  pendingState: PendingPaymentVerificationState | null;
+}): PendingPaymentVerificationState {
+  const { stripeSessionId, requestTimestamp, paymentStatus, location, pendingState } = params;
+
+  return {
+    stripeSessionId,
+    phoneNumber: pendingState?.phoneNumber || "",
+    latitude: pendingState?.latitude ?? location?.lat ?? null,
+    longitude: pendingState?.longitude ?? location?.lng ?? null,
+    smsSent: pendingState?.smsSent || false,
+    currentStep: pendingState?.currentStep || "location",
+    paymentVerificationStatus: pendingState?.paymentVerificationStatus || "pending",
+    requestTimestamp: pendingState?.requestTimestamp || requestTimestamp,
+    isMinimized: pendingState?.isMinimized || false,
+    locationAddress: pendingState?.locationAddress || location?.address || undefined,
+    locationLabel: pendingState?.locationLabel || location?.label || undefined,
+    updatedAt: new Date().toISOString(),
+  };
 }
 
 export function PaymentVerificationModal({
@@ -39,35 +70,85 @@ export function PaymentVerificationModal({
   requestTimestamp,
   initialLocation,
   paymentStatus,
-  onClose,
+  pendingState,
+  onMinimize,
+  onStateChange,
   onVerified,
 }: PaymentVerificationModalProps) {
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const derivedState = useMemo(
+    () =>
+      createStateFromInputs({
+        stripeSessionId,
+        requestTimestamp,
+        paymentStatus,
+        location: initialLocation,
+        pendingState,
+      }),
+    [initialLocation, pendingState, paymentStatus, requestTimestamp, stripeSessionId]
+  );
+
+  const [phoneNumber, setPhoneNumber] = useState(derivedState.phoneNumber);
   const [verificationCode, setVerificationCode] = useState("");
-  const [location, setLocation] = useState<EmergencyLocation | null>(initialLocation);
+  const [location, setLocation] = useState<EmergencyLocation | null>(initialLocation || null);
   const [manualLat, setManualLat] = useState(initialLocation ? String(initialLocation.lat) : "");
   const [manualLng, setManualLng] = useState(initialLocation ? String(initialLocation.lng) : "");
   const [manualAddress, setManualAddress] = useState(initialLocation?.address ?? "");
-  const [isEditingLocation, setIsEditingLocation] = useState(false);
-  const [isSendingCode, setIsSendingCode] = useState(false);
-  const [isVerifyingCode, setIsVerifyingCode] = useState(false);
+  const [currentStep, setCurrentStep] = useState<PendingPaymentVerificationStep>(derivedState.currentStep);
+  const [smsSent, setSmsSent] = useState(derivedState.smsSent);
+  const [paymentVerificationStatus, setPaymentVerificationStatus] = useState(derivedState.paymentVerificationStatus);
   const [statusMessage, setStatusMessage] = useState(
     "Your payment was received. Before a charging provider is dispatched, confirm your phone number and emergency location."
   );
   const [error, setError] = useState("");
-  const [verificationRequestId, setVerificationRequestId] = useState("");
+  const [isSendingCode, setIsSendingCode] = useState(false);
+  const [isVerifyingCode, setIsVerifyingCode] = useState(false);
 
   useEffect(() => {
-    if (!initialLocation) {
-      return;
-    }
+    setPhoneNumber(derivedState.phoneNumber);
+    setLocation(initialLocation || null);
+    setManualLat(initialLocation ? String(initialLocation.lat) : "");
+    setManualLng(initialLocation ? String(initialLocation.lng) : "");
+    setManualAddress(initialLocation?.address ?? "");
+    setCurrentStep(derivedState.currentStep);
+    setSmsSent(derivedState.smsSent);
+    setPaymentVerificationStatus(derivedState.paymentVerificationStatus);
+    setStatusMessage(
+      derivedState.smsSent
+        ? "A verification code was sent. Enter it to continue to dispatch."
+        : "Your payment was received. Before a charging provider is dispatched, confirm your phone number and emergency location."
+    );
 
-    setLocation(initialLocation);
-    setManualLat(String(initialLocation.lat));
-    setManualLng(String(initialLocation.lng));
-    setManualAddress(initialLocation.address ?? "");
-    saveDetectedEmergencyLocation(initialLocation);
-  }, [initialLocation]);
+    if (initialLocation) {
+      saveDetectedEmergencyLocation(initialLocation);
+    }
+  }, [derivedState, initialLocation]);
+
+  const persistState = (nextState: PendingPaymentVerificationState) => {
+    onStateChange(nextState);
+    setPaymentVerificationStatus(nextState.paymentVerificationStatus);
+  };
+
+  const syncLocation = (nextLocation: EmergencyLocation | null) => {
+    setLocation(nextLocation);
+    if (nextLocation) {
+      setManualLat(String(nextLocation.lat));
+      setManualLng(String(nextLocation.lng));
+      setManualAddress(nextLocation.address ?? nextLocation.label ?? "");
+      saveDetectedEmergencyLocation(nextLocation);
+    }
+  };
+
+  const buildNextState = (patch: Partial<PendingPaymentVerificationState>): PendingPaymentVerificationState => ({
+    ...createStateFromInputs({
+      stripeSessionId,
+      requestTimestamp,
+      paymentStatus,
+      location,
+      pendingState,
+    }),
+    ...patch,
+    updatedAt: new Date().toISOString(),
+  });
 
   const handleUseCurrentLocation = () => {
     setError("");
@@ -86,12 +167,17 @@ export function PaymentVerificationModal({
           source: "gps",
         };
 
-        setLocation(nextLocation);
-        setManualLat(String(nextLocation.lat));
-        setManualLng(String(nextLocation.lng));
-        setManualAddress("");
-        setIsEditingLocation(false);
-        saveDetectedEmergencyLocation(nextLocation);
+        syncLocation(nextLocation);
+        persistState(
+          buildNextState({
+            latitude: nextLocation.lat,
+            longitude: nextLocation.lng,
+            locationAddress: nextLocation.address,
+            locationLabel: nextLocation.label,
+            currentStep: smsSent ? "code" : "location",
+            paymentVerificationStatus,
+          })
+        );
       },
       () => {
         setError("Unable to refresh your current location. You can still correct the pin manually.");
@@ -121,9 +207,17 @@ export function PaymentVerificationModal({
       source: "manual",
     };
 
-    setLocation(correctedLocation);
-    saveDetectedEmergencyLocation(correctedLocation);
-    setIsEditingLocation(false);
+    syncLocation(correctedLocation);
+    persistState(
+      buildNextState({
+        latitude: lat,
+        longitude: lng,
+        locationAddress: correctedLocation.address,
+        locationLabel: correctedLocation.label,
+        currentStep: smsSent ? "code" : "location",
+        paymentVerificationStatus,
+      })
+    );
     setError("");
   };
 
@@ -151,9 +245,22 @@ export function PaymentVerificationModal({
         lng: location.lng,
       });
 
-      const nextVerificationRequestId = response.verificationRequestId || response.requestId || stripeSessionId;
-      setVerificationRequestId(nextVerificationRequestId);
-      setStatusMessage(response.message || "Verification code sent.");
+      const nextState = buildNextState({
+        phoneNumber: normalizedPhone,
+        latitude: location.lat,
+        longitude: location.lng,
+        smsSent: true,
+        currentStep: "code",
+        paymentVerificationStatus: "sms-sent",
+        locationAddress: location.address,
+        locationLabel: location.label,
+      });
+
+      persistState(nextState);
+      setPhoneNumber(normalizedPhone);
+      setSmsSent(true);
+      setCurrentStep("code");
+      setStatusMessage(response.message || `Verification code sent to ${normalizedPhone}.`);
     } catch (sendError) {
       setError(sendError instanceof Error ? sendError.message : "Unable to send the verification code.");
     } finally {
@@ -164,7 +271,7 @@ export function PaymentVerificationModal({
   const handleVerifyCode = async () => {
     const normalizedPhone = normalizePhoneNumber(phoneNumber);
 
-    if (!verificationRequestId) {
+    if (!smsSent) {
       setError("Send the verification code first.");
       return;
     }
@@ -196,19 +303,21 @@ export function PaymentVerificationModal({
       }
 
       const verifiedRecord: EmergencyVerificationRecord = {
-        requestId: response.requestId || verificationRequestId || stripeSessionId,
+        requestId: response.requestId || stripeSessionId,
         stripeSessionId: response.stripeSessionId || stripeSessionId,
         paymentStatus: response.paymentStatus || paymentStatus || "paid",
         verifiedPhone: normalizedPhone,
         location: response.location || location,
         requestTimestamp: response.requestTimestamp || requestTimestamp,
-        verificationRequestId,
+        verificationRequestId: stripeSessionId,
         providerStatus: response.providerStatus || "Locating provider",
         estimatedArrivalMinutes: response.estimatedArrivalMinutes ?? null,
         statusUpdatedAt: new Date().toISOString(),
       };
 
       saveVerifiedEmergencyRequest(verifiedRecord);
+      clearPendingPaymentVerificationState();
+      setPaymentVerificationStatus("verified");
       setStatusMessage("Your emergency request is verified. We are locating an available charging provider now.");
       onVerified(verifiedRecord);
     } catch (verifyError) {
@@ -222,11 +331,24 @@ export function PaymentVerificationModal({
   const embedUrl = buildEmergencyMapsEmbedUrl(location);
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Payment Received — Verify Your Emergency Request">
-      <div className="max-h-[78vh] space-y-5 overflow-y-auto pr-1">
-        <p className="text-sm leading-6 text-slate-600">
-          Your payment was received. Before a charging provider is dispatched, confirm your phone number and emergency location.
-        </p>
+    <Modal
+      isOpen={isOpen}
+      onClose={onMinimize}
+      title="Payment Received — Verify Your Emergency Request"
+      closeOnBackdrop={false}
+      closeOnEscape={false}
+      showCloseButton={false}
+    >
+      <div className="space-y-5">
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-sm leading-6 text-slate-600">
+            Your payment was received. Before a charging provider is dispatched, confirm your phone number and emergency location.
+          </p>
+          <Button variant="secondary" onClick={onMinimize} className="shrink-0 rounded-xl px-3 py-2 text-xs">
+            <Minus className="h-4 w-4" />
+            Minimize
+          </Button>
+        </div>
 
         <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
           <Card className="border-slate-200 bg-slate-50/80">
@@ -241,7 +363,20 @@ export function PaymentVerificationModal({
                   inputMode="tel"
                   autoComplete="tel"
                   value={phoneNumber}
-                  onChange={(event) => setPhoneNumber(event.target.value)}
+                  onChange={(event) => {
+                    const nextPhone = event.target.value;
+                    setPhoneNumber(nextPhone);
+                    persistState(
+                      buildNextState({
+                        phoneNumber: nextPhone,
+                        currentStep,
+                        smsSent,
+                        paymentVerificationStatus,
+                        latitude: location?.lat ?? null,
+                        longitude: location?.lng ?? null,
+                      })
+                    );
+                  }}
                   placeholder="(555) 123-4567"
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
                 />
@@ -253,7 +388,7 @@ export function PaymentVerificationModal({
                   Use My Current Location
                 </Button>
                 <Button
-                  onClick={() => setIsEditingLocation((current) => !current)}
+                  onClick={() => setCurrentStep("location")}
                   variant="secondary"
                   className="rounded-xl px-4 py-3 text-sm"
                   disabled={isSendingCode || isVerifyingCode}
@@ -263,7 +398,7 @@ export function PaymentVerificationModal({
                 </Button>
               </div>
 
-              {isEditingLocation ? (
+              {currentStep === "location" ? (
                 <div className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4">
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div>
@@ -298,9 +433,6 @@ export function PaymentVerificationModal({
                   <div className="flex flex-wrap gap-3">
                     <Button onClick={handleSaveCorrectedLocation} className="rounded-xl px-4 py-3 text-sm" disabled={isSendingCode || isVerifyingCode}>
                       Save Corrected Location
-                    </Button>
-                    <Button onClick={() => setIsEditingLocation(false)} variant="secondary" className="rounded-xl px-4 py-3 text-sm" disabled={isSendingCode || isVerifyingCode}>
-                      Cancel
                     </Button>
                   </div>
                 </div>
@@ -389,6 +521,8 @@ export function PaymentVerificationModal({
                 <p className="mt-1">{paymentStatus || "paid"}</p>
                 <p className="mt-3 text-xs uppercase tracking-wide text-slate-500">Request timestamp</p>
                 <p className="mt-1 text-sm text-slate-900">{requestTimestamp}</p>
+                <p className="mt-3 text-xs uppercase tracking-wide text-slate-500">Verification status</p>
+                <p className="mt-1 text-sm text-slate-900">{paymentVerificationStatus}</p>
               </div>
 
               {statusMessage ? (

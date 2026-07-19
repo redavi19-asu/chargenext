@@ -10,24 +10,37 @@ type ModalProps = {
   children: ReactNode;
   title?: string;
   selectedTier?: string | null;
+  closeOnBackdrop?: boolean;
+  closeOnEscape?: boolean;
+  showCloseButton?: boolean;
 };
 
-export function Modal({ isOpen, onClose, children, title }: ModalProps) {
+export function Modal({
+  isOpen,
+  onClose,
+  children,
+  title,
+  closeOnBackdrop = true,
+  closeOnEscape = true,
+  showCloseButton = true,
+}: ModalProps) {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (closeOnEscape && e.key === "Escape") onClose();
     };
     
     if (isOpen) {
       document.body.style.overflow = "hidden";
-      window.addEventListener("keydown", handleEscape);
+      if (closeOnEscape) {
+        window.addEventListener("keydown", handleEscape);
+      }
     }
     
     return () => {
       document.body.style.overflow = "unset";
       window.removeEventListener("keydown", handleEscape);
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, closeOnEscape]);
 
   return (
     <AnimatePresence>
@@ -37,7 +50,7 @@ export function Modal({ isOpen, onClose, children, title }: ModalProps) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose}
+            onClick={closeOnBackdrop ? onClose : undefined}
             className="fixed inset-0 z-[70] bg-black/50 backdrop-blur-sm"
           />
           <motion.div
@@ -49,13 +62,15 @@ export function Modal({ isOpen, onClose, children, title }: ModalProps) {
           >
             <div className="mb-4 flex items-center justify-between">
               {title && <h2 className="text-2xl font-semibold text-slate-900">{title}</h2>}
-              <button
-                onClick={onClose}
-                className="ml-auto rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
-                aria-label="Close modal"
-              >
-                <X className="h-5 w-5" />
-              </button>
+              {showCloseButton ? (
+                <button
+                  onClick={onClose}
+                  className="ml-auto rounded-full p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-600"
+                  aria-label="Close modal"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              ) : null}
             </div>
             {children}
           </motion.div>

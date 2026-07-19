@@ -27,11 +27,29 @@ export type EmergencyVerificationRecord = {
   statusUpdatedAt?: string;
 };
 
+export type PendingPaymentVerificationStep = "location" | "payment" | "code";
+
+export type PendingPaymentVerificationState = {
+  stripeSessionId: string;
+  phoneNumber: string;
+  latitude: number | null;
+  longitude: number | null;
+  smsSent: boolean;
+  currentStep: PendingPaymentVerificationStep;
+  paymentVerificationStatus: "pending" | "sms-sent" | "verified" | "invalid";
+  requestTimestamp: string;
+  isMinimized: boolean;
+  locationAddress?: string;
+  locationLabel?: string;
+  updatedAt: string;
+};
+
 const STORAGE_KEYS = {
   draft: "chargenext:emergency:draft",
   checkoutSessionId: "chargenext:emergency:checkout-session-id",
   verificationRequestId: "chargenext:emergency:verification-request-id",
   verificationRecord: "chargenext:emergency:verification-record",
+  pendingVerification: "chargenext:emergency:pending-payment-verification",
 } as const;
 
 function readStorageValue(key: string) {
@@ -161,4 +179,37 @@ export function getEmergencyLocationLabel(location: EmergencyLocation | null) {
   }
 
   return location.address || location.label || formatEmergencyCoordinates(location);
+}
+
+export function readPendingPaymentVerificationState() {
+  return parseJson<PendingPaymentVerificationState>(readStorageValue(STORAGE_KEYS.pendingVerification));
+}
+
+export function savePendingPaymentVerificationState(state: PendingPaymentVerificationState) {
+  writeStorageValue(STORAGE_KEYS.pendingVerification, JSON.stringify({
+    ...state,
+    updatedAt: new Date().toISOString(),
+  }));
+}
+
+export function updatePendingPaymentVerificationState(
+  patch: Partial<PendingPaymentVerificationState>
+) {
+  const current = readPendingPaymentVerificationState();
+  if (!current) {
+    return null;
+  }
+
+  const nextState = {
+    ...current,
+    ...patch,
+    updatedAt: new Date().toISOString(),
+  } satisfies PendingPaymentVerificationState;
+
+  savePendingPaymentVerificationState(nextState);
+  return nextState;
+}
+
+export function clearPendingPaymentVerificationState() {
+  removeStorageValue(STORAGE_KEYS.pendingVerification);
 }
