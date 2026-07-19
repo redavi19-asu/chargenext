@@ -16,6 +16,7 @@ import { PaymentVerificationModal } from "@/components/payment-verification-moda
 import { BatteryMeter } from "@/components/ui/battery-meter";
 import { FloatingEmergencyButton } from "@/components/ui/floating-button";
 import { StepOneMap } from "@/components/step-one-map";
+import { Footer } from "@/components/footer";
 import { CHARGENEXT_URLS } from "@/lib/constants";
 import { createEmergencyCheckoutSession, verifyStripeCheckoutSession } from "@/lib/emergency-api";
 import {
@@ -1194,6 +1195,7 @@ export default function Home() {
       <Pricing onEmergencyNow={handleOpenEmergencyRequestModal} />
       <FinalCTA onEmergencyNow={handleOpenEmergencyRequestModal} />
       <CTA />
+      <Footer />
 
       <Modal 
         isOpen={isModalOpen} 
