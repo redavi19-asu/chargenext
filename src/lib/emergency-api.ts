@@ -1,0 +1,135 @@
+"use client";
+
+import type { EmergencyLocation } from "@/lib/emergency-flow";
+
+const API_BASE = process.env.NEXT_PUBLIC_CHARGENEXT_API_BASE || "https://chargenext-api.ryanedavis.workers.dev";
+
+type JsonRecord = Record<string, unknown>;
+
+async function postJson<T>(path: string, body: JsonRecord) {
+  const response = await fetch(`${API_BASE}${path}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => "");
+    throw new Error(errorText || `Request failed with ${response.status}`);
+  }
+
+  return (await response.json()) as T;
+}
+
+async function getJson<T>(path: string) {
+  const response = await fetch(`${API_BASE}${path}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => "");
+    throw new Error(errorText || `Request failed with ${response.status}`);
+  }
+
+  return (await response.json()) as T;
+}
+
+function serializeLocation(location: EmergencyLocation | null) {
+  if (!location) {
+    return null;
+  }
+
+  return {
+    lat: location.lat,
+    lng: location.lng,
+    accuracy: location.accuracy ?? null,
+    address: location.address ?? null,
+    label: location.label ?? null,
+    source: location.source ?? "gps",
+  };
+}
+
+export async function createEmergencyCheckoutSession(params: {
+  successUrl: string;
+  cancelUrl: string;
+  location: EmergencyLocation | null;
+  tier?: string;
+}) {
+  return postJson<{ url?: string; session_id?: string; id?: string }>("/checkout", {
+    tier: params.tier || "Emergency Boost",
+    amount: 59,
+    success_url: params.successUrl,
+    cancel_url: params.cancelUrl,
+    return_url: params.successUrl,
+    location: serializeLocation(params.location),
+  });
+}
+
+export async function verifyEmergencyCheckoutSession(sessionId: string) {
+  return postJson<{
+    verified: boolean;
+    paymentStatus?: string;
+    stripeSessionId?: string;
+    requestId?: string;
+    requestTimestamp?: string;
+    location?: EmergencyLocation | null;
+  }>("/checkout/verify", {
+    session_id: sessionId,
+  });
+}
+
+export async function sendEmergencyVerificationCode(params: {
+  sessionId: string;
+  phoneNumber: string;
+  location: EmergencyLocation | null;
+}) {
+  return postJson<{
+    verificationRequestId?: string;
+    requestId?: string;
+    message?: string;
+  }>("/verification/start", {
+    stripe_session_id: params.sessionId,
+    phone_number: params.phoneNumber,
+    location: serializeLocation(params.location),
+    channel: "sms",
+  });
+}
+
+export async function confirmEmergencyVerificationCode(params: {
+  verificationRequestId: string;
+  code: string;
+}) {
+  return postJson<{
+    verified: boolean;
+    requestId?: string;
+    stripeSessionId?: string;
+    paymentStatus?: string;
+    verifiedPhone?: string;
+    location?: EmergencyLocation | null;
+    requestTimestamp?: string;
+    providerStatus?: string;
+    estimatedArrivalMinutes?: number | null;
+    statusUpdatedAt?: string;
+  }>("/verification/confirm", {
+    verification_request_id: params.verificationRequestId,
+    code: params.code,
+  });
+}
+
+export async function fetchEmergencyRequestStatus(requestId: string) {
+  return getJson<{
+    requestId: string;
+    providerStatus?: string;
+    estimatedArrivalMinutes?: number | null;
+    paymentStatus?: string;
+    verifiedPhone?: string;
+    location?: EmergencyLocation | null;
+    requestTimestamp?: string;
+    statusUpdatedAt?: string;
+  }>(`/requests/${encodeURIComponent(requestId)}/status`);
+}

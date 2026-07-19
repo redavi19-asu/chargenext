@@ -15,6 +15,7 @@ import { FloatingEmergencyButton } from "@/components/ui/floating-button";
 import { StepOneMap } from "@/components/step-one-map";
 import { CHARGENEXT_URLS } from "@/lib/constants";
 import { startEmergencyCharge } from "@/lib/checkout";
+import { saveDetectedEmergencyLocation } from "@/lib/emergency-flow";
 
 const googleMapsEmbedUrl =
   "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3105.001839478255!2d-77.0368703!3d38.9071923!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89b7b7bcdf572b1f%3A0xefbdfd5714d0c857!2sWashington%2C%20DC!5e0!3m2!1sen!2sus!4v1730590800000!5m2!1sen!2sus";
@@ -303,10 +304,10 @@ function Hero() {
             >
               <div className="wa-alert-banner mx-auto mb-5 w-full max-w-[760px] rounded-2xl border border-amber-300/60 bg-gradient-to-r from-amber-100 to-yellow-100 px-4 py-3 text-center shadow-lg">
                 <h3 className="text-sm font-semibold text-amber-900 sm:text-base">
-                  ⚠️ Emergency Requests Use WhatsApp
+                  ⚠️ Emergency Requests Use Secure Checkout
                 </h3>
                 <p className="mt-1 text-xs text-amber-900/90 sm:text-[13px]">
-                  Fastest way to share your exact location so we can navigate to you.
+                  Stripe Checkout keeps payment secure, and we save your GPS location before redirecting.
                 </p>
 
                 <div className="mt-3 flex flex-col items-center justify-center gap-2 sm:flex-row">
@@ -329,10 +330,7 @@ function Hero() {
                 </div>
 
                 <p className="mt-2 text-xs text-amber-900/80">
-                  Already have WhatsApp? Tap Emergency Charge Now.
-                </p>
-                <p className="mt-0.5 text-xs font-medium text-amber-900">
-                  No WhatsApp? Call/Text: (###) ###-####
+                  After payment, we verify your phone number and emergency location before dispatch.
                 </p>
               </div>
 
@@ -713,7 +711,7 @@ function FinalCTA() {
             Ready when you need power
           </h2>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-300">
-            Get emergency EV charging fast through WhatsApp, or schedule a non-emergency charge using our request form.
+            Get emergency EV charging fast through secure checkout, or schedule a non-emergency charge using our request form.
           </p>
           
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
@@ -840,13 +838,6 @@ export default function Home() {
   const [gpsDetected, setGpsDetected] = useState(false);
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    if (searchParams.get('paid') === '1') {
-      alert('Payment received. We are now dispatching a driver.');
-    }
-  }, []);
-
-  useEffect(() => {
     const handleOpenModal = (event: Event) => {
       const customEvent = event as CustomEvent;
       setSelectedTier(customEvent.detail?.tier || null);
@@ -868,6 +859,13 @@ export default function Home() {
           const lat = position.coords.latitude.toFixed(6);
           const lng = position.coords.longitude.toFixed(6);
           const accuracy = Math.round(position.coords.accuracy).toString();
+
+          saveDetectedEmergencyLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+            source: "gps",
+          });
 
           setGpsLatitude(lat);
           setGpsLongitude(lng);
@@ -915,7 +913,7 @@ export default function Home() {
         id="how-it-works"
         step={1}
         title="We find you fast"
-        subtitle="Need help right now? Use WhatsApp to share your live location and message us for emergency charging. Just planning ahead? Use the request form for non-emergency service. Once we confirm the request, we'll send you a secure payment link for your deposit or service confirmation, and then we dispatch a tech."
+        subtitle="Need help right now? Tap Emergency Now for secure checkout, then confirm your phone number and emergency location after payment. Just planning ahead? Use the request form for non-emergency service."
         icon={MapPin}
         media={
           <StepOneMap defaultEmbedUrl={googleMapsEmbedUrl} />

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { CHARGENEXT_DEFAULTS } from "@/lib/constants";
+import { clearDetectedEmergencyLocation, saveDetectedEmergencyLocation } from "@/lib/emergency-flow";
 
 export type UserLocation = {
   lat: number;
@@ -37,12 +38,16 @@ export function useGeolocation(autoRequest = true): GeolocationState {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const { latitude, longitude, accuracy } = position.coords;
+        const location = {
+          lat: latitude,
+          lng: longitude,
+          accuracy,
+          source: "gps" as const,
+        };
+
+        saveDetectedEmergencyLocation(location);
         setState({
-          location: {
-            lat: latitude,
-            lng: longitude,
-            accuracy,
-          },
+          location,
           isLoading: false,
           error: null,
         });
@@ -62,6 +67,7 @@ export function useGeolocation(autoRequest = true): GeolocationState {
           isLoading: false,
           error: errorMessage,
         });
+        clearDetectedEmergencyLocation();
       },
       {
         enableHighAccuracy: true,
