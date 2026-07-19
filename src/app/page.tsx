@@ -13,11 +13,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Modal } from "@/components/ui/modal";
 import { EmergencyRequestModal } from "@/components/emergency-request-modal";
 import { PaymentVerificationModal } from "@/components/payment-verification-modal";
+import { ServiceConfirmationModal } from "@/components/service-confirmation-modal";
 import { BatteryMeter } from "@/components/ui/battery-meter";
 import { FloatingEmergencyButton } from "@/components/ui/floating-button";
 import { StepOneMap } from "@/components/step-one-map";
 import { Footer } from "@/components/footer";
 import { CHARGENEXT_URLS } from "@/lib/constants";
+import { CHARGENEXT_SERVICES, type ServiceId, getService, getServiceMetadata } from "@/lib/services-config";
 import { createEmergencyCheckoutSession, verifyStripeCheckoutSession } from "@/lib/emergency-api";
 import {
   clearPendingPaymentVerificationState,
@@ -79,9 +81,10 @@ function ProgressBar() {
 
 type HeroProps = {
   onEmergencyNow: () => void;
+  onScheduleCharge?: () => void;
 };
 
-function Hero({ onEmergencyNow }: HeroProps) {
+function Hero({ onEmergencyNow, onScheduleCharge }: HeroProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], [0, -150]);
@@ -396,7 +399,10 @@ function Hero({ onEmergencyNow }: HeroProps) {
                   <Button
                     variant="secondary"
                     className="rounded-xl px-8 py-6 text-base font-semibold bg-white/15 text-white border border-cyan-400/40 hover:bg-white/25 hover:border-cyan-400/60 transition-all backdrop-blur-sm"
-                    onClick={() => window.dispatchEvent(new CustomEvent("openChargeModal"))}
+                    onClick={() => {
+                      const pricingElement = document.getElementById("pricing");
+                      pricingElement?.scrollIntoView({ behavior: "smooth" });
+                    }}
                   >
                     📅 Schedule a Charge
                   </Button>
@@ -524,9 +530,10 @@ function Features() {
 
 type PricingProps = {
   onEmergencyNow: () => void;
+  onServiceSelect: (serviceId: ServiceId) => void;
 };
 
-function Pricing({ onEmergencyNow }: PricingProps) {
+function Pricing({ onEmergencyNow, onServiceSelect }: PricingProps) {
   const pricingTiers = [
     {
       id: "emergency-boost",
@@ -686,19 +693,20 @@ function Pricing({ onEmergencyNow }: PricingProps) {
                           Instant checkout and driver dispatch
                         </p>
                       </>
-                    ) : tier.id === "pull-up-boost" ? (
-                      <Button
-                        variant="secondary"
-                        className="cta-btn cta-btn--blue"
-                        onClick={() => window.dispatchEvent(new CustomEvent("openPullUpCheckIn"))}
-                      >
-                        I&apos;m Here Now
-                      </Button>
+                    ) : tier.id === "fleet-services" ? (
+                      <a href="mailto:sales@chargenext.com">
+                        <Button
+                          variant="secondary"
+                          className="cta-btn cta-btn--blue w-full"
+                        >
+                          Request Quote
+                        </Button>
+                      </a>
                     ) : (
                       <Button 
                         variant="secondary"
                         className="cta-btn cta-btn--blue"
-                        onClick={() => window.dispatchEvent(new CustomEvent('openChargeModal', { detail: { tier: tier.id, tierName: tier.name } }))}
+                        onClick={() => onServiceSelect(tier.id as ServiceId)}
                       >
                         Request {tier.name}
                       </Button>
@@ -751,7 +759,10 @@ function FinalCTA({ onEmergencyNow }: FinalCTAProps) {
             <Button
               variant="secondary"
               className="rounded-2xl px-8 py-6 text-base font-semibold bg-white/10 text-white transition hover:bg-white/20"
-              onClick={() => window.dispatchEvent(new CustomEvent('openChargeModal'))}
+              onClick={() => {
+                const pricingElement = document.getElementById("pricing");
+                pricingElement?.scrollIntoView({ behavior: "smooth" });
+              }}
             >
               Schedule a Charge
             </Button>
@@ -860,6 +871,9 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPullUpModalOpen, setIsPullUpModalOpen] = useState(false);
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
+  const [selectedService, setSelectedService] = useState<ServiceId | null>(null);
+  const [isServiceConfirmationOpen, setIsServiceConfirmationOpen] = useState(false);
+  const [isServiceCheckoutProcessing, setIsServiceCheckoutProcessing] = useState(false);
   const [gpsLatitude, setGpsLatitude] = useState("");
   const [gpsLongitude, setGpsLongitude] = useState("");
   const [gpsAccuracy, setGpsAccuracy] = useState("");
@@ -926,6 +940,68 @@ export default function Home() {
     captureCurrentGpsLocation();
   };
 
+  const handleOpenServiceConfirmation = (serviceId: ServiceId) => {
+    setSelectedService(serviceId);
+    setIsServiceConfirmationOpen(true);
+    captureCurrentGpsLocation();
+  };
+
+  const handleConfirmService = async () => {
+    if (!selectedService || isServiceCheckoutProcessing || isGpsDetecting) {
+      return;
+    }
+
+    const service = getService(selectedService);
+    if (!service) {
+      setPaymentVerificationError("Invalid service selected");
+      return;
+    }
+
+    const currentLocation = gpsDetected && gpsLatitude && gpsLongitude
+      ? {
+          lat: Number(gpsLatitude),
+          lng: Number(gpsLongitude),
+          accuracy: gpsAccuracy ? Number(gpsAccuracy) : undefined,
+          source: "gps" as const,
+        }
+      : readEmergencyCheckoutDraft()?.location ?? null;
+
+    setIsServiceCheckoutProcessing(true);
+    setPaymentVerificationError("");
+
+    try {
+      const currentUrl = new URL(window.location.href);
+      const successUrl = `${currentUrl.origin}${currentUrl.pathname}?payment=success&session_id={CHECKOUT_SESSION_ID}`;
+      const cancelUrl = `${currentUrl.origin}${currentUrl.pathname}`;
+      
+      const checkoutResponse = await createEmergencyCheckoutSession({
+        successUrl,
+        cancelUrl,
+        location: currentLocation,
+        tier: service.name,
+        amount: service.priceAmount,
+        metadata: getServiceMetadata(selectedService),
+      });
+
+      const checkoutSessionId = String(checkoutResponse.session_id || checkoutResponse.id || "");
+      if (!checkoutSessionId) {
+        throw new Error("Stripe did not return a checkout session id.");
+      }
+
+      saveCheckoutSessionId(checkoutSessionId);
+
+      if (checkoutResponse.url) {
+        window.location.href = checkoutResponse.url;
+        return;
+      }
+
+      throw new Error("Stripe checkout URL was not returned.");
+    } catch (error) {
+      setPaymentVerificationError(error instanceof Error ? error.message : "Unable to create Stripe checkout session.");
+      setIsServiceCheckoutProcessing(false);
+    }
+  };
+
   const handleContinueToSecurePayment = async () => {
     if (isGpsDetecting || isEmergencyCheckoutProcessing || hasEmergencyCheckoutSubmitted) {
       return;
@@ -948,11 +1024,19 @@ export default function Home() {
       const currentUrl = new URL(window.location.href);
       const successUrl = `${currentUrl.origin}${currentUrl.pathname}?payment=success&session_id={CHECKOUT_SESSION_ID}`;
       const cancelUrl = `${currentUrl.origin}${currentUrl.pathname}`;
+      const emergencyService = getService("emergency-boost");
+      
+      if (!emergencyService) {
+        throw new Error("Emergency Boost service not configured");
+      }
+
       const checkoutResponse = await createEmergencyCheckoutSession({
         successUrl,
         cancelUrl,
         location: currentLocation,
-        tier: "Emergency Boost",
+        tier: emergencyService.name,
+        amount: emergencyService.priceAmount,
+        metadata: getServiceMetadata("emergency-boost"),
       });
 
       const checkoutSessionId = String(checkoutResponse.session_id || checkoutResponse.id || "");
@@ -975,28 +1059,6 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
-    const handleOpenModal = (event: Event) => {
-      const customEvent = event as CustomEvent;
-      setSelectedTier(customEvent.detail?.tier || null);
-      setIsPullUpModalOpen(false);
-      setIsModalOpen(true);
-      captureCurrentGpsLocation();
-    };
-
-    const handleOpenPullUpCheckIn = () => {
-      setSelectedTier("pull-up-boost");
-      setIsModalOpen(false);
-      setIsPullUpModalOpen(true);
-    };
-
-    window.addEventListener('openChargeModal', handleOpenModal);
-    window.addEventListener("openPullUpCheckIn", handleOpenPullUpCheckIn);
-    return () => {
-      window.removeEventListener('openChargeModal', handleOpenModal);
-      window.removeEventListener("openPullUpCheckIn", handleOpenPullUpCheckIn);
-    };
-  }, []);
 
   useEffect(() => {
     let isActive = true;
@@ -1120,7 +1182,10 @@ export default function Home() {
     <div id="top" className="relative bg-white text-slate-900">
       <ProgressBar />
       <MobileMenu
-        onSchedule={() => window.dispatchEvent(new CustomEvent("openChargeModal"))}
+        onSchedule={() => {
+          const pricingElement = document.getElementById("pricing");
+          pricingElement?.scrollIntoView({ behavior: "smooth" });
+        }}
         onEmergencyNow={handleOpenEmergencyRequestModal}
       />
       <FloatingEmergencyButton />
@@ -1192,7 +1257,7 @@ export default function Home() {
         media={<BatteryMeter />}
       />
       <Features />
-      <Pricing onEmergencyNow={handleOpenEmergencyRequestModal} />
+      <Pricing onEmergencyNow={handleOpenEmergencyRequestModal} onServiceSelect={handleOpenServiceConfirmation} />
       <FinalCTA onEmergencyNow={handleOpenEmergencyRequestModal} />
       <CTA />
       <Footer />
@@ -1436,6 +1501,19 @@ export default function Home() {
         onMinimize={handleMinimizePaymentVerification}
         onStateChange={handlePaymentVerificationStateChange}
         onVerified={handleVerifiedPayment}
+      />
+
+      <ServiceConfirmationModal
+        isOpen={isServiceConfirmationOpen}
+        service={selectedService ? getService(selectedService) : null}
+        location={gpsDetected ? { lat: Number(gpsLatitude), lng: Number(gpsLongitude), accuracy: gpsAccuracy ? Number(gpsAccuracy) : undefined, source: "gps" } : null}
+        isProcessing={isServiceCheckoutProcessing}
+        onConfirm={handleConfirmService}
+        onCancel={() => {
+          setIsServiceConfirmationOpen(false);
+          setSelectedService(null);
+          setIsServiceCheckoutProcessing(false);
+        }}
       />
     </div>
   );

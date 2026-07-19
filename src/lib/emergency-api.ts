@@ -59,14 +59,17 @@ export async function createEmergencyCheckoutSession(params: {
   cancelUrl: string;
   location: EmergencyLocation | null;
   tier?: string;
+  amount?: number;
+  metadata?: Record<string, string>;
 }) {
   return postJson<{ url?: string; session_id?: string; id?: string }>("/checkout", {
     tier: params.tier || "Emergency Boost",
-    amount: 59,
+    amount: params.amount ?? 59,
     success_url: params.successUrl,
     cancel_url: params.cancelUrl,
     return_url: params.successUrl,
     location: serializeLocation(params.location),
+    metadata: params.metadata || {},
   });
 }
 
