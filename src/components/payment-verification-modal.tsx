@@ -5,7 +5,7 @@ import { MapPin, MessageCircle, Minus, Phone, RefreshCw, ShieldCheck, Smartphone
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Modal } from "@/components/ui/modal";
+import { Modal, ModalBody, ModalFooter, ModalHeader } from "@/components/ui/modal";
 import { CHARGENEXT_URLS } from "@/lib/constants";
 import { confirmCustomerVerificationCode, sendCustomerVerificationCode } from "@/lib/emergency-api";
 import {
@@ -93,6 +93,7 @@ export function PaymentVerificationModal({
   const [manualLat, setManualLat] = useState(initialLocation ? String(initialLocation.lat) : "");
   const [manualLng, setManualLng] = useState(initialLocation ? String(initialLocation.lng) : "");
   const [manualAddress, setManualAddress] = useState(initialLocation?.address ?? "");
+  const [isEditingLocation, setIsEditingLocation] = useState(false);
   const [currentStep, setCurrentStep] = useState<PendingPaymentVerificationStep>(derivedState.currentStep);
   const [smsSent, setSmsSent] = useState(derivedState.smsSent);
   const [paymentVerificationStatus, setPaymentVerificationStatus] = useState(derivedState.paymentVerificationStatus);
@@ -218,6 +219,7 @@ export function PaymentVerificationModal({
         paymentVerificationStatus,
       })
     );
+    setIsEditingLocation(false);
     setError("");
   };
 
@@ -334,28 +336,41 @@ export function PaymentVerificationModal({
     <Modal
       isOpen={isOpen}
       onClose={onMinimize}
-      title="Payment Received — Verify Your Emergency Request"
+      size="large"
+      layout="fixed-header-footer"
       closeOnBackdrop={false}
       closeOnEscape={false}
       showCloseButton={false}
     >
-      <div className="space-y-5">
-        <div className="flex items-start justify-between gap-3">
-          <p className="text-sm leading-6 text-slate-600">
-            Your payment was received. Before a charging provider is dispatched, confirm your phone number and emergency location.
-          </p>
-          <Button variant="secondary" onClick={onMinimize} className="shrink-0 rounded-xl px-3 py-2 text-xs">
-            <Minus className="h-4 w-4" />
-            Minimize
-          </Button>
+      <ModalHeader showCloseButton={false}>
+        <div className="flex items-center gap-3">
+          <div className="rounded-full bg-emerald-100 p-2">
+            <ShieldCheck className="h-6 w-6 text-emerald-700" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900">Payment Received</h2>
+            <p className="text-sm text-slate-500">Verify your location and phone number</p>
+          </div>
         </div>
+        <Button variant="secondary" onClick={onMinimize} className="rounded-xl px-3 py-2 text-sm flex-shrink-0">
+          <Minus className="h-4 w-4" />
+        </Button>
+      </ModalHeader>
 
-        <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-          <Card className="border-slate-200 bg-slate-50/80">
-            <CardContent className="space-y-4 p-4">
+      <ModalBody>
+        <div className="space-y-6">
+          <p className="text-base text-slate-600 leading-relaxed">
+            Before a charging provider is dispatched, please confirm your phone number and emergency location.
+          </p>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Left Column - Customer Details */}
+            <div className="space-y-6">
+              {/* Phone Number */}
               <div>
-                <label htmlFor="payment-phone-number" className="mb-2 block text-sm font-medium text-slate-800">
-                  Phone number
+                <label htmlFor="payment-phone-number" className="mb-2 block text-sm font-semibold text-slate-900">
+                  <Phone className="mr-2 inline h-4 w-4" />
+                  Phone Number
                 </label>
                 <input
                   id="payment-phone-number"
@@ -377,179 +392,238 @@ export function PaymentVerificationModal({
                       })
                     );
                   }}
+                  disabled={isVerifyingCode || isSendingCode}
                   placeholder="(555) 123-4567"
-                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-900 outline-none transition disabled:bg-slate-100 focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
                 />
               </div>
 
-              <div className="flex flex-wrap gap-3">
-                <Button onClick={handleUseCurrentLocation} variant="secondary" className="rounded-xl px-4 py-3 text-sm" disabled={isSendingCode || isVerifyingCode}>
-                  <RefreshCw className="h-4 w-4" />
-                  Use My Current Location
-                </Button>
-                <Button
-                  onClick={() => setCurrentStep("location")}
-                  variant="secondary"
-                  className="rounded-xl px-4 py-3 text-sm"
-                  disabled={isSendingCode || isVerifyingCode}
-                >
-                  <MapPin className="h-4 w-4" />
-                  Correct Location
-                </Button>
-              </div>
+              {/* Location Section */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="text-sm font-semibold text-slate-900">
+                    <MapPin className="mr-2 inline h-4 w-4" />
+                    Emergency Location
+                  </label>
+                </div>
 
-              {currentStep === "location" ? (
-                <div className="grid gap-3 rounded-2xl border border-slate-200 bg-white p-4">
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div>
-                      <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">Latitude</label>
-                      <input
-                        type="text"
-                        value={manualLat}
-                        onChange={(event) => setManualLat(event.target.value)}
-                        className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
-                      />
-                    </div>
-                    <div>
-                      <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">Longitude</label>
-                      <input
-                        type="text"
-                        value={manualLng}
-                        onChange={(event) => setManualLng(event.target.value)}
-                        className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
-                      />
-                    </div>
-                  </div>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 space-y-3">
                   <div>
-                    <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">Readable address or landmark</label>
-                    <input
-                      type="text"
-                      value={manualAddress}
-                      onChange={(event) => setManualAddress(event.target.value)}
-                      placeholder="Apartment entrance, parking lot, nearby landmark"
-                      className="w-full rounded-xl border border-slate-200 px-4 py-3 text-sm text-slate-900 outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
-                    />
+                    <p className="text-xs font-medium text-slate-500 uppercase">Detected Location</p>
+                    <p className="mt-1 text-sm font-semibold text-slate-900">{getEmergencyLocationLabel(location)}</p>
+                    <p className="mt-1 text-xs text-slate-600">{formatEmergencyCoordinates(location)}</p>
                   </div>
-                  <div className="flex flex-wrap gap-3">
-                    <Button onClick={handleSaveCorrectedLocation} className="rounded-xl px-4 py-3 text-sm" disabled={isSendingCode || isVerifyingCode}>
-                      Save Corrected Location
-                    </Button>
-                  </div>
+                  <a
+                    href={mapsUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-sky-600 hover:text-sky-700"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    Open in Google Maps
+                  </a>
                 </div>
-              ) : null}
 
-              <div className="rounded-2xl border border-slate-200 bg-white p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Detected emergency location</p>
-                <p className="mt-2 text-sm font-medium text-slate-900">{getEmergencyLocationLabel(location)}</p>
-                <p className="mt-1 text-sm text-slate-600">{formatEmergencyCoordinates(location)}</p>
-                <p className="mt-1 text-sm text-slate-600">
-                  Latitude: {location?.lat.toFixed(6) ?? "Pending"} | Longitude: {location?.lng.toFixed(6) ?? "Pending"}
-                </p>
-                <a
-                  href={mapsUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="mt-3 inline-flex items-center gap-2 text-sm font-semibold text-sky-700 hover:text-sky-600"
-                >
-                  <MapPin className="h-4 w-4" />
-                  Open in Google Maps
-                </a>
-              </div>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <Button
+                    onClick={handleUseCurrentLocation}
+                    variant="secondary"
+                    className="rounded-xl h-12 text-sm font-medium"
+                    disabled={isSendingCode || isVerifyingCode}
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Refresh Location
+                  </Button>
+                  <Button
+                    onClick={() => setIsEditingLocation(!isEditingLocation)}
+                    variant="secondary"
+                    className="rounded-xl h-12 text-sm font-medium"
+                    disabled={isSendingCode || isVerifyingCode}
+                  >
+                    <MapPin className="h-4 w-4 mr-2" />
+                    Correct Location
+                  </Button>
+                </div>
 
-              <Button onClick={handleSendVerificationCode} disabled={isSendingCode || isVerifyingCode} className="w-full rounded-xl px-4 py-3 text-sm">
-                {isSendingCode ? (
-                  <>
-                    <ShieldCheck className="h-4 w-4 animate-pulse" />
-                    Sending Code...
-                  </>
-                ) : (
-                  <>
-                    <Smartphone className="h-4 w-4" />
-                    Send Verification Code
-                  </>
+                {isEditingLocation && (
+                  <div className="rounded-xl border border-slate-200 bg-white p-4 space-y-4">
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div>
+                        <label className="mb-2 block text-xs font-semibold text-slate-700 uppercase">Latitude</label>
+                        <input
+                          type="text"
+                          value={manualLat}
+                          onChange={(e) => setManualLat(e.target.value)}
+                          disabled={isVerifyingCode || isSendingCode}
+                          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm disabled:bg-slate-100"
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-2 block text-xs font-semibold text-slate-700 uppercase">Longitude</label>
+                        <input
+                          type="text"
+                          value={manualLng}
+                          onChange={(e) => setManualLng(e.target.value)}
+                          disabled={isVerifyingCode || isSendingCode}
+                          className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm disabled:bg-slate-100"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="mb-2 block text-xs font-semibold text-slate-700 uppercase">Address or Landmark</label>
+                      <input
+                        type="text"
+                        value={manualAddress}
+                        onChange={(e) => setManualAddress(e.target.value)}
+                        disabled={isVerifyingCode || isSendingCode}
+                        placeholder="Parking lot entrance, building 2A, etc."
+                        className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm disabled:bg-slate-100"
+                      />
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={handleSaveCorrectedLocation}
+                        className="flex-1 rounded-lg h-10 text-sm font-medium"
+                        disabled={isSendingCode || isVerifyingCode}
+                      >
+                        Save Changes
+                      </Button>
+                      <Button
+                        onClick={() => setIsEditingLocation(false)}
+                        variant="secondary"
+                        className="flex-1 rounded-lg h-10 text-sm font-medium"
+                        disabled={isSendingCode || isVerifyingCode}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
                 )}
-              </Button>
-            </CardContent>
-          </Card>
-
-          <Card className="border-slate-200 bg-white shadow-sm">
-            <CardContent className="space-y-4 p-4">
-              <div className="overflow-hidden rounded-2xl border border-slate-200">
-                <iframe
-                  src={embedUrl}
-                  title="Customer emergency location map"
-                  className="h-64 w-full border-0"
-                  loading="lazy"
-                  allowFullScreen
-                  referrerPolicy="no-referrer-when-downgrade"
-                />
               </div>
+            </div>
 
-              <div>
-                <label htmlFor="payment-verification-code" className="mb-2 block text-sm font-medium text-slate-800">
-                  Verification code
+            {/* Right Column - Verification & Map */}
+            <div className="space-y-6">
+              {/* Verification Code */}
+              {smsSent && (
+                <div className="space-y-3">
+                  <label htmlFor="payment-verification-code" className="block text-sm font-semibold text-slate-900">
+                    <MessageCircle className="mr-2 inline h-4 w-4" />
+                    Verification Code
+                  </label>
+                  <input
+                    id="payment-verification-code"
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    maxLength={6}
+                    value={verificationCode}
+                    onChange={(e) => setVerificationCode(e.target.value)}
+                    disabled={isVerifyingCode || isSendingCode}
+                    placeholder="123456"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-base text-center text-slate-900 outline-none transition disabled:bg-slate-100 focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
+                  />
+                  <p className="text-xs text-slate-500">Enter the 6-digit code sent to your phone</p>
+                </div>
+              )}
+
+              {/* Map Preview */}
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-slate-900">
+                  <MapPin className="mr-2 inline h-4 w-4" />
+                  Location Preview
                 </label>
-                <input
-                  id="payment-verification-code"
-                  type="text"
-                  inputMode="numeric"
-                  autoComplete="one-time-code"
-                  maxLength={6}
-                  value={verificationCode}
-                  onChange={(event) => setVerificationCode(event.target.value)}
-                  placeholder="123456"
-                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-sky-400 focus:ring-2 focus:ring-sky-200"
-                />
+                <div className="overflow-hidden rounded-xl border border-slate-200">
+                  <iframe
+                    src={embedUrl}
+                    title="Emergency location map"
+                    className="h-64 w-full border-0"
+                    loading="lazy"
+                    allowFullScreen
+                    referrerPolicy="no-referrer-when-downgrade"
+                  />
+                </div>
               </div>
 
-              <Button onClick={handleVerifyCode} disabled={isVerifyingCode || isSendingCode} className="w-full rounded-xl px-4 py-3 text-sm">
-                {isVerifyingCode ? (
-                  <>
-                    <ShieldCheck className="h-4 w-4 animate-pulse" />
-                    Verifying...
-                  </>
-                ) : (
-                  <>
-                    <MessageCircle className="h-4 w-4" />
-                    Verify and Request Dispatch
-                  </>
-                )}
-              </Button>
-
-              <div className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">
-                <p className="font-medium text-slate-900">Payment status</p>
-                <p className="mt-1">{paymentStatus || "paid"}</p>
-                <p className="mt-3 text-xs uppercase tracking-wide text-slate-500">Request timestamp</p>
-                <p className="mt-1 text-sm text-slate-900">{requestTimestamp}</p>
-                <p className="mt-3 text-xs uppercase tracking-wide text-slate-500">Verification status</p>
-                <p className="mt-1 text-sm text-slate-900">{paymentVerificationStatus}</p>
+              {/* Payment Status Card */}
+              <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                <p className="text-xs font-semibold text-emerald-700 uppercase">Payment Status</p>
+                <p className="mt-2 text-sm font-semibold text-emerald-900">Received & Confirmed</p>
+                <p className="mt-1 text-xs text-emerald-800">Timestamp: {new Date(requestTimestamp).toLocaleString()}</p>
               </div>
+            </div>
+          </div>
 
-              {statusMessage ? (
-                <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
-                  {statusMessage}
-                </div>
-              ) : null}
+          {/* Status Messages */}
+          {statusMessage && (
+            <div className="rounded-xl border border-sky-200 bg-sky-50 p-4">
+              <p className="text-sm text-sky-900">{statusMessage}</p>
+            </div>
+          )}
 
-              {error ? (
-                <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-900">
-                  {error}
-                </div>
-              ) : null}
+          {error && (
+            <div className="rounded-xl border border-rose-200 bg-rose-50 p-4">
+              <p className="text-sm font-medium text-rose-900">Error</p>
+              <p className="mt-1 text-sm text-rose-800">{error}</p>
+            </div>
+          )}
 
-              <a
-                href={CHARGENEXT_URLS.whatsappEmergency}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-900"
-              >
-                <Phone className="h-4 w-4" />
-                WhatsApp support remains available.
-              </a>
-            </CardContent>
-          </Card>
+          {/* WhatsApp Support */}
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <a
+              href={CHARGENEXT_URLS.whatsappEmergency}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 hover:text-slate-900"
+            >
+              <MessageCircle className="h-4 w-4" />
+              Need help? Contact support on WhatsApp
+            </a>
+          </div>
         </div>
-      </div>
+      </ModalBody>
+
+      <ModalFooter>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          {!smsSent ? (
+            <Button
+              onClick={handleSendVerificationCode}
+              disabled={isSendingCode || isVerifyingCode}
+              className="w-full sm:flex-1 rounded-xl h-12 text-base font-semibold"
+            >
+              {isSendingCode ? (
+                <>
+                  <ShieldCheck className="h-5 w-5 mr-2 animate-pulse" />
+                  Sending...
+                </>
+              ) : (
+                <>
+                  <Smartphone className="h-5 w-5 mr-2" />
+                  Send Verification Code
+                </>
+              )}
+            </Button>
+          ) : (
+            <Button
+              onClick={handleVerifyCode}
+              disabled={isVerifyingCode || isSendingCode}
+              className="w-full sm:flex-1 rounded-xl h-12 text-base font-semibold"
+            >
+              {isVerifyingCode ? (
+                <>
+                  <ShieldCheck className="h-5 w-5 mr-2 animate-pulse" />
+                  Verifying...
+                </>
+              ) : (
+                <>
+                  <MessageCircle className="h-5 w-5 mr-2" />
+                  Verify & Request Dispatch
+                </>
+              )}
+            </Button>
+          )}
+        </div>
+      </ModalFooter>
     </Modal>
   );
 }
