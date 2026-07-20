@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Modal, ModalBody, ModalFooter, ModalHeader } from "@/components/ui/modal";
 import { ServiceProcessCard } from "@/components/service-process-card";
 import { type ChargeNextService } from "@/lib/services-config";
-import type { EmergencyLocation } from "@/lib/emergency-flow";
+import { formatEmergencyCoordinates, type EmergencyLocation } from "@/lib/emergency-flow";
 import { reverseGeocodeLocation } from "@/lib/reverse-geocode";
 
 type ServiceConfirmationModalProps = {
@@ -268,6 +268,9 @@ export function ServiceConfirmationModal({
                 <p className="text-sm font-semibold text-slate-900">
                   {isResolvingAddress ? "Resolving address..." : displayAddress}
                 </p>
+                {currentLocation && (
+                  <p className="mt-1 text-xs text-slate-600">{formatEmergencyCoordinates(currentLocation)}</p>
+                )}
               </div>
             </div>
 
