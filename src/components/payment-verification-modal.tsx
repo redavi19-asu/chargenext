@@ -1,27 +1,30 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
-import { MapPin, MessageCircle, Minus, Phone, RefreshCw, ShieldCheck, Smartphone } from "lucide-react";
+import { MapPin, MessageCircle, Minus, Phone, RefreshCw, ShieldCheck, Smartphone, Truck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Modal, ModalBody, ModalFooter, ModalHeader } from "@/components/ui/modal";
 import { CHARGENEXT_URLS } from "@/lib/constants";
 import { confirmCustomerVerificationCode, sendCustomerVerificationCode } from "@/lib/emergency-api";
 import {
   buildEmergencyMapsEmbedUrl,
   buildEmergencyMapsUrl,
-  clearPendingPaymentVerificationState,
   formatEmergencyCoordinates,
   getEmergencyLocationLabel,
   saveDetectedEmergencyLocation,
-  savePendingPaymentVerificationState,
   saveVerifiedEmergencyRequest,
   type EmergencyLocation,
   type EmergencyVerificationRecord,
   type PendingPaymentVerificationState,
   type PendingPaymentVerificationStep,
 } from "@/lib/emergency-flow";
+
+const ProviderTrackingDashboard = dynamic(
+  () => import("@/components/provider-tracking-dashboard").then((module) => module.ProviderTrackingDashboard),
+  { ssr: false }
+);
 
 type PaymentVerificationModalProps = {
   isOpen: boolean;
@@ -39,14 +42,22 @@ function normalizePhoneNumber(phoneNumber: string) {
   return phoneNumber.replace(/[^\d+]/g, "").trim();
 }
 
+function normalizePaymentVerificationStatus(status?: string | null): PendingPaymentVerificationState["paymentVerificationStatus"] {
+  if (status === "pending" || status === "sms-sent" || status === "verified" || status === "invalid") {
+    return status;
+  }
+
+  return "pending";
+}
+
 function createStateFromInputs(params: {
   stripeSessionId: string;
   requestTimestamp: string;
-  paymentStatus?: string;
   location: EmergencyLocation | null;
   pendingState: PendingPaymentVerificationState | null;
+  paymentStatus?: string;
 }): PendingPaymentVerificationState {
-  const { stripeSessionId, requestTimestamp, paymentStatus, location, pendingState } = params;
+  const { stripeSessionId, requestTimestamp, location, pendingState, paymentStatus } = params;
 
   return {
     stripeSessionId,
@@ -55,7 +66,7 @@ function createStateFromInputs(params: {
     longitude: pendingState?.longitude ?? location?.lng ?? null,
     smsSent: pendingState?.smsSent || false,
     currentStep: pendingState?.currentStep || "location",
-    paymentVerificationStatus: pendingState?.paymentVerificationStatus || "pending",
+    paymentVerificationStatus: pendingState?.paymentVerificationStatus || normalizePaymentVerificationStatus(paymentStatus),
     requestTimestamp: pendingState?.requestTimestamp || requestTimestamp,
     isMinimized: pendingState?.isMinimized || false,
     locationAddress: pendingState?.locationAddress || location?.address || undefined,
@@ -80,11 +91,10 @@ export function PaymentVerificationModal({
       createStateFromInputs({
         stripeSessionId,
         requestTimestamp,
-        paymentStatus,
         location: initialLocation,
         pendingState,
       }),
-    [initialLocation, pendingState, paymentStatus, requestTimestamp, stripeSessionId]
+    [initialLocation, pendingState, requestTimestamp, stripeSessionId]
   );
 
   const [phoneNumber, setPhoneNumber] = useState(derivedState.phoneNumber);
@@ -97,6 +107,7 @@ export function PaymentVerificationModal({
   const [currentStep, setCurrentStep] = useState<PendingPaymentVerificationStep>(derivedState.currentStep);
   const [smsSent, setSmsSent] = useState(derivedState.smsSent);
   const [paymentVerificationStatus, setPaymentVerificationStatus] = useState(derivedState.paymentVerificationStatus);
+  const [trackingRecord, setTrackingRecord] = useState<EmergencyVerificationRecord | null>(pendingState?.trackingRecord ?? null);
   const [statusMessage, setStatusMessage] = useState(
     "Your payment was received. Before a charging provider is dispatched, confirm your phone number and emergency location."
   );
@@ -113,6 +124,7 @@ export function PaymentVerificationModal({
     setCurrentStep(derivedState.currentStep);
     setSmsSent(derivedState.smsSent);
     setPaymentVerificationStatus(derivedState.paymentVerificationStatus);
+    setTrackingRecord(derivedState.paymentVerificationStatus === "verified" ? pendingState?.trackingRecord ?? null : pendingState?.trackingRecord ?? null);
     setStatusMessage(
       derivedState.smsSent
         ? "A verification code was sent. Enter it to continue to dispatch."
@@ -122,7 +134,7 @@ export function PaymentVerificationModal({
     if (initialLocation) {
       saveDetectedEmergencyLocation(initialLocation);
     }
-  }, [derivedState, initialLocation]);
+  }, [derivedState, initialLocation, pendingState]);
 
   const persistState = (nextState: PendingPaymentVerificationState) => {
     onStateChange(nextState);
@@ -312,13 +324,30 @@ export function PaymentVerificationModal({
         location: response.location || location,
         requestTimestamp: response.requestTimestamp || requestTimestamp,
         verificationRequestId: stripeSessionId,
-        providerStatus: response.providerStatus || "Locating provider",
+        providerStatus: response.providerStatus || "Assigned",
         estimatedArrivalMinutes: response.estimatedArrivalMinutes ?? null,
+        providerName: response.providerStatus ? undefined : "Dispatch team",
+        vehicleName: response.providerStatus ? undefined : `ChargeNext Truck #${String(Math.abs(stripeSessionId.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0)) % 900 + 100)}`,
+        providerPhone: "+12024252813",
+        trackingStage: "assigned",
+        trackingProgress: 0.12,
+        trackingStartedAt: new Date().toISOString(),
+        refreshCount: 0,
+        distanceRemainingMiles: 7.5,
+        cancelAllowed: true,
         statusUpdatedAt: new Date().toISOString(),
       };
 
       saveVerifiedEmergencyRequest(verifiedRecord);
-      clearPendingPaymentVerificationState();
+      setTrackingRecord(verifiedRecord);
+      persistState(
+        buildNextState({
+          paymentVerificationStatus: "verified",
+          trackingRecord: verifiedRecord,
+          currentStep: "code",
+          smsSent: true,
+        })
+      );
       setPaymentVerificationStatus("verified");
       setStatusMessage("Your emergency request is verified. We are locating an available charging provider now.");
       onVerified(verifiedRecord);
@@ -331,6 +360,57 @@ export function PaymentVerificationModal({
 
   const mapsUrl = buildEmergencyMapsUrl(location);
   const embedUrl = buildEmergencyMapsEmbedUrl(location);
+
+  if (trackingRecord) {
+    const trackingLocation = trackingRecord.location || location;
+
+    return (
+      <Modal
+        isOpen={isOpen}
+        onClose={onMinimize}
+        size="large"
+        layout="fixed-header-footer"
+        closeOnBackdrop={false}
+        closeOnEscape={false}
+        showCloseButton={false}
+      >
+        <ModalHeader showCloseButton={false}>
+          <div className="flex items-center gap-3">
+            <div className="rounded-full bg-sky-100 p-2">
+              <Truck className="h-6 w-6 text-sky-700" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900">Track Your Provider</h2>
+              <p className="text-sm text-slate-500">Your payment and phone are verified</p>
+            </div>
+          </div>
+          <Button variant="secondary" onClick={onMinimize} className="rounded-xl px-3 py-2 text-sm flex-shrink-0">
+            <Minus className="h-4 w-4" />
+          </Button>
+        </ModalHeader>
+
+        <ModalBody>
+          <ProviderTrackingDashboard
+            requestId={trackingRecord.requestId || trackingRecord.stripeSessionId}
+            customerLocation={trackingLocation}
+            initialRecord={trackingRecord}
+            onRecordChange={(nextRecord) => {
+              setTrackingRecord(nextRecord);
+              saveVerifiedEmergencyRequest(nextRecord);
+              persistState(
+                buildNextState({
+                  paymentVerificationStatus: "verified",
+                  trackingRecord: nextRecord,
+                  smsSent: true,
+                  currentStep: "code",
+                })
+              );
+            }}
+          />
+        </ModalBody>
+      </Modal>
+    );
+  }
 
   return (
     <Modal

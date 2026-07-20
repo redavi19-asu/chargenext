@@ -117,6 +117,13 @@ export async function confirmEmergencyVerificationCode(params: {
     requestTimestamp?: string;
     providerStatus?: string;
     estimatedArrivalMinutes?: number | null;
+    providerName?: string;
+    vehicleName?: string;
+    providerPhone?: string;
+    trackingStage?: "assigned" | "en-route" | "arrived" | "charging" | "completed";
+    trackingProgress?: number;
+    distanceRemainingMiles?: number | null;
+    cancelAllowed?: boolean;
     statusUpdatedAt?: string;
   }>("/verification/confirm", {
     verification_request_id: params.verificationRequestId,
@@ -189,6 +196,13 @@ export async function fetchEmergencyRequestStatus(requestId: string) {
   return getJson<{
     requestId: string;
     providerStatus?: string;
+    providerName?: string;
+    vehicleName?: string;
+    providerPhone?: string;
+    trackingStage?: "assigned" | "en-route" | "arrived" | "charging" | "completed";
+    trackingProgress?: number;
+    distanceRemainingMiles?: number | null;
+    cancelAllowed?: boolean;
     estimatedArrivalMinutes?: number | null;
     paymentStatus?: string;
     verifiedPhone?: string;

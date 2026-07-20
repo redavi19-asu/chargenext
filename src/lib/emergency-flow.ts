@@ -9,6 +9,8 @@ export type EmergencyLocation = {
   source?: "gps" | "manual";
 };
 
+export type ProviderTrackingStage = "assigned" | "en-route" | "arrived" | "charging" | "completed";
+
 export type EmergencyCheckoutDraft = {
   location: EmergencyLocation | null;
   capturedAt: string;
@@ -23,6 +25,15 @@ export type EmergencyVerificationRecord = {
   requestTimestamp: string;
   verificationRequestId?: string;
   providerStatus?: string;
+  providerName?: string;
+  vehicleName?: string;
+  providerPhone?: string;
+  trackingStage?: ProviderTrackingStage;
+  trackingProgress?: number;
+  trackingStartedAt?: string;
+  refreshCount?: number;
+  distanceRemainingMiles?: number | null;
+  cancelAllowed?: boolean;
   estimatedArrivalMinutes?: number | null;
   statusUpdatedAt?: string;
 };
@@ -41,6 +52,7 @@ export type PendingPaymentVerificationState = {
   isMinimized: boolean;
   locationAddress?: string;
   locationLabel?: string;
+  trackingRecord?: EmergencyVerificationRecord | null;
   updatedAt: string;
 };
 

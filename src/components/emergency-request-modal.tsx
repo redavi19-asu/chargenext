@@ -3,8 +3,8 @@
 import { MapPin, RefreshCw, ShieldCheck, Smartphone } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Modal, ModalBody, ModalFooter, ModalHeader } from "@/components/ui/modal";
+import { ServiceProcessCard } from "@/components/service-process-card";
 import {
   buildEmergencyMapsEmbedUrl,
   buildEmergencyMapsUrl,
@@ -64,38 +64,13 @@ export function EmergencyRequestModal({
         <div className="space-y-8">
           {/* Main Description */}
           <p className="text-base text-slate-600 leading-relaxed">
-            Here's what happens when you request emergency charging:
+            Here&apos;s what happens when you request emergency charging:
           </p>
 
-          {/* Process Steps */}
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-6">
-            <ol className="space-y-3">
-              <li className="flex gap-4">
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-sky-100 text-sm font-semibold text-sky-700 flex-shrink-0">1</span>
-                <span className="text-sm text-slate-700 pt-1">Confirm your emergency location</span>
-              </li>
-              <li className="flex gap-4">
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-sky-100 text-sm font-semibold text-sky-700 flex-shrink-0">2</span>
-                <span className="text-sm text-slate-700 pt-1">Continue to secure Stripe payment</span>
-              </li>
-              <li className="flex gap-4">
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-sky-100 text-sm font-semibold text-sky-700 flex-shrink-0">3</span>
-                <span className="text-sm text-slate-700 pt-1">Return to ChargeNext after payment</span>
-              </li>
-              <li className="flex gap-4">
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-sky-100 text-sm font-semibold text-sky-700 flex-shrink-0">4</span>
-                <span className="text-sm text-slate-700 pt-1">Verify your phone number with SMS code</span>
-              </li>
-              <li className="flex gap-4">
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-sky-100 text-sm font-semibold text-sky-700 flex-shrink-0">5</span>
-                <span className="text-sm text-slate-700 pt-1">Request and location sent to available providers</span>
-              </li>
-              <li className="flex gap-4">
-                <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-sky-100 text-sm font-semibold text-sky-700 flex-shrink-0">6</span>
-                <span className="text-sm text-slate-700 pt-1">Track provider status from customer dashboard</span>
-              </li>
-            </ol>
-          </div>
+          <ServiceProcessCard
+            title="Emergency charging process"
+            intro="Here&apos;s what happens when you request emergency charging:"
+          />
 
           {/* Important Notice */}
           <div className="rounded-xl border border-amber-200 bg-amber-50 p-6">
@@ -190,7 +165,7 @@ export function EmergencyRequestModal({
               <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
                 <p className="text-xs font-semibold text-emerald-700 uppercase mb-2">Secure Payment</p>
                 <p className="text-sm text-emerald-900 leading-relaxed">
-                  Stripe Checkout keeps your card details secure. You'll return to ChargeNext after payment to complete verification.
+                  Stripe Checkout keeps your card details secure. You&apos;ll return to ChargeNext after payment to complete verification.
                 </p>
               </div>
             </div>

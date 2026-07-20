@@ -93,8 +93,8 @@ export function Modal({
     };
   }, [isOpen, onClose, closeOnEscape]);
 
-  const maxWidthClass = size === "large" ? "max-w-3xl" : "max-w-2xl";
-  const heightClass = size === "large" ? "max-h-[85vh]" : "max-h-screen";
+  const maxWidthClass = size === "large" ? "max-w-[900px]" : "max-w-2xl";
+  const heightClass = size === "large" ? "max-h-[90vh]" : "max-h-screen";
   const contentClass = layout === "fixed-header-footer" ? "flex flex-col" : "";
 
   return (

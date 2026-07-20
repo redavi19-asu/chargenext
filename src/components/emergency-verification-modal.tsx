@@ -1,10 +1,10 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { MapPin, MessageCircle, Phone, RefreshCw, ShieldCheck, Smartphone } from "lucide-react";
+import { MapPin, MessageCircle, Phone, RefreshCw, ShieldCheck, Smartphone, Truck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Modal, ModalBody, ModalFooter, ModalHeader } from "@/components/ui/modal";
 import { CHARGENEXT_URLS } from "@/lib/constants";
 import { confirmEmergencyVerificationCode, sendEmergencyVerificationCode } from "@/lib/emergency-api";
@@ -13,12 +13,18 @@ import {
   buildEmergencyMapsUrl,
   formatEmergencyCoordinates,
   getEmergencyLocationLabel,
+  readVerifiedEmergencyRequest,
   saveDetectedEmergencyLocation,
   saveVerifiedEmergencyRequest,
   saveVerificationRequestId,
   type EmergencyLocation,
   type EmergencyVerificationRecord,
 } from "@/lib/emergency-flow";
+
+const ProviderTrackingDashboard = dynamic(
+  () => import("@/components/provider-tracking-dashboard").then((module) => module.ProviderTrackingDashboard),
+  { ssr: false }
+);
 
 type EmergencyVerificationModalProps = {
   isOpen: boolean;
@@ -47,6 +53,10 @@ export function EmergencyVerificationModal({
   const [verificationCode, setVerificationCode] = useState("");
   const [verificationRequestId, setVerificationRequestId] = useState("");
   const [location, setLocation] = useState<EmergencyLocation | null>(initialLocation);
+  const [trackingRecord, setTrackingRecord] = useState<EmergencyVerificationRecord | null>(() => {
+    const savedRecord = readVerifiedEmergencyRequest();
+    return savedRecord?.stripeSessionId === stripeSessionId ? savedRecord : null;
+  });
   const [manualLat, setManualLat] = useState(initialLocation ? String(initialLocation.lat) : "");
   const [manualLng, setManualLng] = useState(initialLocation ? String(initialLocation.lng) : "");
   const [manualAddress, setManualAddress] = useState(initialLocation?.address ?? "");
@@ -65,6 +75,11 @@ export function EmergencyVerificationModal({
       saveDetectedEmergencyLocation(initialLocation);
     }
   }, [initialLocation]);
+
+  useEffect(() => {
+    const savedRecord = readVerifiedEmergencyRequest();
+    setTrackingRecord(savedRecord?.stripeSessionId === stripeSessionId ? savedRecord : null);
+  }, [stripeSessionId]);
 
   const handleUseCurrentLocation = () => {
     setError("");
@@ -194,12 +209,22 @@ export function EmergencyVerificationModal({
         },
         requestTimestamp: response.requestTimestamp || requestTimestamp,
         verificationRequestId,
-        providerStatus: response.providerStatus || "Locating provider",
+        providerStatus: response.providerStatus || "Assigned",
         estimatedArrivalMinutes: response.estimatedArrivalMinutes ?? null,
+        providerName: response.providerName || "Dispatch team",
+        vehicleName: response.vehicleName || `ChargeNext Truck #${String(Math.abs(verificationRequestId.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0)) % 900 + 100)}`,
+        providerPhone: response.providerPhone || "+12024252813",
+        trackingStage: response.trackingStage || "assigned",
+        trackingProgress: response.trackingProgress ?? 0.12,
+        trackingStartedAt: new Date().toISOString(),
+        refreshCount: 0,
+        distanceRemainingMiles: response.distanceRemainingMiles ?? 7.5,
+        cancelAllowed: response.cancelAllowed ?? true,
         statusUpdatedAt: response.statusUpdatedAt || new Date().toISOString(),
       };
 
       saveVerifiedEmergencyRequest(verifiedRecord);
+      setTrackingRecord(verifiedRecord);
       setStatusMessage("Your emergency request has been verified. A charging provider is being located now.");
       onVerified(verifiedRecord);
     } catch (verifyError) {
@@ -211,6 +236,50 @@ export function EmergencyVerificationModal({
 
   const embedUrl = buildEmergencyMapsEmbedUrl(location);
   const mapsUrl = buildEmergencyMapsUrl(location);
+
+  if (trackingRecord) {
+    const trackingLocation = trackingRecord.location || location || {
+      lat: 0,
+      lng: 0,
+      source: "manual",
+    };
+
+    return (
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        size="large"
+        layout="fixed-header-footer"
+        closeOnBackdrop={true}
+        closeOnEscape={true}
+        showCloseButton={true}
+      >
+        <ModalHeader onClose={onClose} showCloseButton={true}>
+          <div className="flex items-center gap-3">
+            <div className="rounded-full bg-sky-100 p-2">
+              <Truck className="h-6 w-6 text-sky-700" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900">Track Your Provider</h2>
+              <p className="text-sm text-slate-500">Your payment and phone number are verified</p>
+            </div>
+          </div>
+        </ModalHeader>
+
+        <ModalBody>
+          <ProviderTrackingDashboard
+            requestId={trackingRecord.requestId || trackingRecord.stripeSessionId}
+            customerLocation={trackingLocation}
+            initialRecord={trackingRecord}
+            onRecordChange={(nextRecord) => {
+              setTrackingRecord(nextRecord);
+              saveVerifiedEmergencyRequest(nextRecord);
+            }}
+          />
+        </ModalBody>
+      </Modal>
+    );
+  }
 
   return (
     <Modal

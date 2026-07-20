@@ -3,7 +3,6 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { useRef, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { motion, useScroll, useSpring, useTransform } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import { Zap, Plug, Car, MapPin, Smartphone, ShieldCheck, Menu, X } from "lucide-react";
@@ -13,13 +12,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Modal } from "@/components/ui/modal";
 import { EmergencyRequestModal } from "@/components/emergency-request-modal";
 import { PaymentVerificationModal } from "@/components/payment-verification-modal";
+import { SchedulingRequestModal } from "@/components/scheduling-request-modal";
 import { ServiceConfirmationModal } from "@/components/service-confirmation-modal";
 import { BatteryMeter } from "@/components/ui/battery-meter";
 import { FloatingEmergencyButton } from "@/components/ui/floating-button";
 import { StepOneMap } from "@/components/step-one-map";
 import { Footer } from "@/components/footer";
 import { CHARGENEXT_URLS } from "@/lib/constants";
-import { CHARGENEXT_SERVICES, type ServiceId, getService, getServiceMetadata } from "@/lib/services-config";
+import { type ServiceId, getService, getServiceMetadata } from "@/lib/services-config";
 import { createEmergencyCheckoutSession, verifyStripeCheckoutSession } from "@/lib/emergency-api";
 import {
   clearPendingPaymentVerificationState,
@@ -29,6 +29,7 @@ import {
   readPendingPaymentVerificationState,
   saveDetectedEmergencyLocation,
   savePendingPaymentVerificationState,
+  saveVerifiedEmergencyRequest,
   type EmergencyLocation,
   type EmergencyVerificationRecord,
   type PendingPaymentVerificationState,
@@ -399,10 +400,7 @@ function Hero({ onEmergencyNow, onScheduleCharge }: HeroProps) {
                   <Button
                     variant="secondary"
                     className="rounded-xl px-8 py-6 text-base font-semibold bg-white/15 text-white border border-cyan-400/40 hover:bg-white/25 hover:border-cyan-400/60 transition-all backdrop-blur-sm"
-                    onClick={() => {
-                      const pricingElement = document.getElementById("pricing");
-                      pricingElement?.scrollIntoView({ behavior: "smooth" });
-                    }}
+                    onClick={onScheduleCharge}
                   >
                     📅 Schedule a Charge
                   </Button>
@@ -531,9 +529,10 @@ function Features() {
 type PricingProps = {
   onEmergencyNow: () => void;
   onServiceSelect: (serviceId: ServiceId) => void;
+  onRequestQuote: () => void;
 };
 
-function Pricing({ onEmergencyNow, onServiceSelect }: PricingProps) {
+function Pricing({ onEmergencyNow, onServiceSelect, onRequestQuote }: PricingProps) {
   const pricingTiers = [
     {
       id: "emergency-boost",
@@ -694,14 +693,13 @@ function Pricing({ onEmergencyNow, onServiceSelect }: PricingProps) {
                         </p>
                       </>
                     ) : tier.id === "fleet-services" ? (
-                      <a href="mailto:sales@chargenext.com">
-                        <Button
-                          variant="secondary"
-                          className="cta-btn cta-btn--blue w-full"
-                        >
-                          Request Quote
-                        </Button>
-                      </a>
+                      <Button
+                        variant="secondary"
+                        className="cta-btn cta-btn--blue w-full"
+                        onClick={onRequestQuote}
+                      >
+                        Request Quote
+                      </Button>
                     ) : (
                       <Button 
                         variant="secondary"
@@ -730,9 +728,10 @@ function Pricing({ onEmergencyNow, onServiceSelect }: PricingProps) {
 
 type FinalCTAProps = {
   onEmergencyNow: () => void;
+  onScheduleCharge: () => void;
 };
 
-function FinalCTA({ onEmergencyNow }: FinalCTAProps) {
+function FinalCTA({ onEmergencyNow, onScheduleCharge }: FinalCTAProps) {
   return (
     <Section className="bg-slate-900 text-white">
       <div className="mx-auto max-w-4xl px-6 py-24 text-center md:py-32">
@@ -759,10 +758,7 @@ function FinalCTA({ onEmergencyNow }: FinalCTAProps) {
             <Button
               variant="secondary"
               className="rounded-2xl px-8 py-6 text-base font-semibold bg-white/10 text-white transition hover:bg-white/20"
-              onClick={() => {
-                const pricingElement = document.getElementById("pricing");
-                pricingElement?.scrollIntoView({ behavior: "smooth" });
-              }}
+              onClick={onScheduleCharge}
             >
               Schedule a Charge
             </Button>
@@ -867,17 +863,13 @@ function MobileMenu({ onSchedule, onEmergencyNow }: MobileMenuProps) {
 }
 
 export default function Home() {
-  const router = useRouter();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPullUpModalOpen, setIsPullUpModalOpen] = useState(false);
-  const [selectedTier, setSelectedTier] = useState<string | null>(null);
   const [selectedService, setSelectedService] = useState<ServiceId | null>(null);
   const [isServiceConfirmationOpen, setIsServiceConfirmationOpen] = useState(false);
   const [isServiceCheckoutProcessing, setIsServiceCheckoutProcessing] = useState(false);
   const [gpsLatitude, setGpsLatitude] = useState("");
   const [gpsLongitude, setGpsLongitude] = useState("");
   const [gpsAccuracy, setGpsAccuracy] = useState("");
-  const [gpsMapsLink, setGpsMapsLink] = useState("");
   const [gpsDetected, setGpsDetected] = useState(false);
   const [isGpsDetecting, setIsGpsDetecting] = useState(false);
   const [isEmergencyRequestModalOpen, setIsEmergencyRequestModalOpen] = useState(false);
@@ -886,6 +878,8 @@ export default function Home() {
   const [pendingPaymentVerification, setPendingPaymentVerification] = useState<PendingPaymentVerificationState | null>(null);
   const [paymentVerificationBootstrapping, setPaymentVerificationBootstrapping] = useState(false);
   const [paymentVerificationError, setPaymentVerificationError] = useState("");
+  const [isSchedulingRequestModalOpen, setIsSchedulingRequestModalOpen] = useState(false);
+  const [schedulingRequestDefaultServiceType, setSchedulingRequestDefaultServiceType] = useState("Scheduled Charging");
 
   const captureCurrentGpsLocation = (onComplete?: (location: EmergencyLocation | null) => void) => {
     setIsGpsDetecting(true);
@@ -893,7 +887,6 @@ export default function Home() {
     setGpsLatitude("");
     setGpsLongitude("");
     setGpsAccuracy("");
-    setGpsMapsLink("");
 
     if (!navigator.geolocation) {
       setIsGpsDetecting(false);
@@ -917,7 +910,6 @@ export default function Home() {
         setGpsLatitude(lat);
         setGpsLongitude(lng);
         setGpsAccuracy(accuracy);
-        setGpsMapsLink(`https://www.google.com/maps?q=${lat},${lng}`);
         setGpsDetected(true);
         setIsGpsDetecting(false);
         onComplete?.(location);
@@ -944,6 +936,11 @@ export default function Home() {
     setSelectedService(serviceId);
     setIsServiceConfirmationOpen(true);
     captureCurrentGpsLocation();
+  };
+
+  const handleOpenSchedulingRequest = (defaultServiceType = "Scheduled Charging") => {
+    setSchedulingRequestDefaultServiceType(defaultServiceType);
+    setIsSchedulingRequestModalOpen(true);
   };
 
   const handleConfirmService = async () => {
@@ -1143,10 +1140,22 @@ export default function Home() {
   }, []);
 
   const handleVerifiedPayment = (record: EmergencyVerificationRecord) => {
-    clearPendingPaymentVerificationState();
-    setPendingPaymentVerification(null);
-    const nextRequestId = record.requestId || record.stripeSessionId;
-    router.push(`/emergency/status?requestId=${encodeURIComponent(nextRequestId)}`);
+    saveVerifiedEmergencyRequest(record);
+
+    if (!pendingPaymentVerification) {
+      return;
+    }
+
+    const nextState: PendingPaymentVerificationState = {
+      ...pendingPaymentVerification,
+      paymentVerificationStatus: "verified",
+      trackingRecord: record,
+      isMinimized: false,
+      updatedAt: new Date().toISOString(),
+    };
+
+    setPendingPaymentVerification(nextState);
+    savePendingPaymentVerificationState(nextState);
   };
 
   const handlePaymentVerificationStateChange = (nextState: PendingPaymentVerificationState) => {
@@ -1182,10 +1191,7 @@ export default function Home() {
     <div id="top" className="relative bg-white text-slate-900">
       <ProgressBar />
       <MobileMenu
-        onSchedule={() => {
-          const pricingElement = document.getElementById("pricing");
-          pricingElement?.scrollIntoView({ behavior: "smooth" });
-        }}
+        onSchedule={() => handleOpenSchedulingRequest("Scheduled Charging")}
         onEmergencyNow={handleOpenEmergencyRequestModal}
       />
       <FloatingEmergencyButton />
@@ -1230,7 +1236,10 @@ export default function Home() {
         </button>
       ) : null}
       
-      <Hero onEmergencyNow={handleOpenEmergencyRequestModal} />
+      <Hero
+        onEmergencyNow={handleOpenEmergencyRequestModal}
+        onScheduleCharge={() => handleOpenSchedulingRequest("Scheduled Charging")}
+      />
       <StoryPanel
         id="how-it-works"
         step={1}
@@ -1257,129 +1266,23 @@ export default function Home() {
         media={<BatteryMeter />}
       />
       <Features />
-      <Pricing onEmergencyNow={handleOpenEmergencyRequestModal} onServiceSelect={handleOpenServiceConfirmation} />
-      <FinalCTA onEmergencyNow={handleOpenEmergencyRequestModal} />
+      <Pricing
+        onEmergencyNow={handleOpenEmergencyRequestModal}
+        onServiceSelect={handleOpenServiceConfirmation}
+        onRequestQuote={() => handleOpenSchedulingRequest("Fleet EV Charging")}
+      />
+      <FinalCTA
+        onEmergencyNow={handleOpenEmergencyRequestModal}
+        onScheduleCharge={() => handleOpenSchedulingRequest("Scheduled Charging")}
+      />
       <CTA />
       <Footer />
 
-      <Modal 
-        isOpen={isModalOpen} 
-        onClose={() => {
-          setIsModalOpen(false);
-          setSelectedTier(null);
-        }}
-        title="Request a Charge"
-        selectedTier={selectedTier}
-      >
-        <form 
-          action={CHARGENEXT_URLS.formspreeEndpoint} 
-          method="POST"
-          className="space-y-4"
-        >
-          {selectedTier && (
-            <div className="mb-4 rounded-lg bg-sky-50 border border-sky-200 p-4">
-              <p className="text-sm font-medium text-sky-900">
-                Selected Service: <span className="font-bold capitalize">{selectedTier.replace(/-/g, ' ')}</span>
-              </p>
-            </div>
-          )}
-          
-          <input type="hidden" name="service_tier" value={selectedTier || ''} />
-          <input type="hidden" name="latitude" value={gpsLatitude} />
-          <input type="hidden" name="longitude" value={gpsLongitude} />
-          <input type="hidden" name="accuracy" value={gpsAccuracy} />
-          <input type="hidden" name="maps_link" value={gpsMapsLink} />
-
-          <div>
-            <label htmlFor="form-name" className="block text-sm font-medium text-slate-700">
-              Full Name
-            </label>
-            <input
-              type="text"
-              id="form-name"
-              name="name"
-              required
-              className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="form-email" className="block text-sm font-medium text-slate-700">
-              Email
-            </label>
-            <input
-              type="email"
-              id="form-email"
-              name="email"
-              required
-              className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="form-phone" className="block text-sm font-medium text-slate-700">
-              Phone Number
-            </label>
-            <input
-              type="tel"
-              id="form-phone"
-              name="phone"
-              required
-              className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="form-location" className="block text-sm font-medium text-slate-700">
-              Location
-            </label>
-            <input
-              type="text"
-              id="form-location"
-              name="location"
-              required
-              placeholder="Street address or landmark"
-              className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
-            />
-            {gpsDetected && (
-              <p className="mt-2 text-xs text-emerald-700">
-                Detected GPS saved with your request ✅ ({gpsLatitude}, {gpsLongitude})
-              </p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="form-vehicle" className="block text-sm font-medium text-slate-700">
-              Vehicle Make & Model
-            </label>
-            <input
-              type="text"
-              id="form-vehicle"
-              name="vehicle"
-              required
-              placeholder="e.g., Tesla Model 3, Nissan Leaf"
-              className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="form-message" className="block text-sm font-medium text-slate-700">
-              Additional Details
-            </label>
-            <textarea
-              id="form-message"
-              name="message"
-              rows={3}
-              className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-slate-900 focus:border-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500/20"
-              placeholder="Any special requirements or information..."
-            />
-          </div>
-
-          <Button type="submit" className="w-full rounded-xl py-6 text-base">
-            Submit Request
-          </Button>
-        </form>
-      </Modal>
+      <SchedulingRequestModal
+        isOpen={isSchedulingRequestModalOpen}
+        onClose={() => setIsSchedulingRequestModalOpen(false)}
+        defaultServiceType={schedulingRequestDefaultServiceType}
+      />
 
       <Modal
         isOpen={isPullUpModalOpen}

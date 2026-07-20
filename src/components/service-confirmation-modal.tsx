@@ -3,6 +3,7 @@
 import { Clock, MapPin, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Modal, ModalBody, ModalFooter, ModalHeader } from "@/components/ui/modal";
+import { ServiceProcessCard } from "@/components/service-process-card";
 import { type ChargeNextService } from "@/lib/services-config";
 import type { EmergencyLocation } from "@/lib/emergency-flow";
 
@@ -86,7 +87,7 @@ export function ServiceConfirmationModal({
 
             {/* Service Highlights */}
             <div className="space-y-3">
-              <p className="text-xs font-semibold text-slate-700 uppercase">What's Included</p>
+              <p className="text-xs font-semibold text-slate-700 uppercase">What&apos;s Included</p>
               <ul className="space-y-2">
                 {service.bullets.map((bullet, i) => (
                   <li key={i} className="flex items-start gap-3">
@@ -125,6 +126,11 @@ export function ServiceConfirmationModal({
               </div>
             </div>
           )}
+
+          <ServiceProcessCard
+            title={`${service.name} process`}
+            intro={`Here&apos;s what happens when you request ${service.name.toLowerCase()}:`}
+          />
 
           {/* Legal Notice */}
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs text-slate-600">

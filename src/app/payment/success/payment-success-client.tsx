@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { AlertCircle, Loader2, ShieldCheck } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -12,12 +12,12 @@ import {
   readEmergencyCheckoutDraft,
   saveCheckoutSessionId,
   saveDetectedEmergencyLocation,
+  saveVerifiedEmergencyRequest,
   type EmergencyLocation,
   type EmergencyVerificationRecord,
 } from "@/lib/emergency-flow";
 
 export default function PaymentSuccessClient() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
   const [isVerified, setIsVerified] = useState(false);
@@ -89,8 +89,7 @@ export default function PaymentSuccessClient() {
   }, [searchParams]);
 
   const handleVerified = (record: EmergencyVerificationRecord) => {
-    const nextRequestId = record.requestId || record.stripeSessionId;
-    router.replace(`/emergency/status?requestId=${encodeURIComponent(nextRequestId)}`);
+    saveVerifiedEmergencyRequest(record);
   };
 
   return (
@@ -138,7 +137,7 @@ export default function PaymentSuccessClient() {
                 requestTimestamp={requestTimestamp}
                 initialLocation={paymentLocation}
                 paymentStatus={paymentStatus}
-                onClose={() => router.push("/")}
+                onClose={() => window.location.assign("/")}
                 onVerified={handleVerified}
               />
             ) : null}
