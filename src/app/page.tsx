@@ -938,6 +938,21 @@ export default function Home() {
     captureCurrentGpsLocation();
   };
 
+  const handleServiceLocationChange = (location: EmergencyLocation | null) => {
+    if (!location) {
+      setGpsDetected(false);
+      setGpsLatitude("");
+      setGpsLongitude("");
+      setGpsAccuracy("");
+      return;
+    }
+
+    setGpsDetected(true);
+    setGpsLatitude(location.lat.toFixed(6));
+    setGpsLongitude(location.lng.toFixed(6));
+    setGpsAccuracy(location.accuracy ? String(Math.round(location.accuracy)) : "");
+  };
+
   const handleOpenSchedulingRequest = (defaultServiceType = "Scheduled Charging") => {
     setSchedulingRequestDefaultServiceType(defaultServiceType);
     setIsSchedulingRequestModalOpen(true);
@@ -1412,6 +1427,7 @@ export default function Home() {
         location={gpsDetected ? { lat: Number(gpsLatitude), lng: Number(gpsLongitude), accuracy: gpsAccuracy ? Number(gpsAccuracy) : undefined, source: "gps" } : null}
         isProcessing={isServiceCheckoutProcessing}
         onConfirm={handleConfirmService}
+        onLocationChange={handleServiceLocationChange}
         onCancel={() => {
           setIsServiceConfirmationOpen(false);
           setSelectedService(null);
