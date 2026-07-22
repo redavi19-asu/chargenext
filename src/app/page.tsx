@@ -85,7 +85,7 @@ type HeroProps = {
   onScheduleCharge?: () => void;
 };
 
-function ChargeNextLogo() {
+function ElectricScanner() {
   const prefersReducedMotion = useReducedMotion();
 
   return (
