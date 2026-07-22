@@ -94,9 +94,9 @@ function ElectricScanner() {
       initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
       animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
       transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.6, delay: 3.05, ease: "easeOut" }}
-      className="mt-1 flex justify-center"
+      className="mt-1 flex w-full justify-center"
     >
-      <div className="relative w-[clamp(360px,54vw,620px)] px-2 sm:px-0">
+      <div className="relative w-[88vw] max-w-[360px] px-0 sm:w-[min(54vw,620px)] sm:max-w-none">
         <div
           className="absolute left-1/2 top-full mt-2 h-3 w-[84%] -translate-x-1/2 rounded-full bg-cyan-400/20 blur-2xl"
           style={{ transform: "translateX(-50%)" }}
