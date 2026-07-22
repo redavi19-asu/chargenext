@@ -96,31 +96,40 @@ function ElectricScanner() {
       transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.6, delay: 3.05, ease: "easeOut" }}
       className="mt-1 flex w-full justify-center"
     >
-      <div className="relative w-[88vw] max-w-[360px] px-0 sm:w-[min(54vw,620px)] sm:max-w-none">
-        <div
-          className="absolute left-1/2 top-full mt-2 h-3 w-[84%] -translate-x-1/2 rounded-full bg-cyan-400/20 blur-2xl"
-          style={{ transform: "translateX(-50%)" }}
-        />
+      <div className="inline-flex items-center justify-center gap-[6px] whitespace-nowrap sm:gap-[10px]">
+        <motion.h1
+          className="font-orbitron text-[clamp(2.4rem,11vw,4rem)] sm:text-6xl md:text-8xl lg:text-[10rem] font-black tracking-tighter sm:tracking-tight text-white drop-shadow-2xl leading-none"
+          animate={prefersReducedMotion ? undefined : { x: [-6, 0], opacity: [0, 1] }}
+          transition={prefersReducedMotion ? undefined : { duration: 1.3, ease: "easeIn" }}
+          style={{
+            textShadow: "0 0 30px rgba(34, 211, 238, 0.3), 0 0 60px rgba(56, 189, 248, 0.1)",
+            lineHeight: "1.1",
+          }}
+        >
+          Charge
+        </motion.h1>
 
-        <div className="relative h-3.5 overflow-hidden rounded-full border border-cyan-200/20 bg-[linear-gradient(180deg,rgba(5,10,18,0.95),rgba(9,18,30,0.88))] shadow-[inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(34,211,238,0.12),0_12px_28px_rgba(0,0,0,0.45)] backdrop-blur-md sm:h-3">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(34,211,238,0.08),transparent_72%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.04),transparent_20%,transparent_80%,rgba(255,255,255,0.02))]" />
+        <motion.span
+          aria-hidden="true"
+          className="relative inline-flex h-[26px] w-[26px] flex-shrink-0 items-center justify-center sm:h-[34px] sm:w-[34px]"
+          animate={prefersReducedMotion ? undefined : { scale: [0.96, 1.08, 0.96] }}
+          transition={prefersReducedMotion ? undefined : { duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+          style={{ filter: "drop-shadow(0 0 16px rgba(34, 211, 238, 0.7))" }}
+        >
+          <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(34,211,238,0.95)_0%,rgba(34,211,238,0.75)_30%,rgba(34,211,238,0.18)_58%,transparent_78%)] shadow-[0_0_18px_rgba(34,211,238,0.45),0_0_42px_rgba(56,189,248,0.22)]" />
+          <span className="absolute inset-[6px] rounded-full bg-[radial-gradient(circle,rgba(125,211,252,1)_0%,rgba(34,211,238,0.95)_45%,rgba(34,211,238,0.35)_100%)]" />
+        </motion.span>
 
-          {prefersReducedMotion ? (
-            <div className="absolute inset-y-0 left-1/2 w-[18%] -translate-x-1/2 rounded-full bg-[linear-gradient(90deg,transparent_0%,rgba(34,211,238,0.12)_15%,rgba(34,211,238,0.88)_50%,rgba(34,211,238,0.12)_85%,transparent_100%)] shadow-[0_0_18px_rgba(34,211,238,0.45)]" />
-          ) : (
-            <motion.div
-              className="absolute inset-y-0 left-1/2 w-[18%] -translate-x-1/2"
-              animate={{ x: ["-220%", "220%", "-220%"] }}
-              transition={{ duration: 2.7, repeat: Infinity, ease: "easeInOut" }}
-              style={{ filter: "drop-shadow(0 0 14px rgba(34, 211, 238, 0.7))" }}
-            >
-              <div className="absolute inset-0 rounded-full bg-[linear-gradient(90deg,transparent_0%,rgba(34,211,238,0.04)_12%,rgba(34,211,238,0.58)_42%,rgba(125,211,252,1)_50%,rgba(34,211,238,0.58)_58%,rgba(34,211,238,0.04)_88%,transparent_100%)]" />
-              <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_50%,rgba(125,211,252,0.95)_0%,rgba(34,211,238,0.9)_26%,rgba(34,211,238,0.35)_52%,transparent_78%)] blur-[0.5px]" />
-              <div className="absolute inset-0 rounded-full ring-1 ring-cyan-200/30" />
-            </motion.div>
-          )}
-        </div>
+        <motion.h1
+          className="font-orbitron text-[clamp(2.4rem,11vw,4rem)] sm:text-6xl md:text-8xl lg:text-[10rem] font-black tracking-tighter sm:tracking-tight bg-gradient-to-r from-cyan-200 via-cyan-300 to-sky-400 bg-clip-text text-transparent drop-shadow-2xl text-electric-shimmer idle-glow leading-none"
+          animate={prefersReducedMotion ? undefined : { x: [6, 0], opacity: [0, 1] }}
+          transition={prefersReducedMotion ? undefined : { duration: 1.3, ease: "easeIn" }}
+          style={{
+            lineHeight: "1.1",
+          }}
+        >
+          Next
+        </motion.h1>
       </div>
     </motion.div>
   );
@@ -295,71 +304,7 @@ function Hero({ onEmergencyNow, onScheduleCharge }: HeroProps) {
                 />
               </motion.div>
 
-              {/* ===== LEFT TEXT - "Charge" ===== */}
-              <motion.div
-                initial={{ x: -800, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{
-                  duration: 1.3,
-                  ease: "easeIn",
-                  type: "tween",
-                }}
-                className="relative flex-shrink-0 z-30"
-              >
-                <h1 className="font-orbitron text-5xl sm:text-6xl md:text-8xl lg:text-[10rem] font-black tracking-tighter sm:tracking-tight text-white drop-shadow-2xl"
-                  style={{
-                    textShadow: "0 0 30px rgba(34, 211, 238, 0.3), 0 0 60px rgba(56, 189, 248, 0.1)",
-                    lineHeight: "1.1",
-                  }}
-                >
-                  Charge
-                </h1>
-              </motion.div>
-
-              {/* ===== RIGHT TEXT - "Next" ===== */}
-              <motion.div
-                initial={{ x: 800, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{
-                  duration: 1.3,
-                  ease: "easeIn",
-                  type: "tween",
-                }}
-                className="relative flex-shrink-0 z-30"
-              >
-                <motion.h1
-                  className="font-orbitron text-5xl sm:text-6xl md:text-8xl lg:text-[10rem] font-black tracking-tighter sm:tracking-tight bg-gradient-to-r from-cyan-200 via-cyan-300 to-sky-400 bg-clip-text text-transparent drop-shadow-2xl text-electric-shimmer idle-glow"
-                  animate={{ scale: [0.95, 1] }}
-                  transition={{ duration: 0.2, delay: 1.3 }}
-                  style={{
-                    lineHeight: "1.1",
-                  }}
-                >
-                  Next
-                </motion.h1>
-              </motion.div>
-
-              {/* ===== POST-COLLISION GLOW AROUND LOGO ===== */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: [0, 0.6, 0.2], scale: [0.8, 1.2, 1.1] }}
-                transition={{ duration: 1.5, delay: 1.5, ease: "easeOut" }}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10 post-collision-pulse"
-                style={{
-                  width: "600px",
-                  height: "200px",
-                }}
-              >
-                <div
-                  className="w-full h-full rounded-full blur-2xl"
-                  style={{
-                    background: "radial-gradient(ellipse, rgba(34, 211, 238, 0.3) 0%, transparent 70%)",
-                  }}
-                />
-              </motion.div>
-              <div className="basis-full flex justify-center pt-2 sm:pt-3 lg:pt-0">
-                <ElectricScanner />
-              </div>
+              <ChargeNextLogo />
             </div>
 
             {/* ===== CTA AND DESCRIPTION SECTION ===== */}
