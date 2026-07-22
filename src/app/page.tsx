@@ -110,8 +110,8 @@ function ElectricScanner() {
             <div className="absolute inset-y-0 left-1/2 w-[18%] -translate-x-1/2 rounded-full bg-[linear-gradient(90deg,transparent_0%,rgba(34,211,238,0.12)_15%,rgba(34,211,238,0.88)_50%,rgba(34,211,238,0.12)_85%,transparent_100%)] shadow-[0_0_18px_rgba(34,211,238,0.45)]" />
           ) : (
             <motion.div
-              className="absolute inset-y-0 left-0 w-[18%]"
-              animate={{ x: [0, "455%", 0] }}
+              className="absolute inset-y-0 left-1/2 w-[18%] -translate-x-1/2"
+              animate={{ x: ["-220%", "220%", "-220%"] }}
               transition={{ duration: 2.7, repeat: Infinity, ease: "easeInOut" }}
               style={{ filter: "drop-shadow(0 0 14px rgba(34, 211, 238, 0.7))" }}
             >
