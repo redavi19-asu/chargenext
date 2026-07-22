@@ -359,6 +359,8 @@ function Hero({ onEmergencyNow, onScheduleCharge }: HeroProps) {
               </motion.div>
             </div>
 
+            <ElectricScanner />
+
             {/* ===== CTA AND DESCRIPTION SECTION ===== */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
@@ -462,10 +464,7 @@ function Hero({ onEmergencyNow, onScheduleCharge }: HeroProps) {
                   </Button>
                 </motion.div>
               </motion.div>
-
             </motion.div>
-
-            <ElectricScanner />
           </motion.div>
         </Sticky>
       </div>
