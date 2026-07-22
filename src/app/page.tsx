@@ -94,24 +94,24 @@ function ElectricScanner() {
       initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
       animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
       transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.6, delay: 3.05, ease: "easeOut" }}
-      className="mt-8 flex justify-center"
+      className="mt-4 flex justify-center"
     >
-      <div className="relative w-[clamp(250px,30vw,350px)] px-2 sm:px-0">
+      <div className="relative w-[clamp(320px,42vw,500px)] px-2 sm:px-0">
         <div
-          className="absolute left-1/2 top-full mt-2 h-3 w-[72%] -translate-x-1/2 rounded-full bg-cyan-400/20 blur-2xl"
+          className="absolute left-1/2 top-full mt-2 h-3 w-[78%] -translate-x-1/2 rounded-full bg-cyan-400/20 blur-2xl"
           style={{ transform: "translateX(-50%)" }}
         />
 
-        <div className="relative h-3 overflow-hidden rounded-full border border-cyan-200/20 bg-[linear-gradient(180deg,rgba(5,10,18,0.95),rgba(9,18,30,0.88))] shadow-[inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(34,211,238,0.12),0_12px_28px_rgba(0,0,0,0.45)] backdrop-blur-md">
+        <div className="relative h-3.5 overflow-hidden rounded-full border border-cyan-200/20 bg-[linear-gradient(180deg,rgba(5,10,18,0.95),rgba(9,18,30,0.88))] shadow-[inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(34,211,238,0.12),0_12px_28px_rgba(0,0,0,0.45)] backdrop-blur-md sm:h-3">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(34,211,238,0.08),transparent_72%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.04),transparent_20%,transparent_80%,rgba(255,255,255,0.02))]" />
 
           {prefersReducedMotion ? (
-            <div className="absolute inset-y-0 left-1/2 w-[28%] -translate-x-1/2 rounded-full bg-[linear-gradient(90deg,transparent_0%,rgba(34,211,238,0.12)_15%,rgba(34,211,238,0.88)_50%,rgba(34,211,238,0.12)_85%,transparent_100%)] shadow-[0_0_18px_rgba(34,211,238,0.45)]" />
+            <div className="absolute inset-y-0 left-1/2 w-[22%] -translate-x-1/2 rounded-full bg-[linear-gradient(90deg,transparent_0%,rgba(34,211,238,0.12)_15%,rgba(34,211,238,0.88)_50%,rgba(34,211,238,0.12)_85%,transparent_100%)] shadow-[0_0_18px_rgba(34,211,238,0.45)]" />
           ) : (
             <motion.div
-              className="absolute inset-y-0 left-0 w-[28%]"
-              animate={{ x: [0, "257%", 0] }}
+              className="absolute inset-y-0 left-0 w-[22%]"
+              animate={{ x: [0, "355%", 0] }}
               transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
               style={{ filter: "drop-shadow(0 0 14px rgba(34, 211, 238, 0.7))" }}
             >
@@ -463,8 +463,9 @@ function Hero({ onEmergencyNow, onScheduleCharge }: HeroProps) {
                 </motion.div>
               </motion.div>
 
-              <ElectricScanner />
             </motion.div>
+
+            <ElectricScanner />
           </motion.div>
         </Sticky>
       </div>
