@@ -142,7 +142,7 @@ function Hero({ onEmergencyNow, onScheduleCharge }: HeroProps) {
             className="mx-auto max-w-6xl px-6 text-center"
           >
             {/* ===== CINEMATIC HERO COLLISION SEQUENCE ===== */}
-            <div className="mb-8 sm:mb-12 md:mb-16 flex items-center justify-center relative h-52 sm:h-64 md:h-72 lg:h-96 overflow-visible lg:overflow-hidden pt-2 sm:pt-3 pointer-events-none">
+            <div className="mb-8 sm:mb-12 md:mb-16 flex flex-wrap items-center justify-center relative h-52 sm:h-64 md:h-72 lg:h-96 overflow-visible lg:flex-nowrap lg:overflow-hidden pt-2 sm:pt-3 pointer-events-none">
               
               {/* ===== CENTER ENERGY CORE - Pre-impact pulse ===== */}
               <motion.div
@@ -357,7 +357,9 @@ function Hero({ onEmergencyNow, onScheduleCharge }: HeroProps) {
                   }}
                 />
               </motion.div>
-              <ElectricScanner />
+              <div className="basis-full flex justify-center pt-2 sm:pt-3 lg:pt-0">
+                <ElectricScanner />
+              </div>
             </div>
 
             {/* ===== CTA AND DESCRIPTION SECTION ===== */}
