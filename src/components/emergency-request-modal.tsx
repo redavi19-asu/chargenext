@@ -34,7 +34,7 @@ export function EmergencyRequestModal({
   onCancel,
   onContinue,
 }: EmergencyRequestModalProps) {
-  const continueDisabled = isDetectingLocation || isProcessing || hasSubmitted || !location;
+  const continueDisabled = isDetectingLocation || isProcessing || hasSubmitted;
   const embedUrl = buildEmergencyMapsEmbedUrl(location);
   const mapsUrl = buildEmergencyMapsUrl(location);
 

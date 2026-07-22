@@ -3,7 +3,7 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { useRef, useState, useEffect } from "react";
-import { motion, useScroll, useSpring, useTransform } from "framer-motion";
+import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import { Zap, Plug, Car, MapPin, Smartphone, ShieldCheck, Menu, X } from "lucide-react";
 
@@ -84,6 +84,47 @@ type HeroProps = {
   onEmergencyNow: () => void;
   onScheduleCharge?: () => void;
 };
+
+function ElectricScanner() {
+  const prefersReducedMotion = useReducedMotion();
+
+  return (
+    <motion.div
+      aria-hidden="true"
+      initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
+      animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+      transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.6, delay: 3.05, ease: "easeOut" }}
+      className="mt-8 flex justify-center"
+    >
+      <div className="relative w-[clamp(250px,30vw,350px)] px-2 sm:px-0">
+        <div
+          className="absolute left-1/2 top-full mt-2 h-3 w-[72%] -translate-x-1/2 rounded-full bg-cyan-400/20 blur-2xl"
+          style={{ transform: "translateX(-50%)" }}
+        />
+
+        <div className="relative h-3 overflow-hidden rounded-full border border-cyan-200/20 bg-[linear-gradient(180deg,rgba(5,10,18,0.95),rgba(9,18,30,0.88))] shadow-[inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(34,211,238,0.12),0_12px_28px_rgba(0,0,0,0.45)] backdrop-blur-md">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(34,211,238,0.08),transparent_72%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.04),transparent_20%,transparent_80%,rgba(255,255,255,0.02))]" />
+
+          {prefersReducedMotion ? (
+            <div className="absolute inset-y-0 left-1/2 w-[28%] -translate-x-1/2 rounded-full bg-[linear-gradient(90deg,transparent_0%,rgba(34,211,238,0.12)_15%,rgba(34,211,238,0.88)_50%,rgba(34,211,238,0.12)_85%,transparent_100%)] shadow-[0_0_18px_rgba(34,211,238,0.45)]" />
+          ) : (
+            <motion.div
+              className="absolute inset-y-0 left-0 w-[28%]"
+              animate={{ x: [0, "257%", 0] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+              style={{ filter: "drop-shadow(0 0 14px rgba(34, 211, 238, 0.7))" }}
+            >
+              <div className="absolute inset-0 rounded-full bg-[linear-gradient(90deg,transparent_0%,rgba(34,211,238,0.04)_12%,rgba(34,211,238,0.58)_42%,rgba(125,211,252,1)_50%,rgba(34,211,238,0.58)_58%,rgba(34,211,238,0.04)_88%,transparent_100%)]" />
+              <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_50%,rgba(125,211,252,0.95)_0%,rgba(34,211,238,0.9)_26%,rgba(34,211,238,0.35)_52%,transparent_78%)] blur-[0.5px]" />
+              <div className="absolute inset-0 rounded-full ring-1 ring-cyan-200/30" />
+            </motion.div>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 function Hero({ onEmergencyNow, onScheduleCharge }: HeroProps) {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -421,6 +462,8 @@ function Hero({ onEmergencyNow, onScheduleCharge }: HeroProps) {
                   </Button>
                 </motion.div>
               </motion.div>
+
+              <ElectricScanner />
             </motion.div>
           </motion.div>
         </Sticky>
