@@ -864,6 +864,7 @@ function MobileMenu({ onSchedule, onEmergencyNow }: MobileMenuProps) {
             <a href="#how-it-works" onClick={closeMenu} className="block rounded-lg px-3 py-2 transition hover:bg-white/10">How it works</a>
             <a href="#features" onClick={closeMenu} className="block rounded-lg px-3 py-2 transition hover:bg-white/10">Features</a>
             <a href="#pricing" onClick={closeMenu} className="block rounded-lg px-3 py-2 transition hover:bg-white/10">Pricing</a>
+            <a href={CHARGENEXT_URLS.whatsappEmergency} target="_blank" rel="noopener noreferrer" onClick={closeMenu} className="block rounded-lg px-3 py-2 transition hover:bg-white/10">Customer Service</a>
           </nav>
 
           <div className="mt-4 space-y-2 border-t border-white/15 pt-4">
