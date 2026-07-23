@@ -3,6 +3,7 @@
 import Image from "next/image";
 import type { ReactNode } from "react";
 import { useRef, useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { motion, useReducedMotion, useScroll, useSpring, useTransform } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
 import { Zap, Plug, Car, MapPin, Smartphone, ShieldCheck, Menu, X } from "lucide-react";
@@ -21,6 +22,11 @@ import { Footer } from "@/components/footer";
 import { CHARGENEXT_URLS } from "@/lib/constants";
 import { type ServiceId, getService, getServiceMetadata } from "@/lib/services-config";
 import { createEmergencyCheckoutSession, verifyStripeCheckoutSession } from "@/lib/emergency-api";
+
+// Dynamically import CoverageModal to avoid SSR issues with react-leaflet
+const CoverageModal = dynamic(() => import("@/components/coverage-modal").then(mod => ({ default: mod.CoverageModal })), {
+  ssr: false,
+});
 import {
   clearPendingPaymentVerificationState,
   saveCheckoutSessionId,
@@ -800,7 +806,7 @@ function FinalCTA({ onEmergencyNow, onScheduleCharge }: FinalCTAProps) {
   );
 }
 
-function CTA() {
+function CTA({ onOpenScheduling, onOpenCoverage }: { onOpenScheduling: () => void; onOpenCoverage: () => void }) {
   return (
     <Section className="bg-black text-white">
       <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-24 md:grid-cols-2 md:py-36">
@@ -810,8 +816,9 @@ function CTA() {
             Book a mobile charge in under a minute. We&apos;ll meet you where you are — parking lot, roadside, or driveway.
           </p>
           <div className="mt-6 flex gap-3">
-            <Button className="rounded-2xl px-6 py-6 text-base">Book a Charge</Button>
+            <Button onClick={onOpenScheduling} className="rounded-2xl px-6 py-6 text-base">Book a Charge</Button>
             <Button
+              onClick={onOpenCoverage}
               variant="secondary"
               className="rounded-2xl px-6 py-6 text-base bg-white/10 text-white transition hover:bg-white/20"
             >
@@ -912,6 +919,7 @@ export default function Home() {
   const [paymentVerificationError, setPaymentVerificationError] = useState("");
   const [isSchedulingRequestModalOpen, setIsSchedulingRequestModalOpen] = useState(false);
   const [schedulingRequestDefaultServiceType, setSchedulingRequestDefaultServiceType] = useState("Scheduled Charging");
+  const [isCoverageModalOpen, setIsCoverageModalOpen] = useState(false);
 
   const captureCurrentGpsLocation = (onComplete?: (location: EmergencyLocation | null) => void) => {
     setIsGpsDetecting(true);
@@ -1322,9 +1330,10 @@ export default function Home() {
         onEmergencyNow={handleOpenEmergencyRequestModal}
         onScheduleCharge={() => handleOpenSchedulingRequest("Scheduled Charging")}
       />
-      <CTA />
+      <CTA onOpenScheduling={() => setIsSchedulingRequestModalOpen(true)} onOpenCoverage={() => setIsCoverageModalOpen(true)} />
       <Footer />
 
+      <CoverageModal isOpen={isCoverageModalOpen} onClose={() => setIsCoverageModalOpen(false)} />
       <SchedulingRequestModal
         isOpen={isSchedulingRequestModalOpen}
         onClose={() => setIsSchedulingRequestModalOpen(false)}
