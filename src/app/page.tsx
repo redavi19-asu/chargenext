@@ -207,7 +207,7 @@ function Hero({ onEmergencyNow, onScheduleCharge }: HeroProps) {
                   <div className="mb-4 origin-left scale-[0.95] sm:scale-[0.72] md:scale-[0.78] lg:mb-6 lg:scale-[0.68] [&>div]:justify-start [&>div]:mt-0">
                     <ChargeNextLogo />
                   </div>
-                  <div className="mb-5 hidden max-w-[330px] lg:block">
+                  <div className="mb-5 block max-w-[280px] sm:max-w-[330px] lg:max-w-[330px]">
                     <ElectricScanner />
                   </div>
                 </motion.div>
@@ -257,16 +257,16 @@ function Hero({ onEmergencyNow, onScheduleCharge }: HeroProps) {
               </div>
             </div>
 
-            <motion.div initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ ...intro, delay: prefersReducedMotion ? 0 : 4.05 }} className="chargenext-network-statbar mt-3 hidden grid-cols-4 divide-x divide-sky-400/30 rounded-2xl border border-sky-500/45 bg-[#020817]/78 px-3 py-5 shadow-[0_0_34px_rgba(2,132,199,0.2)] backdrop-blur-xl lg:grid">
+            <motion.div initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ ...intro, delay: prefersReducedMotion ? 0 : 4.05 }} className="chargenext-network-statbar mt-3 grid grid-cols-1 gap-3 divide-y divide-sky-400/30 rounded-2xl border border-sky-500/45 bg-[#020817]/78 px-3 py-4 shadow-[0_0_34px_rgba(2,132,199,0.2)] backdrop-blur-xl sm:grid-cols-2 sm:divide-y-0 sm:divide-x lg:grid-cols-4 lg:gap-0">
               {[
                 { icon: Zap, title: "15–30 MIN", detail: "Average Arrival" },
                 { icon: Plug, title: "LEVEL 2 POWER", detail: "Up to 25 Miles Per Hour*" },
                 { icon: ShieldCheck, title: "CERTIFIED TECHS", detail: "Trained. Insured. Trusted." },
                 { icon: Smartphone, title: "TEXT US ANYTIME", detail: "We’re Ready 24/7" },
               ].map(({ icon: Icon, title, detail }) => (
-                <div key={title} className="flex items-center justify-center gap-4 px-5">
-                  <Icon className="h-10 w-10 shrink-0 text-sky-300 drop-shadow-[0_0_12px_rgba(56,189,248,0.75)]" />
-                  <span><strong className="block text-base text-white xl:text-lg">{title}</strong><span className="text-sm text-white/65">{detail}</span></span>
+                <div key={title} className="flex items-center justify-start gap-4 px-3 py-1 sm:justify-center sm:px-5 sm:py-0">
+                  <Icon className="h-9 w-9 shrink-0 text-sky-300 drop-shadow-[0_0_12px_rgba(56,189,248,0.75)] sm:h-10 sm:w-10" />
+                  <span><strong className="block text-sm text-white xl:text-lg sm:text-base">{title}</strong><span className="text-xs text-white/65 sm:text-sm">{detail}</span></span>
                 </div>
               ))}
             </motion.div>
