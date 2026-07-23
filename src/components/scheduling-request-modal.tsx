@@ -157,7 +157,7 @@ export function SchedulingRequestModal({ isOpen, onClose, defaultServiceType }: 
         </ModalHeader>
 
         <ModalBody>
-          <div className="space-y-6">
+          <div className="max-h-[calc(90vh-280px)] overflow-y-auto space-y-6 pr-4">
             <p className="text-base leading-relaxed text-slate-600">
               Tell us about your fleet or scheduled charging needs and we&apos;ll follow up with a quote and availability.
             </p>
