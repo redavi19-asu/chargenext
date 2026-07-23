@@ -19,7 +19,7 @@ import { BatteryMeter } from "@/components/ui/battery-meter";
 import { FloatingEmergencyButton } from "@/components/ui/floating-button";
 import { StepOneMap } from "@/components/step-one-map";
 import { Footer } from "@/components/footer";
-import { ElectricNetworkBackground } from "@/components/electric-network-background";
+import { ElectricNetworkBackground } from "../components/electric-network-background";
 import { CHARGENEXT_URLS } from "@/lib/constants";
 import { type ServiceId, getService, getServiceMetadata } from "@/lib/services-config";
 import { createEmergencyCheckoutSession, verifyStripeCheckoutSession } from "@/lib/emergency-api";
@@ -63,7 +63,7 @@ type StickyProps = {
 
 const Sticky = ({ children, className = "", innerClass = "" }: StickyProps) => (
   <div
-    className={`relative lg:sticky lg:top-0 min-h-[100dvh] lg:h-[100vh] flex items-start lg:items-center pt-[calc(env(safe-area-inset-top)+7rem)] lg:pt-0 pb-8 lg:pb-0 ${className}`}
+    className={`relative lg:sticky lg:top-0 flex items-start lg:items-center pt-[calc(env(safe-area-inset-top)+7rem)] lg:pt-0 pb-8 lg:pb-0 ${className}`}
   >
     <div className={`w-full ${innerClass}`}>{children}</div>
   </div>
@@ -155,26 +155,26 @@ function ElectricScanner() {
     >
       <div className="relative w-[88vw] max-w-[360px] px-0 sm:w-[min(54vw,620px)] sm:max-w-none">
         <div
-          className="absolute left-1/2 top-full mt-2 h-3 w-[84%] -translate-x-1/2 rounded-full bg-cyan-400/20 blur-2xl"
+          className="absolute left-1/2 top-full mt-2 h-3 w-[84%] -translate-x-1/2 rounded-full bg-blue-500/20 blur-2xl"
           style={{ transform: "translateX(-50%)" }}
         />
 
-        <div className="relative h-3.5 overflow-hidden rounded-full border border-cyan-200/20 bg-[linear-gradient(180deg,rgba(5,10,18,0.95),rgba(9,18,30,0.88))] shadow-[inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(34,211,238,0.12),0_12px_28px_rgba(0,0,0,0.45)] backdrop-blur-md sm:h-3">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(34,211,238,0.08),transparent_72%)]" />
+        <div className="relative h-3.5 overflow-hidden rounded-full border border-blue-200/20 bg-[linear-gradient(180deg,rgba(5,10,18,0.95),rgba(9,18,30,0.88))] shadow-[inset_0_1px_0_rgba(255,255,255,0.08),inset_0_-1px_0_rgba(59,130,246,0.12),0_12px_28px_rgba(0,0,0,0.45)] backdrop-blur-md sm:h-3">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.08),transparent_72%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,255,255,0.04),transparent_20%,transparent_80%,rgba(255,255,255,0.02))]" />
 
           {prefersReducedMotion ? (
-            <div className="absolute inset-y-0 left-1/2 w-[18%] -translate-x-1/2 rounded-full bg-[linear-gradient(90deg,transparent_0%,rgba(34,211,238,0.12)_15%,rgba(34,211,238,0.88)_50%,rgba(34,211,238,0.12)_85%,transparent_100%)] shadow-[0_0_18px_rgba(34,211,238,0.45)]" />
+            <div className="absolute inset-y-0 left-1/2 w-[18%] -translate-x-1/2 rounded-full bg-[linear-gradient(90deg,transparent_0%,rgba(59,130,246,0.12)_15%,rgba(59,130,246,0.88)_50%,rgba(125,211,252,0.9)_62%,rgba(59,130,246,0.12)_85%,transparent_100%)] shadow-[0_0_18px_rgba(59,130,246,0.45)]" />
           ) : (
             <motion.div
               className="absolute inset-y-0 left-1/2 w-[18%] -translate-x-1/2"
               animate={{ x: ["-220%", "220%", "-220%"] }}
               transition={{ duration: 2.7, repeat: Infinity, ease: "easeInOut" }}
-              style={{ filter: "drop-shadow(0 0 14px rgba(34, 211, 238, 0.7))" }}
+              style={{ filter: "drop-shadow(0 0 14px rgba(59, 130, 246, 0.7))" }}
             >
-              <div className="absolute inset-0 rounded-full bg-[linear-gradient(90deg,transparent_0%,rgba(34,211,238,0.04)_12%,rgba(34,211,238,0.58)_42%,rgba(125,211,252,1)_50%,rgba(34,211,238,0.58)_58%,rgba(34,211,238,0.04)_88%,transparent_100%)]" />
-              <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_50%,rgba(125,211,252,0.95)_0%,rgba(34,211,238,0.9)_26%,rgba(34,211,238,0.35)_52%,transparent_78%)] blur-[0.5px]" />
-              <div className="absolute inset-0 rounded-full ring-1 ring-cyan-200/30" />
+              <div className="absolute inset-0 rounded-full bg-[linear-gradient(90deg,transparent_0%,rgba(59,130,246,0.04)_12%,rgba(59,130,246,0.58)_42%,rgba(125,211,252,1)_50%,rgba(59,130,246,0.58)_58%,rgba(59,130,246,0.04)_88%,transparent_100%)]" />
+              <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_50%_50%,rgba(125,211,252,0.95)_0%,rgba(59,130,246,0.9)_26%,rgba(59,130,246,0.35)_52%,transparent_78%)] blur-[0.5px]" />
+              <div className="absolute inset-0 rounded-full ring-1 ring-blue-200/30" />
             </motion.div>
           )}
         </div>
@@ -189,22 +189,22 @@ function Hero({ onEmergencyNow, onScheduleCharge }: HeroProps) {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], [0, -110]);
   const opacity = useTransform(scrollYProgress, [0, 0.68, 1], [1, 1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.97]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.985]);
   const intro = prefersReducedMotion ? { duration: 0 } : { duration: 0.75, delay: 3.1, ease: "easeOut" as const };
 
   return (
     <Section className="chargenext-network-hero overflow-hidden bg-black text-white">
-      <div ref={ref} className="relative h-[160vh]">
-        <Sticky className="relative overflow-hidden">
+      <div ref={ref} className="relative min-h-[100vh] h-auto">
+        <Sticky className="relative overflow-hidden min-h-[100vh] pb-8 lg:pb-8">
           <ElectricNetworkBackground />
           <div className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(90deg,rgba(0,3,12,0.98)_0%,rgba(0,5,17,0.91)_31%,rgba(0,7,20,0.54)_58%,rgba(0,4,14,0.18)_100%)]" />
           <div className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(180deg,rgba(0,0,0,0.42)_0%,transparent_23%,transparent_70%,rgba(0,0,0,0.78)_100%)]" />
 
-          <motion.div style={{ y, opacity, scale }} className="relative z-10 mx-auto w-full max-w-[1500px] px-5 pb-6 sm:px-8 lg:px-12 xl:px-14">
+          <motion.div style={{ y, opacity, scale }} className="relative z-10 mx-auto w-full max-w-[1500px] px-5 pb-0 sm:px-8 lg:px-12 xl:px-14">
             <div className="grid min-h-[calc(100dvh-7rem)] items-center pt-2 lg:grid-cols-[minmax(0,620px)_1fr] lg:pt-16">
               <div className="max-w-[650px] text-left">
                 <motion.div initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={intro}>
-                  <div className="mb-4 origin-left scale-[0.8] sm:scale-[0.72] md:scale-[0.78] lg:mb-6 lg:scale-[0.68] [&>div]:justify-start [&>div]:mt-0">
+                  <div className="mb-4 origin-left scale-[0.95] sm:scale-[0.72] md:scale-[0.78] lg:mb-6 lg:scale-[0.68] [&>div]:justify-start [&>div]:mt-0">
                     <ChargeNextLogo />
                   </div>
                   <div className="mb-5 hidden max-w-[330px] lg:block">
@@ -216,7 +216,7 @@ function Hero({ onEmergencyNow, onScheduleCharge }: HeroProps) {
                   DC • MD • VA
                 </motion.p>
 
-                <motion.h2 initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={intro} className="font-orbitron text-[clamp(2.2rem,6.8vw,5.4rem)] font-black uppercase leading-[0.88] tracking-[-0.04em] drop-shadow-[0_8px_35px_rgba(0,0,0,0.95)]">
+                <motion.h2 initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={intro} className="font-orbitron text-[clamp(2.6rem,7.4vw,5.4rem)] font-black uppercase leading-[0.88] tracking-[-0.04em] drop-shadow-[0_8px_35px_rgba(0,0,0,0.95)]">
                   <span className="block text-white">We Bring</span>
                   <span className="mt-2 block bg-gradient-to-b from-sky-300 via-blue-500 to-blue-700 bg-clip-text text-transparent">The Charge</span>
                 </motion.h2>
