@@ -31,17 +31,27 @@ function CoverageMapContent() {
       if (mapRef.current && (mapRef.current as any)._leaflet_map) {
         const map = (mapRef.current as any)._leaflet_map;
         
-        // Add circle overlay
+        // Add bright blue/cyan circle overlay for 100-mile radius
         (L as any).circle([DC_LAT, DC_LNG], {
-          radius: RADIUS_KM * 1000,
-          fillColor: "rgba(34, 197, 94, 0.2)",
-          color: "rgb(34, 197, 94)",
-          weight: 2,
-          opacity: 0.8,
-          fillOpacity: 0.3,
+          radius: RADIUS_KM * 1000, // Convert km to meters
+          fillColor: "#00B4FF", // Bright cyan/blue
+          color: "#0080CC", // Darker blue border
+          weight: 3,
+          opacity: 1,
+          fillOpacity: 0.35,
+        }).addTo(map);
+        
+        // Add optional pink highlight circle (slightly smaller for effect)
+        (L as any).circle([DC_LAT, DC_LNG], {
+          radius: RADIUS_KM * 1000 * 0.95,
+          fillColor: "#FF006E", // Hot pink
+          color: "transparent",
+          weight: 0,
+          opacity: 0,
+          fillOpacity: 0.08,
         }).addTo(map);
       }
-    }, 500);
+    }, 200);
 
     return () => clearTimeout(timer);
   }, []);
