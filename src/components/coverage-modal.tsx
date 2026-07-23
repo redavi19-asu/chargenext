@@ -1,8 +1,6 @@
 "use client";
 
-"use client";
-
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MapContainer, TileLayer, Marker } from "react-leaflet";
 import { Modal, ModalHeader, ModalBody } from "@/components/ui/modal";
 import L from "leaflet";
@@ -20,41 +18,51 @@ const DC_LNG = -77.0369;
 // 100 miles in kilometers
 const RADIUS_KM = 160.934;
 
-function CoverageMapContent() {
-  const mapRef = useRef(null);
+function MapWithCircle() {
+  const mapRef = useRef<any>(null);
+  const circleRef = useRef<any>(null);
+  const [mapReady, setMapReady] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    
-    // Add circle and marker after map is ready
-    const timer = setTimeout(() => {
-      if (mapRef.current && (mapRef.current as any)._leaflet_map) {
-        const map = (mapRef.current as any)._leaflet_map;
-        
-        // Add bright blue/cyan circle overlay for 100-mile radius
-        (L as any).circle([DC_LAT, DC_LNG], {
-          radius: RADIUS_KM * 1000, // Convert km to meters
-          fillColor: "#00B4FF", // Bright cyan/blue
-          color: "#0080CC", // Darker blue border
-          weight: 3,
-          opacity: 1,
-          fillOpacity: 0.35,
-        }).addTo(map);
-        
-        // Add optional pink highlight circle (slightly smaller for effect)
-        (L as any).circle([DC_LAT, DC_LNG], {
-          radius: RADIUS_KM * 1000 * 0.95,
-          fillColor: "#FF006E", // Hot pink
-          color: "transparent",
-          weight: 0,
-          opacity: 0,
-          fillOpacity: 0.08,
-        }).addTo(map);
-      }
-    }, 200);
+    if (!mapReady || !mapRef.current) return;
 
-    return () => clearTimeout(timer);
-  }, []);
+    try {
+      const map = mapRef.current._leaflet_map || mapRef.current;
+      
+      // Remove existing circle if any
+      if (circleRef.current) {
+        map.removeLayer(circleRef.current);
+      }
+
+      // Create and add the bright blue circle
+      const circle = (L as any).circle([DC_LAT, DC_LNG], {
+        radius: RADIUS_KM * 1000,
+        fillColor: "#00D4FF",
+        color: "#0080FF",
+        weight: 2,
+        opacity: 1,
+        fillOpacity: 0.4,
+      });
+
+      circle.addTo(map);
+      circleRef.current = circle;
+
+      // Add a border circle for definition
+      const borderCircle = (L as any).circle([DC_LAT, DC_LNG], {
+        radius: RADIUS_KM * 1000,
+        fillColor: "transparent",
+        color: "#FF1493",
+        weight: 1,
+        opacity: 0.6,
+        fillOpacity: 0,
+        dashArray: "5, 10",
+      });
+
+      borderCircle.addTo(map);
+    } catch (error) {
+      console.error("Error adding circle to map:", error);
+    }
+  }, [mapReady]);
 
   return (
     <MapContainer
@@ -63,6 +71,7 @@ function CoverageMapContent() {
       scrollWheelZoom={true}
       style={{ height: "100%", width: "100%" }}
       ref={mapRef}
+      whenCreated={() => setMapReady(true)}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -86,7 +95,7 @@ export function CoverageModal({ isOpen, onClose }: CoverageModalProps) {
             We currently serve the Washington DC area and surrounding regions within a 100-mile radius.
           </p>
           <div className="h-[500px] w-full rounded-2xl overflow-hidden shadow-lg">
-            <CoverageMapContent />
+            <MapWithCircle />
           </div>
           <div className="rounded-xl bg-emerald-50 border border-emerald-200 p-4 text-sm text-emerald-900">
             <p className="font-semibold mb-1">✓ We're expanding!</p>
