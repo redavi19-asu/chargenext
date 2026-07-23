@@ -105,7 +105,7 @@ function ChargeNextLogo() {
     >
       <div className="inline-flex items-center justify-center gap-[6px] whitespace-nowrap sm:gap-[10px]">
         <motion.h1
-          className="font-orbitron text-[clamp(2.4rem,11vw,4rem)] sm:text-6xl md:text-8xl lg:text-[10rem] font-black tracking-tighter sm:tracking-tight text-white drop-shadow-2xl leading-none"
+          className="font-orbitron text-[clamp(2.8rem,12vw,4.6rem)] sm:text-7xl md:text-9xl lg:text-[11rem] font-black tracking-tighter sm:tracking-tight text-white drop-shadow-2xl leading-none"
           animate={prefersReducedMotion ? undefined : { x: [-6, 0], opacity: [0, 1] }}
           transition={prefersReducedMotion ? undefined : { duration: 1.3, ease: "easeIn" }}
           style={{
@@ -118,7 +118,7 @@ function ChargeNextLogo() {
 
         <motion.span
           aria-hidden="true"
-          className="relative inline-flex h-[26px] w-[26px] flex-shrink-0 items-center justify-center sm:h-[34px] sm:w-[34px]"
+          className="relative inline-flex h-[30px] w-[30px] flex-shrink-0 items-center justify-center sm:h-[38px] sm:w-[38px]"
           animate={prefersReducedMotion ? undefined : { scale: [0.96, 1.08, 0.96] }}
           transition={prefersReducedMotion ? undefined : { duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
           style={{ filter: "drop-shadow(0 0 16px rgba(59, 130, 246, 0.72))" }}
@@ -128,7 +128,7 @@ function ChargeNextLogo() {
         </motion.span>
 
         <motion.h1
-          className="font-orbitron text-[clamp(2.4rem,11vw,4rem)] sm:text-6xl md:text-8xl lg:text-[10rem] font-black tracking-tighter sm:tracking-tight bg-gradient-to-b from-sky-300 via-blue-500 to-blue-700 bg-clip-text text-transparent drop-shadow-2xl text-electric-shimmer idle-glow leading-none"
+          className="font-orbitron text-[clamp(2.8rem,12vw,4.6rem)] sm:text-7xl md:text-9xl lg:text-[11rem] font-black tracking-tighter sm:tracking-tight bg-gradient-to-b from-sky-300 via-blue-500 to-blue-700 bg-clip-text text-transparent drop-shadow-2xl text-electric-shimmer idle-glow leading-none"
           animate={prefersReducedMotion ? undefined : { x: [6, 0], opacity: [0, 1] }}
           transition={prefersReducedMotion ? undefined : { duration: 1.3, ease: "easeIn" }}
           style={{
@@ -712,7 +712,7 @@ function MobileMenu({ onSchedule, onEmergencyNow }: MobileMenuProps) {
             </Button>
             <Button
               variant="secondary"
-              className="h-10 w-full rounded-lg border border-blue-400/55 bg-slate-950 text-sm font-semibold text-white transition hover:bg-slate-900 hover:shadow-[0_0_18px_rgba(59,130,246,0.16)]"
+              className="h-10 w-full rounded-lg !border !border-blue-400/55 !bg-slate-950 !text-white text-sm font-semibold transition hover:!bg-slate-900 hover:!shadow-[0_0_18px_rgba(59,130,246,0.16)]"
               onClick={() => {
                 onSchedule();
                 closeMenu();
