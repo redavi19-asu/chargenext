@@ -15,8 +15,8 @@ type CoverageModalProps = {
 const DC_LAT = 38.9072;
 const DC_LNG = -77.0369;
 
-// 100 miles in kilometers
-const RADIUS_KM = 160.934;
+// 60 miles in kilometers
+const RADIUS_KM = 96.56;
 
 function CoverageCircles() {
   const map = useMap() as any;
@@ -25,7 +25,7 @@ function CoverageCircles() {
     if (!map) return;
 
     try {
-      // Add bright blue circle for 100-mile radius
+      // Add bright blue circle for 60-mile radius
       const circle = (L as any).circle([DC_LAT, DC_LNG], {
         radius: RADIUS_KM * 1000,
         fillColor: "#00D4FF",
@@ -78,7 +78,7 @@ function MapWithCircle() {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <Marker position={[DC_LAT, DC_LNG]}>
+      <Marker position={[DC_LAT, DC_LNG]} title="ChargeNext Service Center">
       </Marker>
       <CoverageCircles />
     </MapContainer>
@@ -94,7 +94,7 @@ export function CoverageModal({ isOpen, onClose }: CoverageModalProps) {
       <ModalBody>
         <div className="space-y-4">
           <p className="text-slate-700">
-            We currently serve the Washington DC area and surrounding regions within a 100-mile radius.
+            We currently serve the Washington DC area and surrounding regions within a 60-mile radius.
           </p>
           <div className="h-[500px] w-full rounded-2xl overflow-hidden shadow-lg">
             <MapWithCircle />
