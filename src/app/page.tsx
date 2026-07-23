@@ -85,6 +85,56 @@ type HeroProps = {
   onScheduleCharge?: () => void;
 };
 
+function ChargeNextLogo() {
+  const prefersReducedMotion = useReducedMotion();
+
+  return (
+    <motion.div
+      aria-hidden="true"
+      initial={prefersReducedMotion ? false : { opacity: 0, y: 10 }}
+      animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, y: 0 }}
+      transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.6, delay: 3.05, ease: "easeOut" }}
+      className="mt-1 flex w-full justify-center"
+    >
+      <div className="inline-flex items-center justify-center gap-[6px] whitespace-nowrap sm:gap-[10px]">
+        <motion.h1
+          className="font-orbitron text-[clamp(2.4rem,11vw,4rem)] sm:text-6xl md:text-8xl lg:text-[10rem] font-black tracking-tighter sm:tracking-tight text-white drop-shadow-2xl leading-none"
+          animate={prefersReducedMotion ? undefined : { x: [-6, 0], opacity: [0, 1] }}
+          transition={prefersReducedMotion ? undefined : { duration: 1.3, ease: "easeIn" }}
+          style={{
+            textShadow: "0 0 30px rgba(34, 211, 238, 0.3), 0 0 60px rgba(56, 189, 248, 0.1)",
+            lineHeight: "1.1",
+          }}
+        >
+          Charge
+        </motion.h1>
+
+        <motion.span
+          aria-hidden="true"
+          className="relative inline-flex h-[26px] w-[26px] flex-shrink-0 items-center justify-center sm:h-[34px] sm:w-[34px]"
+          animate={prefersReducedMotion ? undefined : { scale: [0.96, 1.08, 0.96] }}
+          transition={prefersReducedMotion ? undefined : { duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+          style={{ filter: "drop-shadow(0 0 16px rgba(34, 211, 238, 0.7))" }}
+        >
+          <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(34,211,238,0.95)_0%,rgba(34,211,238,0.75)_30%,rgba(34,211,238,0.18)_58%,transparent_78%)] shadow-[0_0_18px_rgba(34,211,238,0.45),0_0_42px_rgba(56,189,248,0.22)]" />
+          <span className="absolute inset-[6px] rounded-full bg-[radial-gradient(circle,rgba(125,211,252,1)_0%,rgba(34,211,238,0.95)_45%,rgba(34,211,238,0.35)_100%)]" />
+        </motion.span>
+
+        <motion.h1
+          className="font-orbitron text-[clamp(2.4rem,11vw,4rem)] sm:text-6xl md:text-8xl lg:text-[10rem] font-black tracking-tighter sm:tracking-tight bg-gradient-to-r from-cyan-200 via-cyan-300 to-sky-400 bg-clip-text text-transparent drop-shadow-2xl text-electric-shimmer idle-glow leading-none"
+          animate={prefersReducedMotion ? undefined : { x: [6, 0], opacity: [0, 1] }}
+          transition={prefersReducedMotion ? undefined : { duration: 1.3, ease: "easeIn" }}
+          style={{
+            lineHeight: "1.1",
+          }}
+        >
+          Next
+        </motion.h1>
+      </div>
+    </motion.div>
+  );
+}
+
 function ElectricScanner() {
   const prefersReducedMotion = useReducedMotion();
 
@@ -295,6 +345,7 @@ function Hero({ onEmergencyNow, onScheduleCharge }: HeroProps) {
                 />
               </motion.div>
 
+              <ChargeNextLogo />
               <ElectricScanner />
             </div>
 
