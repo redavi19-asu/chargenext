@@ -31,9 +31,9 @@ export function FloatingEmergencyButton() {
         target="_blank"
         rel="noopener noreferrer"
         className="hidden sm:flex items-center gap-2 px-4 py-3 rounded-full bg-gradient-to-r from-cyan-400 to-sky-500 text-white font-semibold text-sm shadow-xl transition hover:shadow-2xl hover:scale-105"
-        aria-label="Customer Service"
+        aria-label="Customer Service via WhatsApp"
       >
-        <span>Customer Service</span>
+        <span>Customer Service via WhatsApp</span>
       </motion.a>
 
       {/* Circular icon button */}
@@ -42,7 +42,7 @@ export function FloatingEmergencyButton() {
         target="_blank"
         rel="noopener noreferrer"
         className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-cyan-400 to-sky-500 text-white shadow-xl transition hover:shadow-2xl hover:scale-110 sm:h-16 sm:w-16"
-        aria-label="Customer Service"
+        aria-label="Customer Service via WhatsApp"
         whileHover={{ scale: 1.15 }}
       >
         <Phone className="h-6 w-6 sm:h-7 sm:w-7" />
