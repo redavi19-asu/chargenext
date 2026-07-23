@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { MapContainer, TileLayer, Marker } from "react-leaflet";
+import { useEffect } from "react";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import { Modal, ModalHeader, ModalBody } from "@/components/ui/modal";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -18,60 +18,61 @@ const DC_LNG = -77.0369;
 // 100 miles in kilometers
 const RADIUS_KM = 160.934;
 
-function MapWithCircle() {
-  const mapRef = useRef<any>(null);
-  const circleRef = useRef<any>(null);
-  const [mapReady, setMapReady] = useState(false);
+function CoverageCircles() {
+  const map = useMap() as any;
 
   useEffect(() => {
-    if (!mapReady || !mapRef.current) return;
+    if (!map) return;
 
     try {
-      const map = mapRef.current._leaflet_map || mapRef.current;
-      
-      // Remove existing circle if any
-      if (circleRef.current) {
-        map.removeLayer(circleRef.current);
-      }
-
-      // Create and add the bright blue circle
+      // Add bright blue circle for 100-mile radius
       const circle = (L as any).circle([DC_LAT, DC_LNG], {
         radius: RADIUS_KM * 1000,
         fillColor: "#00D4FF",
         color: "#0080FF",
-        weight: 2,
+        weight: 3,
         opacity: 1,
-        fillOpacity: 0.4,
+        fillOpacity: 0.45,
       });
 
       circle.addTo(map);
-      circleRef.current = circle;
 
-      // Add a border circle for definition
-      const borderCircle = (L as any).circle([DC_LAT, DC_LNG], {
+      // Add pink dashed border
+      const border = (L as any).circle([DC_LAT, DC_LNG], {
         radius: RADIUS_KM * 1000,
         fillColor: "transparent",
         color: "#FF1493",
-        weight: 1,
-        opacity: 0.6,
+        weight: 2,
+        opacity: 0.8,
         fillOpacity: 0,
-        dashArray: "5, 10",
+        dashArray: "8, 5",
       });
 
-      borderCircle.addTo(map);
-    } catch (error) {
-      console.error("Error adding circle to map:", error);
-    }
-  }, [mapReady]);
+      border.addTo(map);
 
+      return () => {
+        try {
+          map.removeLayer(circle);
+          map.removeLayer(border);
+        } catch (e) {
+          // Layer already removed
+        }
+      };
+    } catch (error) {
+      console.error("Error adding circles:", error);
+    }
+  }, [map]);
+
+  return null;
+}
+
+function MapWithCircle() {
   return (
     <MapContainer
       center={[DC_LAT, DC_LNG]}
       zoom={8}
       scrollWheelZoom={true}
       style={{ height: "100%", width: "100%" }}
-      ref={mapRef}
-      whenCreated={() => setMapReady(true)}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -79,6 +80,7 @@ function MapWithCircle() {
       />
       <Marker position={[DC_LAT, DC_LNG]}>
       </Marker>
+      <CoverageCircles />
     </MapContainer>
   );
 }
