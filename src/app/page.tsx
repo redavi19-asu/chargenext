@@ -19,6 +19,7 @@ import { BatteryMeter } from "@/components/ui/battery-meter";
 import { FloatingEmergencyButton } from "@/components/ui/floating-button";
 import { StepOneMap } from "@/components/step-one-map";
 import { Footer } from "@/components/footer";
+import { ElectricNetworkBackground } from "@/components/electric-network-background";
 import { CHARGENEXT_URLS } from "@/lib/constants";
 import { type ServiceId, getService, getServiceMetadata } from "@/lib/services-config";
 import { createEmergencyCheckoutSession, verifyStripeCheckoutSession } from "@/lib/emergency-api";
@@ -119,15 +120,15 @@ function ChargeNextLogo() {
           aria-hidden="true"
           className="relative inline-flex h-[26px] w-[26px] flex-shrink-0 items-center justify-center sm:h-[34px] sm:w-[34px]"
           animate={prefersReducedMotion ? undefined : { scale: [0.96, 1.08, 0.96] }}
-          transition={prefersReducedMotion ? undefined : { duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-          style={{ filter: "drop-shadow(0 0 16px rgba(34, 211, 238, 0.7))" }}
+          transition={prefersReducedMotion ? undefined : { duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+          style={{ filter: "drop-shadow(0 0 16px rgba(59, 130, 246, 0.72))" }}
         >
-          <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(34,211,238,0.95)_0%,rgba(34,211,238,0.75)_30%,rgba(34,211,238,0.18)_58%,transparent_78%)] shadow-[0_0_18px_rgba(34,211,238,0.45),0_0_42px_rgba(56,189,248,0.22)]" />
-          <span className="absolute inset-[6px] rounded-full bg-[radial-gradient(circle,rgba(125,211,252,1)_0%,rgba(34,211,238,0.95)_45%,rgba(34,211,238,0.35)_100%)]" />
+          <span className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(125,211,252,0.95)_0%,rgba(59,130,246,0.78)_30%,rgba(29,78,216,0.2)_58%,transparent_78%)] shadow-[0_0_18px_rgba(59,130,246,0.5),0_0_42px_rgba(29,78,216,0.26)]" />
+          <span className="absolute inset-[6px] rounded-full bg-[radial-gradient(circle,rgba(125,211,252,1)_0%,rgba(59,130,246,0.95)_45%,rgba(29,78,216,0.38)_100%)]" />
         </motion.span>
 
         <motion.h1
-          className="font-orbitron text-[clamp(2.4rem,11vw,4rem)] sm:text-6xl md:text-8xl lg:text-[10rem] font-black tracking-tighter sm:tracking-tight bg-gradient-to-r from-cyan-200 via-cyan-300 to-sky-400 bg-clip-text text-transparent drop-shadow-2xl text-electric-shimmer idle-glow leading-none"
+          className="font-orbitron text-[clamp(2.4rem,11vw,4rem)] sm:text-6xl md:text-8xl lg:text-[10rem] font-black tracking-tighter sm:tracking-tight bg-gradient-to-b from-sky-300 via-blue-500 to-blue-700 bg-clip-text text-transparent drop-shadow-2xl text-electric-shimmer idle-glow leading-none"
           animate={prefersReducedMotion ? undefined : { x: [6, 0], opacity: [0, 1] }}
           transition={prefersReducedMotion ? undefined : { duration: 1.3, ease: "easeIn" }}
           style={{
@@ -184,280 +185,90 @@ function ElectricScanner() {
 
 function Hero({ onEmergencyNow, onScheduleCharge }: HeroProps) {
   const ref = useRef<HTMLDivElement | null>(null);
+  const prefersReducedMotion = useReducedMotion();
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], [0, -150]);
-  const opacity = useTransform(scrollYProgress, [0, 0.6, 1], [1, 1, 0]);
-  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
+  const y = useTransform(scrollYProgress, [0, 1], [0, -110]);
+  const opacity = useTransform(scrollYProgress, [0, 0.68, 1], [1, 1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.97]);
+  const intro = prefersReducedMotion ? { duration: 0 } : { duration: 0.75, delay: 3.1, ease: "easeOut" as const };
 
   return (
-    <Section className="bg-black text-white overflow-hidden">
-      <div ref={ref} className="relative h-[160vh]" style={{ position: "relative" }}>
-        <Sticky className="bg-[radial-gradient(ellipse_80%_60%_at_50%_40%,rgba(34,211,238,0.08),rgba(0,0,0,0)_70%)]">
-          <motion.div
-            style={{ y, opacity, scale }}
-            className="mx-auto max-w-6xl px-6 text-center"
-          >
-            {/* ===== CINEMATIC HERO COLLISION SEQUENCE ===== */}
-            <div className="mb-8 sm:mb-12 md:mb-16 flex flex-col items-center justify-center relative min-h-fit overflow-visible pt-2 sm:pt-3 pointer-events-none">
-              
-              {/* ===== CENTER ENERGY CORE - Pre-impact pulse ===== */}
-              <motion.div
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ opacity: [0, 1, 1, 0], scale: [0, 1, 1, 0.5] }}
-                transition={{ duration: 2.5, delay: 0.2, times: [0, 0.1, 0.7, 1], ease: "easeInOut" }}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20"
-              >
-                <motion.div
-                  animate={{ scale: [1, 1.08, 1] }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                  className="core-pulse relative"
-                  style={{
-                    width: "32px",
-                    height: "32px",
-                    borderRadius: "50%",
-                    background: "radial-gradient(circle, rgba(34, 211, 238, 0.9) 0%, rgba(56, 189, 248, 0.4) 100%)",
-                    backdropFilter: "blur(2px)",
-                  }}
-                />
-              </motion.div>
+    <Section className="chargenext-network-hero overflow-hidden bg-black text-white">
+      <div ref={ref} className="relative h-[160vh]">
+        <Sticky className="relative overflow-hidden">
+          <ElectricNetworkBackground />
+          <div className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(90deg,rgba(0,3,12,0.98)_0%,rgba(0,5,17,0.91)_31%,rgba(0,7,20,0.54)_58%,rgba(0,4,14,0.18)_100%)]" />
+          <div className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(180deg,rgba(0,0,0,0.42)_0%,transparent_23%,transparent_70%,rgba(0,0,0,0.78)_100%)]" />
 
-              {/* ===== LIGHTNING ARC LINES - Strike on collision ===== */}
-              <motion.svg
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 1, 0.6, 0] }}
-                transition={{ duration: 0.7, delay: 1.3, ease: "easeOut" }}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 pointer-events-none z-15"
-                viewBox="0 0 400 400"
-              >
-                {/* Vertical lightning strike */}
-                <motion.line
-                  x1="200"
-                  y1="50"
-                  x2="200"
-                  y2="350"
-                  stroke="rgba(34, 211, 238, 0.8)"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                  filter="drop-shadow(0 0 10px rgba(34, 211, 238, 0.6))"
-                  animate={{ strokeDashoffset: [1000, 0, 0] }}
-                  transition={{ duration: 0.5, delay: 1.3 }}
-                  strokeDasharray="1000"
-                />
-                {/* Diagonal arc left */}
-                <motion.path
-                  d="M 200 200 Q 100 150, 80 100"
-                  stroke="rgba(56, 189, 248, 0.7)"
-                  strokeWidth="2"
-                  fill="none"
-                  strokeLinecap="round"
-                  filter="drop-shadow(0 0 8px rgba(56, 189, 248, 0.5))"
-                  animate={{ strokeDashoffset: [800, 0] }}
-                  transition={{ duration: 0.5, delay: 1.35 }}
-                  strokeDasharray="800"
-                />
-                {/* Diagonal arc right */}
-                <motion.path
-                  d="M 200 200 Q 300 150, 320 100"
-                  stroke="rgba(56, 189, 248, 0.7)"
-                  strokeWidth="2"
-                  fill="none"
-                  strokeLinecap="round"
-                  filter="drop-shadow(0 0 8px rgba(56, 189, 248, 0.5))"
-                  animate={{ strokeDashoffset: [800, 0] }}
-                  transition={{ duration: 0.5, delay: 1.35 }}
-                  strokeDasharray="800"
-                />
-              </motion.svg>
+          <motion.div style={{ y, opacity, scale }} className="relative z-10 mx-auto w-full max-w-[1500px] px-5 pb-6 sm:px-8 lg:px-12 xl:px-14">
+            <div className="grid min-h-[calc(100dvh-7rem)] items-center pt-2 lg:grid-cols-[minmax(0,620px)_1fr] lg:pt-16">
+              <div className="max-w-[650px] text-left">
+                <motion.div initial={prefersReducedMotion ? false : { opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={intro}>
+                  <div className="mb-4 origin-left scale-[0.8] sm:scale-[0.72] md:scale-[0.78] lg:mb-6 lg:scale-[0.68] [&>div]:justify-start [&>div]:mt-0">
+                    <ChargeNextLogo />
+                  </div>
+                  <div className="mb-5 hidden max-w-[330px] lg:block">
+                    <ElectricScanner />
+                  </div>
+                </motion.div>
 
-              {/* ===== SCREEN FLASH OVERLAY - Blinding impact ===== */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 1, 0.5, 0] }}
-                transition={{ duration: 0.6, delay: 1.35, ease: "easeOut" }}
-                className="absolute inset-0 bg-white/70 pointer-events-none z-40"
-              />
+                <motion.p initial={prefersReducedMotion ? false : { opacity: 0, x: -18 }} animate={{ opacity: 1, x: 0 }} transition={intro} className="mb-3 text-base font-bold tracking-[0.12em] text-sky-400 sm:text-lg">
+                  DC • MD • VA
+                </motion.p>
 
-              {/* ===== SHOCKWAVE RING - Expanding circle ===== */}
-              <motion.div
-                initial={{ scale: 0.1, opacity: 1 }}
-                animate={{ scale: [0.1, 2.8, 3.5], opacity: [1, 0.5, 0] }}
-                transition={{ duration: 0.9, delay: 1.3, ease: "easeOut" }}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-18"
-              >
-                <div
-                  className="rounded-full border-2 border-cyan-400"
-                  style={{
-                    width: "120px",
-                    height: "120px",
-                    boxShadow: "0 0 30px rgba(34, 211, 238, 0.6)",
-                  }}
-                />
-              </motion.div>
+                <motion.h2 initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={intro} className="font-orbitron text-[clamp(2.2rem,6.8vw,5.4rem)] font-black uppercase leading-[0.88] tracking-[-0.04em] drop-shadow-[0_8px_35px_rgba(0,0,0,0.95)]">
+                  <span className="block text-white">We Bring</span>
+                  <span className="mt-2 block bg-gradient-to-b from-sky-300 via-blue-500 to-blue-700 bg-clip-text text-transparent">The Charge</span>
+                </motion.h2>
 
-              {/* ===== ELECTRIC BURST GLOW - Radiant energy ===== */}
-              <motion.div
-                initial={{ scale: 0.5, opacity: 0 }}
-                animate={{ scale: [0.5, 2, 3], opacity: [0, 1, 0] }}
-                transition={{ duration: 0.8, delay: 1.32, ease: "easeOut" }}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-17"
-              >
-                <div
-                  className="rounded-full blur-3xl"
-                  style={{
-                    width: "300px",
-                    height: "300px",
-                    background: "radial-gradient(circle, rgba(34, 211, 238, 0.6) 0%, rgba(56, 189, 248, 0.3) 50%, transparent 100%)",
-                  }}
-                />
-              </motion.div>
+                <motion.p initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...intro, delay: prefersReducedMotion ? 0 : 3.35 }} className="mt-6 max-w-[590px] text-lg leading-relaxed text-white/86 sm:text-xl md:text-2xl">
+                  Mobile EV charging that comes to you — fast, reliable, and anywhere you need it.
+                </motion.p>
 
-              {/* ===== PARTICLE BURST - Sparks scatter ===== */}
-              {[0, 1, 2, 3, 4, 5, 6, 7].map((i) => {
-                const angle = (i / 8) * Math.PI * 2;
-                const distance = 280;
-                const tx = Math.cos(angle) * distance;
-                const ty = Math.sin(angle) * distance;
-                return (
-                  <motion.div
-                    key={`particle-${i}`}
-                    initial={{ x: 0, y: 0, opacity: 0, scale: 1 }}
-                    animate={{ x: tx, y: ty, opacity: [1, 0], scale: [1, 0] }}
-                    transition={{ duration: 1, delay: 1.35, ease: "easeOut" }}
-                    className="absolute top-1/2 left-1/2 w-3 h-3 rounded-full pointer-events-none z-25"
-                    style={{
-                      background: "radial-gradient(circle, rgba(34, 211, 238, 1) 0%, rgba(56, 189, 248, 0.5) 100%)",
-                      boxShadow: "0 0 12px rgba(34, 211, 238, 0.8)",
-                      marginLeft: "-6px",
-                      marginTop: "-6px",
-                    }}
-                  />
-                );
-              })}
+                <motion.div initial={prefersReducedMotion ? false : { opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ ...intro, delay: prefersReducedMotion ? 0 : 3.55 }} className="mt-7 grid max-w-[620px] grid-cols-1 gap-3 sm:grid-cols-3">
+                  {[
+                    { icon: Zap, title: "On-Demand", detail: "Fast Response" },
+                    { icon: ShieldCheck, title: "Safe &", detail: "Professional" },
+                    { icon: MapPin, title: "DC, MD", detail: "& VA" },
+                  ].map(({ icon: Icon, title, detail }) => (
+                    <div key={title} className="flex items-center gap-3 rounded-xl border border-sky-400/18 bg-black/30 px-3 py-3 backdrop-blur-sm">
+                      <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-sky-400/75 bg-sky-500/10 shadow-[0_0_18px_rgba(14,165,233,0.36)]">
+                        <Icon className="h-6 w-6 text-sky-300" />
+                      </span>
+                      <span><strong className="block text-sm text-white sm:text-base">{title}</strong><span className="text-xs text-white/70 sm:text-sm">{detail}</span></span>
+                    </div>
+                  ))}
+                </motion.div>
 
-              {/* ===== RESIDUAL GLOW AURA - Lingers after impact ===== */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.6 }}
-                animate={{ opacity: [0, 1, 0.2], scale: [0.6, 1.5, 2] }}
-                transition={{ duration: 2, delay: 1.35, ease: "easeOut" }}
-                className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-14"
-              >
-                <div
-                  className="rounded-full blur-3xl"
-                  style={{
-                    width: "500px",
-                    height: "500px",
-                    background: "radial-gradient(circle, rgba(34, 211, 238, 0.25) 0%, rgba(56, 189, 248, 0.1) 40%, transparent 100%)",
-                  }}
-                />
-              </motion.div>
+                <motion.div initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...intro, delay: prefersReducedMotion ? 0 : 3.75 }} className="mt-7 flex max-w-[710px] flex-col gap-4 sm:flex-row">
+                  <Button className="chargenext-network-primary h-auto min-h-[82px] flex-1 justify-start rounded-2xl px-6 py-4 text-left" onClick={onEmergencyNow}>
+                    <Zap className="mr-4 h-8 w-8 shrink-0" />
+                    <span><strong className="block text-sm sm:text-base">REQUEST EMERGENCY<br />CHARGE</strong></span>
+                  </Button>
+                  <Button variant="secondary" className="chargenext-network-secondary h-auto min-h-[82px] flex-1 justify-start rounded-2xl px-6 py-4 text-left text-white" onClick={onScheduleCharge}>
+                    <Plug className="mr-4 h-8 w-8 shrink-0 text-sky-300" />
+                    <span><strong className="block text-sm sm:text-base">SCHEDULE A CHARGE</strong><span className="mt-1 block font-normal text-white/65">Plan Ahead & Save</span></span>
+                  </Button>
+                </motion.div>
 
-              <ChargeNextLogo />
-              <ElectricScanner />
+                <motion.div initial={prefersReducedMotion ? false : { opacity: 0 }} animate={{ opacity: 1 }} transition={{ ...intro, delay: prefersReducedMotion ? 0 : 3.95 }} className="wa-alert-banner mt-5 max-w-[710px] rounded-xl border border-amber-300/45 bg-amber-100/92 px-3 py-2 text-center shadow-lg backdrop-blur-sm">
+                  <p className="text-xs font-semibold text-amber-950 sm:text-sm">⚠️ Emergency requests use secure Stripe checkout. Your GPS location is saved before redirecting.</p>
+                </motion.div>
+              </div>
             </div>
 
-            {/* ===== CTA AND DESCRIPTION SECTION ===== */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 2.2 }}
-              className="mt-10"
-            >
-              <div className="wa-alert-banner mx-auto mb-5 w-full max-w-[760px] rounded-2xl border border-amber-300/60 bg-gradient-to-r from-amber-100 to-yellow-100 px-4 py-3 text-center shadow-lg">
-                <h3 className="text-sm font-semibold text-amber-900 sm:text-base">
-                  ⚠️ Emergency Requests Use Secure Checkout
-                </h3>
-                <p className="mt-1 text-xs text-amber-900/90 sm:text-[13px]">
-                  Stripe Checkout keeps payment secure, and we save your GPS location before redirecting.
-                </p>
-
-                <div className="mt-3 flex flex-col items-center justify-center gap-2 sm:flex-row">
-                  <a
-                    href="https://apps.apple.com/app/whatsapp-messenger/id310633997"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex h-8 w-full items-center justify-center rounded-lg border border-amber-400 bg-white/80 px-3 text-xs font-semibold text-amber-900 transition hover:bg-white sm:w-auto"
-                  >
-                    Get WhatsApp (iPhone)
-                  </a>
-                  <a
-                    href="https://play.google.com/store/apps/details?id=com.whatsapp"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex h-8 w-full items-center justify-center rounded-lg border border-amber-400 bg-white/80 px-3 text-xs font-semibold text-amber-900 transition hover:bg-white sm:w-auto"
-                  >
-                    Get WhatsApp (Android)
-                  </a>
+            <motion.div initial={prefersReducedMotion ? false : { opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ ...intro, delay: prefersReducedMotion ? 0 : 4.05 }} className="chargenext-network-statbar mt-3 hidden grid-cols-4 divide-x divide-sky-400/30 rounded-2xl border border-sky-500/45 bg-[#020817]/78 px-3 py-5 shadow-[0_0_34px_rgba(2,132,199,0.2)] backdrop-blur-xl lg:grid">
+              {[
+                { icon: Zap, title: "15–30 MIN", detail: "Average Arrival" },
+                { icon: Plug, title: "LEVEL 2 POWER", detail: "Up to 25 Miles Per Hour*" },
+                { icon: ShieldCheck, title: "CERTIFIED TECHS", detail: "Trained. Insured. Trusted." },
+                { icon: Smartphone, title: "TEXT US ANYTIME", detail: "We’re Ready 24/7" },
+              ].map(({ icon: Icon, title, detail }) => (
+                <div key={title} className="flex items-center justify-center gap-4 px-5">
+                  <Icon className="h-10 w-10 shrink-0 text-sky-300 drop-shadow-[0_0_12px_rgba(56,189,248,0.75)]" />
+                  <span><strong className="block text-base text-white xl:text-lg">{title}</strong><span className="text-sm text-white/65">{detail}</span></span>
                 </div>
-
-                <p className="mt-2 text-xs text-amber-900/80">
-                  After payment, we verify your phone number and emergency location before dispatch.
-                </p>
-              </div>
-
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm backdrop-blur-sm border border-cyan-500/20">
-                <Zap className="h-4 w-4 text-cyan-300 animate-pulse" />
-                <span className="text-white/90">Emergency EV Charging • On Demand</span>
-              </div>
-              
-              <p className="mx-auto max-w-3xl text-2xl md:text-3xl font-orbitron font-bold text-white drop-shadow-lg mb-4">
-                <span className="bg-gradient-to-r from-cyan-200 to-sky-400 bg-clip-text text-transparent">
-                  Power When You Need It Most
-                </span>
-              </p>
-              
-              <p className="mx-auto max-w-2xl text-lg text-white/80 md:text-xl mb-6">
-                Mobile EV charging that comes to you — anywhere in the DMV region
-              </p>
-              <p className="mx-auto max-w-2xl text-base text-white/70 md:text-lg">
-                Real-time dispatch • Secure payment • Live tracking • Minutes, not hours
-              </p>
-
-              {/* ===== HERO CTA BUTTONS ===== */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 2.5 }}
-                className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row flex-wrap"
-              >
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Button
-                    className="rounded-xl px-8 py-6 text-base font-semibold bg-gradient-to-r from-cyan-500 to-sky-600 hover:from-cyan-400 hover:to-sky-500 shadow-lg shadow-cyan-500/50 transition-all"
-                    onClick={onEmergencyNow}
-                  >
-                    🚨 Emergency Charge Now
-                  </Button>
-                </motion.div>
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Button
-                    variant="secondary"
-                    className="rounded-xl px-8 py-6 text-base font-semibold bg-white/15 text-white border border-cyan-400/40 hover:bg-white/25 hover:border-cyan-400/60 transition-all backdrop-blur-sm"
-                    onClick={onScheduleCharge}
-                  >
-                    📅 Schedule a Charge
-                  </Button>
-                </motion.div>
-                <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Button
-                    variant="secondary"
-                    className="rounded-xl px-8 py-6 text-base font-semibold bg-white/15 text-white border border-cyan-400/40 hover:bg-white/25 hover:border-cyan-400/60 transition-all backdrop-blur-sm"
-                    onClick={() => {
-                      const pricingElement = document.getElementById("pricing");
-                      pricingElement?.scrollIntoView({ behavior: "smooth" });
-                    }}
-                  >
-                    💰 View Service Tiers
-                  </Button>
-                </motion.div>
-              </motion.div>
+              ))}
             </motion.div>
           </motion.div>
         </Sticky>
@@ -495,10 +306,10 @@ function StoryPanel({ id, step, title, subtitle, icon: Icon, image, media, inver
               </span>
               <span className="uppercase tracking-wide">Step {step}</span>
             </div>
-            <h2 className="flex items-center gap-3 text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">
+            <h2 className="flex items-center gap-3 text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
               {Icon ? <Icon className="h-8 w-8 text-sky-500" /> : null} {title}
             </h2>
-            <p className="mt-4 text-lg text-slate-600">{subtitle}</p>
+            <p className="mt-4 text-base text-slate-600 md:text-lg">{subtitle}</p>
           </motion.div>
 
           <motion.div style={{ y: yImg, opacity }} className="relative">
@@ -536,7 +347,7 @@ function Features() {
     <Section id="features" className="bg-slate-50">
       <div className="mx-auto max-w-6xl px-6 py-24 md:py-32">
         <div className="mx-auto max-w-2xl text-center">
-          <h3 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">Built for reliability</h3>
+          <h3 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Built for reliability</h3>
           <p className="mt-3 text-slate-600">No drama. Just power when you need it most.</p>
         </div>
         <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -666,7 +477,7 @@ function Pricing({ onEmergencyNow, onServiceSelect, onRequestQuote }: PricingPro
     <Section id="pricing" className="bg-white">
       <div className="mx-auto max-w-7xl px-6 py-24 md:py-36">
         <div className="mb-16 text-center">
-          <h3 className="text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">
+          <h3 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
             Simple, transparent pricing
           </h3>
           <p className="mt-3 text-slate-600">Pay once dispatch is confirmed — no hidden fees.</p>
@@ -687,10 +498,10 @@ function Pricing({ onEmergencyNow, onServiceSelect, onRequestQuote }: PricingPro
                     <div className={`inline-block rounded-lg px-3 py-1 text-xs font-semibold ${tier.accentColor} bg-white/60`}>
                       {tier.description}
                     </div>
-                    <h4 className="mt-4 text-2xl font-bold text-slate-900">{tier.name}</h4>
+                    <h4 className="mt-4 text-xl font-bold text-slate-900">{tier.name}</h4>
                     
                     <div className="mt-4 flex items-baseline gap-2">
-                      <span className="text-3xl font-bold tracking-tight text-slate-900">
+                      <span className="text-2xl font-bold tracking-tight text-slate-900">
                         {tier.price}
                       </span>
                       {tier.priceNote && (
@@ -778,10 +589,10 @@ function FinalCTA({ onEmergencyNow, onScheduleCharge }: FinalCTAProps) {
           viewport={{ once: true, amount: 0.6 }}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-4xl font-bold tracking-tight md:text-5xl">
+          <h2 className="text-3xl font-bold tracking-tight md:text-4xl">
             Ready when you need power
           </h2>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-300">
+          <p className="mx-auto mt-6 max-w-2xl text-base text-slate-300 md:text-lg">
             Get emergency EV charging fast through secure checkout, or schedule a non-emergency charge using our request form.
           </p>
           
@@ -811,8 +622,8 @@ function CTA({ onOpenScheduling, onOpenCoverage }: { onOpenScheduling: () => voi
     <Section className="bg-black text-white">
       <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-24 md:grid-cols-2 md:py-36">
         <div>
-          <h3 className="text-3xl font-semibold tracking-tight md:text-4xl">Ready when you are.</h3>
-          <p className="mt-3 max-w-xl text-white/80">
+          <h3 className="text-2xl font-semibold tracking-tight md:text-3xl">Ready when you are.</h3>
+          <p className="mt-3 max-w-xl text-sm text-white/80 md:text-base">
             Book a mobile charge in under a minute. We&apos;ll meet you where you are — parking lot, roadside, or driveway.
           </p>
           <div className="mt-6 flex gap-3">
@@ -859,34 +670,49 @@ function MobileMenu({ onSchedule, onEmergencyNow }: MobileMenuProps) {
         aria-label={isOpen ? "Close menu" : "Open menu"}
         aria-expanded={isOpen}
         onClick={() => setIsOpen((prev) => !prev)}
-        className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-cyan-300/40 bg-black/65 text-white backdrop-blur-md"
+        className="inline-flex h-14 w-14 items-center justify-center rounded-xl border border-blue-400/50 bg-black/75 text-white shadow-[0_0_0_1px_rgba(59,130,246,0.12),0_0_24px_rgba(59,130,246,0.12)] backdrop-blur-md"
       >
-        {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        {isOpen ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
       </button>
 
       {isOpen ? (
-        <div className="mt-3 w-[260px] rounded-2xl border border-cyan-300/30 bg-slate-950/95 p-4 text-white shadow-2xl backdrop-blur-xl">
-          <nav className="space-y-2 text-sm">
-            <a href="#top" onClick={closeMenu} className="block rounded-lg px-3 py-2 transition hover:bg-white/10">Home</a>
-            <a href="#how-it-works" onClick={closeMenu} className="block rounded-lg px-3 py-2 transition hover:bg-white/10">How it works</a>
-            <a href="#features" onClick={closeMenu} className="block rounded-lg px-3 py-2 transition hover:bg-white/10">Features</a>
-            <a href="#pricing" onClick={closeMenu} className="block rounded-lg px-3 py-2 transition hover:bg-white/10">Pricing</a>
-            <a href={CHARGENEXT_URLS.whatsappEmergency} target="_blank" rel="noopener noreferrer" onClick={closeMenu} className="block rounded-lg px-3 py-2 transition text-cyan-400 font-semibold hover:bg-white/10 shadow-lg shadow-cyan-400/50">Customer Service via WhatsApp</a>
+        <div className="mt-2 w-[248px] rounded-2xl border border-blue-400/25 bg-slate-950/95 p-2.5 text-white shadow-2xl backdrop-blur-xl">
+          <nav className="space-y-1 text-[13px]">
+            <a href="#top" onClick={closeMenu} className="block rounded-lg px-3 py-1.5 transition hover:bg-white/10">Home</a>
+            <a href="#how-it-works" onClick={closeMenu} className="block rounded-lg px-3 py-1.5 transition hover:bg-white/10">How it works</a>
+            <a href="#features" onClick={closeMenu} className="block rounded-lg px-3 py-1.5 transition hover:bg-white/10">Features</a>
+            <a href="#pricing" onClick={closeMenu} className="block rounded-lg px-3 py-1.5 transition hover:bg-white/10">Pricing</a>
+            <motion.a
+              href={CHARGENEXT_URLS.whatsappEmergency}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={closeMenu}
+              className="relative inline-flex w-full items-center justify-start rounded-lg px-3 py-1.5 font-semibold text-blue-300 transition hover:bg-white/5"
+            >
+              <motion.span
+                aria-hidden="true"
+                className="absolute inset-0 rounded-lg border-[3px] border-blue-400/65"
+                animate={{ scale: [1, 1.2, 1], opacity: [0.62, 0.2, 0.62] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                style={{ boxShadow: "0 0 0 1px rgba(59, 130, 246, 0.12), 0 0 22px rgba(59, 130, 246, 0.18)" }}
+              />
+              <span className="relative z-10">Customer Service via WhatsApp</span>
+            </motion.a>
           </nav>
 
-          <div className="mt-4 space-y-2 border-t border-white/15 pt-4">
+          <div className="mt-2 space-y-1.5 border-t border-white/15 pt-2.5">
             <Button
               onClick={() => {
                 onEmergencyNow();
                 closeMenu();
               }}
-              className="inline-flex w-full items-center justify-center rounded-lg bg-gradient-to-r from-cyan-500 to-sky-600 px-4 py-2 text-sm font-semibold text-white"
+              className="inline-flex h-10 w-full items-center justify-center rounded-lg bg-gradient-to-r from-sky-400 via-blue-500 to-blue-700 px-4 py-2 text-sm font-semibold text-white"
             >
               Emergency
             </Button>
             <Button
               variant="secondary"
-              className="w-full rounded-lg border border-cyan-300/40 bg-white/10 text-sm font-semibold text-white transition hover:bg-white/20"
+              className="h-10 w-full rounded-lg border border-blue-400/55 bg-slate-950 text-sm font-semibold text-white transition hover:bg-slate-900 hover:shadow-[0_0_18px_rgba(59,130,246,0.16)]"
               onClick={() => {
                 onSchedule();
                 closeMenu();
