@@ -583,11 +583,11 @@ export function ProviderTrackingDashboard({
             </div>
 
             <div className="mt-4 grid gap-3">
-              <Button onClick={handleContactProvider} className="w-full rounded-2xl py-3.5 text-base font-semibold">
+              <Button onClick={handleContactProvider} className="service-cta service-cta--yellow-ring w-full rounded-2xl py-3.5 text-base font-semibold">
                 <Phone className="h-4 w-4" />
                 Contact Provider
               </Button>
-              <Button variant="secondary" onClick={handleWhatsAppSupport} className="w-full rounded-2xl py-3.5 text-base font-semibold">
+              <Button variant="secondary" onClick={handleWhatsAppSupport} className="service-cta service-cta--yellow-ring w-full rounded-2xl py-3.5 text-base font-semibold">
                 <MessageCircle className="h-4 w-4" />
                 WhatsApp Support
               </Button>

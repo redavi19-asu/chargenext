@@ -132,7 +132,7 @@ export function EmergencyRequestModal({
                 <Button
                   onClick={onUseCurrentLocation}
                   variant="secondary"
-                  className="w-full rounded-xl h-12 text-sm font-medium mt-4"
+                  className="service-cta service-cta--yellow-ring w-full rounded-xl h-12 text-sm font-medium mt-4"
                   disabled={isDetectingLocation || isProcessing || hasSubmitted}
                 >
                   <RefreshCw className="h-4 w-4 mr-2" />
@@ -177,7 +177,7 @@ export function EmergencyRequestModal({
         <div className="flex flex-col gap-3 sm:flex-row-reverse">
           <Button
             onClick={onContinue}
-            className="w-full sm:flex-1 rounded-xl h-12 text-base font-semibold"
+            className="service-cta service-cta--yellow-ring cta-btn--danger-dark w-full sm:flex-1 rounded-xl h-12 text-base font-semibold"
             disabled={continueDisabled}
           >
             {isProcessing ? (

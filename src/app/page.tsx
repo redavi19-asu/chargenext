@@ -52,7 +52,7 @@ type SectionProps = {
 };
 
 const Section = ({ children, className = "", id }: SectionProps) => (
-  <section id={id} className={`relative w-full ${className}`}>{children}</section>
+  <section id={id} className={`relative w-full overflow-x-clip ${className}`}>{children}</section>
 );
 
 type StickyProps = {
@@ -63,7 +63,7 @@ type StickyProps = {
 
 const Sticky = ({ children, className = "", innerClass = "" }: StickyProps) => (
   <div
-    className={`relative lg:sticky lg:top-0 flex items-start lg:items-center pt-[calc(env(safe-area-inset-top)+7rem)] lg:pt-0 pb-8 lg:pb-0 ${className}`}
+    className={`relative overflow-x-clip lg:sticky lg:top-0 flex items-start lg:items-center pt-[calc(env(safe-area-inset-top)+7rem)] lg:pt-0 pb-8 lg:pb-0 ${className}`}
   >
     <div className={`w-full ${innerClass}`}>{children}</div>
   </div>
@@ -153,9 +153,9 @@ function ElectricScanner() {
       transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.6, delay: 3.05, ease: "easeOut" }}
       className="mt-1 flex w-full justify-center"
     >
-      <div className="relative w-[88vw] max-w-[360px] px-0 sm:w-[min(54vw,620px)] sm:max-w-none">
+      <div className="relative w-full max-w-[42rem] px-0">
         <div
-          className="absolute left-1/2 top-full mt-2 h-3 w-[84%] -translate-x-1/2 rounded-full bg-blue-500/20 blur-2xl"
+          className="absolute left-1/2 top-full mt-2 h-3 w-full -translate-x-1/2 rounded-full bg-blue-500/20 blur-2xl"
           style={{ transform: "translateX(-50%)" }}
         />
 
@@ -207,7 +207,7 @@ function Hero({ onEmergencyNow, onScheduleCharge }: HeroProps) {
                   <div className="mb-4 origin-left scale-[0.95] sm:scale-[0.72] md:scale-[0.78] lg:mb-6 lg:scale-[0.68] [&>div]:justify-start [&>div]:mt-0">
                     <ChargeNextLogo />
                   </div>
-                  <div className="mb-5 block max-w-[280px] sm:max-w-[330px] lg:max-w-[330px]">
+                  <div className="mb-5 block w-full max-w-[42rem]">
                     <ElectricScanner />
                   </div>
                 </motion.div>
@@ -241,11 +241,11 @@ function Hero({ onEmergencyNow, onScheduleCharge }: HeroProps) {
                 </motion.div>
 
                 <motion.div initial={prefersReducedMotion ? false : { opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ ...intro, delay: prefersReducedMotion ? 0 : 3.75 }} className="mt-7 flex max-w-[710px] flex-col gap-4 sm:flex-row">
-                  <Button className="chargenext-network-primary h-auto min-h-[82px] flex-1 justify-start rounded-2xl px-6 py-4 text-left" onClick={onEmergencyNow}>
+                  <Button className="service-cta service-cta--yellow-ring chargenext-network-primary cta-btn--danger-dark h-auto min-h-[82px] flex-1 justify-start rounded-2xl px-6 py-4 text-left" onClick={onEmergencyNow}>
                     <Zap className="mr-4 h-8 w-8 shrink-0" />
                     <span><strong className="block text-sm sm:text-base">REQUEST EMERGENCY<br />CHARGE</strong></span>
                   </Button>
-                  <Button variant="secondary" className="chargenext-network-secondary h-auto min-h-[82px] flex-1 justify-start rounded-2xl px-6 py-4 text-left text-white" onClick={onScheduleCharge}>
+                  <Button variant="secondary" className="service-cta service-cta--yellow-ring chargenext-network-secondary h-auto min-h-[82px] flex-1 justify-start rounded-2xl px-6 py-4 text-left text-white" onClick={onScheduleCharge}>
                     <Plug className="mr-4 h-8 w-8 shrink-0 text-sky-300" />
                     <span><strong className="block text-sm sm:text-base">SCHEDULE A CHARGE</strong><span className="mt-1 block font-normal text-white/65">Plan Ahead & Save</span></span>
                   </Button>
@@ -297,7 +297,7 @@ function StoryPanel({ id, step, title, subtitle, icon: Icon, image, media, inver
 
   return (
     <Section id={id} className="bg-white">
-      <div ref={ref} className="relative mx-auto max-w-6xl px-6 py-24 md:py-36">
+      <div ref={ref} className="relative mx-auto max-w-6xl px-4 py-24 sm:px-6 md:py-36">
         <div className={`grid items-center gap-10 md:grid-cols-2 ${invert ? "md:[&>*:first-child]:order-2" : ""}`}>
           <motion.div style={{ y: yTxt, opacity }}>
             <div className="mb-4 inline-flex items-center gap-2 text-sm text-sky-700">
@@ -345,7 +345,7 @@ function Features() {
 
   return (
     <Section id="features" className="bg-slate-50">
-      <div className="mx-auto max-w-6xl px-6 py-24 md:py-32">
+      <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6 md:py-32">
         <div className="mx-auto max-w-2xl text-center">
           <h3 className="text-xl font-semibold tracking-tight text-slate-900 md:text-2xl">Built for reliability</h3>
           <p className="mt-3 text-slate-600">No drama. Just power when you need it most.</p>
@@ -475,7 +475,7 @@ function Pricing({ onEmergencyNow, onServiceSelect, onRequestQuote }: PricingPro
 
   return (
     <Section id="pricing" className="bg-white">
-      <div className="mx-auto max-w-7xl px-6 py-24 md:py-36">
+      <div className="mx-auto max-w-7xl px-4 py-24 sm:px-6 md:py-36">
         <div className="mb-16 text-center">
           <h3 className="text-2xl font-semibold tracking-tight text-slate-900 md:text-3xl">
             Simple, transparent pricing
@@ -532,7 +532,7 @@ function Pricing({ onEmergencyNow, onServiceSelect, onRequestQuote }: PricingPro
                       <>
                         <Button
                           onClick={onEmergencyNow}
-                          className="cta-btn cta-btn--danger"
+                          className="cta-btn cta-btn--danger service-cta service-cta--yellow-ring"
                         >
                           Emergency Charge Now
                         </Button>
@@ -543,7 +543,7 @@ function Pricing({ onEmergencyNow, onServiceSelect, onRequestQuote }: PricingPro
                     ) : tier.id === "fleet-services" ? (
                       <Button
                         variant="secondary"
-                        className="cta-btn cta-btn--blue w-full"
+                        className="cta-btn cta-btn--blue service-cta service-cta--yellow-ring w-full"
                         onClick={onRequestQuote}
                       >
                         Request Quote
@@ -551,7 +551,7 @@ function Pricing({ onEmergencyNow, onServiceSelect, onRequestQuote }: PricingPro
                     ) : (
                       <Button 
                         variant="secondary"
-                        className="cta-btn cta-btn--blue"
+                        className="cta-btn cta-btn--blue service-cta service-cta--yellow-ring"
                         onClick={() => onServiceSelect(tier.id as ServiceId)}
                       >
                         Request {tier.name}
@@ -582,7 +582,7 @@ type FinalCTAProps = {
 function FinalCTA({ onEmergencyNow, onScheduleCharge }: FinalCTAProps) {
   return (
     <Section className="bg-slate-900 text-white">
-      <div className="mx-auto max-w-4xl px-6 py-24 text-center md:py-32">
+      <div className="mx-auto max-w-4xl px-4 py-24 text-center sm:px-6 md:py-32">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -599,13 +599,13 @@ function FinalCTA({ onEmergencyNow, onScheduleCharge }: FinalCTAProps) {
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Button
               onClick={onEmergencyNow}
-              className="rounded-2xl px-8 py-6 text-base font-semibold"
+              className="service-cta service-cta--yellow-ring cta-btn--danger-dark rounded-2xl px-8 py-6 text-base font-semibold"
             >
               Emergency Request
             </Button>
             <Button
               variant="secondary"
-              className="rounded-2xl px-8 py-6 text-base font-semibold bg-white/10 text-white transition hover:bg-white/20"
+              className="service-cta service-cta--yellow-ring rounded-2xl px-8 py-6 text-base font-semibold bg-white/10 text-white transition hover:bg-white/20"
               onClick={onScheduleCharge}
             >
               Schedule a Charge
@@ -620,18 +620,18 @@ function FinalCTA({ onEmergencyNow, onScheduleCharge }: FinalCTAProps) {
 function CTA({ onOpenScheduling, onOpenCoverage }: { onOpenScheduling: () => void; onOpenCoverage: () => void }) {
   return (
     <Section className="bg-black text-white">
-      <div className="mx-auto grid max-w-6xl items-center gap-10 px-6 py-24 md:grid-cols-2 md:py-36">
+      <div className="mx-auto grid max-w-6xl items-center gap-10 px-4 py-24 sm:px-6 md:grid-cols-2 md:py-36">
         <div>
           <h3 className="text-2xl font-semibold tracking-tight md:text-3xl">Ready when you are.</h3>
           <p className="mt-3 max-w-xl text-sm text-white/80 md:text-base">
             Book a mobile charge in under a minute. We&apos;ll meet you where you are — parking lot, roadside, or driveway.
           </p>
           <div className="mt-6 flex gap-3">
-            <Button onClick={onOpenScheduling} className="rounded-2xl px-6 py-6 text-base">Book a Charge</Button>
+            <Button onClick={onOpenScheduling} className="service-cta service-cta--yellow-ring rounded-2xl px-6 py-6 text-base">Book a Charge</Button>
             <Button
               onClick={onOpenCoverage}
               variant="secondary"
-              className="rounded-2xl px-6 py-6 text-base bg-white/10 text-white transition hover:bg-white/20"
+              className="service-cta service-cta--yellow-ring rounded-2xl px-6 py-6 text-base bg-white/10 text-white transition hover:bg-white/20"
             >
               See coverage
             </Button>
@@ -687,7 +687,7 @@ function MobileMenu({ onSchedule, onEmergencyNow }: MobileMenuProps) {
               target="_blank"
               rel="noopener noreferrer"
               onClick={closeMenu}
-              className="relative inline-flex w-full items-center justify-start rounded-lg px-3 py-1.5 font-semibold text-blue-300 transition hover:bg-white/5"
+              className="service-cta service-cta--yellow-ring relative inline-flex w-full items-center justify-start rounded-lg px-3 py-2 font-semibold text-blue-300 transition hover:bg-white/5"
             >
               <motion.span
                 aria-hidden="true"
@@ -706,13 +706,13 @@ function MobileMenu({ onSchedule, onEmergencyNow }: MobileMenuProps) {
                 onEmergencyNow();
                 closeMenu();
               }}
-              className="inline-flex h-10 w-full items-center justify-center rounded-lg bg-gradient-to-r from-sky-400 via-blue-500 to-blue-700 px-4 py-2 text-sm font-semibold text-white"
+              className="service-cta service-cta--yellow-ring inline-flex h-12 w-full items-center justify-center rounded-lg cta-btn--danger-dark px-4 py-3 text-sm font-semibold"
             >
               Emergency
             </Button>
             <Button
               variant="secondary"
-              className="h-10 w-full rounded-lg !border !border-blue-400/55 !bg-slate-950 !text-white text-sm font-semibold transition hover:!bg-slate-900 hover:!shadow-[0_0_18px_rgba(59,130,246,0.16)]"
+              className="service-cta service-cta--yellow-ring h-12 w-full rounded-lg !border !border-blue-400/55 !bg-slate-950 !text-white text-sm font-semibold transition hover:!bg-slate-900 hover:!shadow-[0_0_18px_rgba(59,130,246,0.16)]"
               onClick={() => {
                 onSchedule();
                 closeMenu();
@@ -1253,7 +1253,7 @@ export default function Home() {
             />
           </div>
 
-          <Button type="submit" className="w-full rounded-xl py-6 text-base">
+          <Button type="submit" className="service-cta service-cta--yellow-ring cta-btn--blue w-full rounded-xl py-6 text-base">
             Start Charging Session
           </Button>
         </form>

@@ -30,7 +30,7 @@ export function FloatingEmergencyButton() {
         href={CHARGENEXT_URLS.whatsappEmergency}
         target="_blank"
         rel="noopener noreferrer"
-        className="hidden sm:flex items-center gap-2 px-4 py-3 rounded-full bg-gradient-to-r from-cyan-400 to-sky-500 text-white font-semibold text-sm shadow-xl transition hover:shadow-2xl hover:scale-105"
+        className="service-cta service-cta--yellow-ring hidden items-center gap-2 rounded-full bg-gradient-to-r from-cyan-400 to-sky-500 px-4 py-3 text-sm font-semibold text-white shadow-xl transition hover:shadow-2xl hover:scale-105 sm:flex"
         aria-label="Customer Service via WhatsApp"
       >
         <span>Customer Service via WhatsApp</span>
@@ -41,7 +41,7 @@ export function FloatingEmergencyButton() {
         href={CHARGENEXT_URLS.whatsappEmergency}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-cyan-400 to-sky-500 text-white shadow-xl transition hover:shadow-2xl hover:scale-110 sm:h-16 sm:w-16"
+        className="service-cta service-cta--yellow-ring flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-r from-cyan-400 to-sky-500 text-white shadow-xl transition hover:shadow-2xl hover:scale-110 sm:h-16 sm:w-16"
         aria-label="Customer Service via WhatsApp"
         whileHover={{ scale: 1.15 }}
       >

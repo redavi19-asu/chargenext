@@ -290,7 +290,7 @@ export function ServiceConfirmationModal({
                 type="button"
                 variant="secondary"
                 onClick={handleRefreshLocation}
-                className="rounded-xl h-11 text-sm font-medium"
+                className="service-cta service-cta--yellow-ring rounded-xl h-12 text-sm font-medium"
                 disabled={isProcessing}
               >
                 <MapPin className="h-4 w-4" />
@@ -300,7 +300,7 @@ export function ServiceConfirmationModal({
                 type="button"
                 variant="secondary"
                 onClick={() => setIsEditingLocation((current) => !current)}
-                className="rounded-xl h-11 text-sm font-medium"
+                className="service-cta service-cta--yellow-ring rounded-xl h-12 text-sm font-medium"
                 disabled={isProcessing}
               >
                 Use Different Location
@@ -346,7 +346,7 @@ export function ServiceConfirmationModal({
                   <Button
                     type="button"
                     onClick={handleSaveDifferentLocation}
-                    className="flex-1 rounded-xl h-11 text-sm font-medium"
+                    className="service-cta service-cta--yellow-ring flex-1 rounded-xl h-12 text-sm font-medium"
                     disabled={isProcessing}
                   >
                     Save Location
@@ -355,7 +355,7 @@ export function ServiceConfirmationModal({
                     type="button"
                     variant="secondary"
                     onClick={() => setIsEditingLocation(false)}
-                    className="flex-1 rounded-xl h-11 text-sm font-medium"
+                    className="flex-1 rounded-xl h-12 text-sm font-medium"
                     disabled={isProcessing}
                   >
                     Cancel
@@ -396,7 +396,7 @@ export function ServiceConfirmationModal({
           <Button
             onClick={onConfirm}
             disabled={isProcessing || !currentLocation || isResolvingAddress}
-            className="w-full sm:flex-1 rounded-xl h-12 text-base font-semibold"
+            className="service-cta service-cta--yellow-ring cta-btn--blue w-full sm:flex-1 rounded-xl h-12 text-base font-semibold"
           >
             {isProcessing ? (
               <>

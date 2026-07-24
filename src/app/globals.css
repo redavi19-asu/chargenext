@@ -22,6 +22,28 @@ body {
   min-height: 100vh;
 }
 
+html,
+body,
+#__next {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+img,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
 @layer utilities {
   .bg-gradient-radial {
     background-image: radial-gradient(circle, var(--tw-gradient-stops));
@@ -34,65 +56,160 @@ body {
     font-weight: 900;
   }
 
-  /* ===== PRICING CTA BUTTONS ===== */
+  /* ===== PRICING / SERVICE CTA BUTTONS ===== */
 
-  /* Base CTA button styles */
   .cta-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 14px;
+    gap: 0.5rem;
+    border-radius: 18px;
     font-weight: 700;
+    line-height: 1.15;
+    min-height: 48px;
+    max-width: 100%;
+    min-width: 0;
     padding: 14px 18px;
     background: #ffffff;
-    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, filter 180ms ease;
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, filter 180ms ease, background-color 180ms ease;
     width: 100%;
     cursor: pointer;
     text-decoration: none;
+    text-align: center;
+    white-space: normal;
+    touch-action: manipulation;
   }
 
   .cta-btn:hover {
     transform: translateY(-1px);
   }
 
+  .service-cta {
+    position: relative;
+    isolation: isolate;
+  }
+
+  @keyframes serviceRingPulse {
+    0%,
+    100% {
+      box-shadow:
+        0 0 0 1px rgba(250, 204, 21, 0.68),
+        0 0 0 6px rgba(250, 204, 21, 0.12),
+        0 0 22px rgba(250, 204, 21, 0.24);
+    }
+    50% {
+      box-shadow:
+        0 0 0 1px rgba(250, 204, 21, 0.92),
+        0 0 0 9px rgba(250, 204, 21, 0.18),
+        0 0 30px rgba(250, 204, 21, 0.34);
+    }
+  }
+
+  .service-cta--yellow-ring {
+    animation: serviceRingPulse 2.8s ease-in-out infinite;
+  }
+
+  .service-cta--yellow-ring:hover {
+    filter: brightness(1.02);
+  }
+
+  .service-cta--yellow-ring:focus-visible {
+    outline: 2px solid rgba(250, 204, 21, 0.92);
+    outline-offset: 3px;
+  }
+
   /* Blue neon ring + glow for non-emergency tiers */
   .cta-btn--blue {
-    border: 2px solid #22d3ee;
-    color: #0891b2;
-    box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.15), 0 10px 30px rgba(34, 211, 238, 0.18);
+    border: 1px solid rgba(125, 211, 252, 0.72);
+    color: #e0f2fe;
+    background: linear-gradient(135deg, rgba(2, 8, 23, 0.92), rgba(14, 116, 144, 0.72));
+    box-shadow:
+      0 0 0 1px rgba(125, 211, 252, 0.18),
+      0 0 0 5px rgba(59, 130, 246, 0.08),
+      0 14px 30px rgba(8, 47, 73, 0.25);
   }
 
   .cta-btn--blue:hover {
-    box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.22), 0 14px 40px rgba(34, 211, 238, 0.25);
+    box-shadow:
+      0 0 0 1px rgba(186, 230, 253, 0.34),
+      0 0 0 6px rgba(59, 130, 246, 0.12),
+      0 18px 42px rgba(8, 47, 73, 0.3);
   }
 
   .cta-btn--blue:focus-visible {
-    outline: 2px solid #22d3ee;
-    outline-offset: 2px;
+    outline: 2px solid rgba(125, 211, 252, 0.92);
+    outline-offset: 3px;
   }
 
-  /* Red pulsing emergency look */
+  /* Emergency look: solid for light sections, inverted for dark sections */
   .cta-btn--danger {
-    border: 2px solid #ff3b30;
-    color: #ff3b30;
-    box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.18), 0 12px 32px rgba(255, 59, 48, 0.20);
-    animation: emergencyPulse 1.1s ease-in-out infinite;
+    border: 1px solid rgba(255, 90, 80, 0.95);
+    color: #ffffff;
+    background: linear-gradient(135deg, #ff6258 0%, #e11d48 55%, #b91c1c 100%);
+    box-shadow:
+      0 0 0 1px rgba(255, 90, 80, 0.2),
+      0 0 0 5px rgba(255, 90, 80, 0.12),
+      0 16px 38px rgba(185, 28, 28, 0.28);
+    animation: emergencyPulse 1.15s ease-in-out infinite;
+  }
+
+  .cta-btn--danger-dark {
+    border: 1px solid rgba(255, 88, 80, 0.95);
+    color: #fff1f1;
+    background: linear-gradient(135deg, rgba(6, 8, 16, 0.9), rgba(61, 16, 16, 0.92));
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 120, 108, 0.08),
+      0 0 0 1px rgba(255, 90, 80, 0.18),
+      0 0 0 6px rgba(255, 90, 80, 0.1),
+      0 0 28px rgba(255, 59, 48, 0.3);
+    animation: emergencyPulseDark 1.15s ease-in-out infinite;
+  }
+
+  .cta-btn--danger-dark:hover,
+  .cta-btn--danger:hover {
+    filter: brightness(1.04);
   }
 
   @keyframes emergencyPulse {
     0%, 100% {
-      box-shadow: 0 0 0 3px rgba(255, 59, 48, 0.15), 0 10px 25px rgba(255, 59, 48, 0.12);
+      box-shadow:
+        0 0 0 1px rgba(255, 90, 80, 0.18),
+        0 0 0 5px rgba(255, 90, 80, 0.1),
+        0 14px 32px rgba(185, 28, 28, 0.18);
       filter: brightness(1);
     }
     50% {
-      box-shadow: 0 0 0 6px rgba(255, 59, 48, 0.30), 0 18px 45px rgba(255, 59, 48, 0.28);
-      filter: brightness(1.08);
+      box-shadow:
+        0 0 0 1px rgba(255, 120, 108, 0.32),
+        0 0 0 8px rgba(255, 90, 80, 0.16),
+        0 18px 44px rgba(185, 28, 28, 0.3);
+      filter: brightness(1.06);
+    }
+  }
+
+  @keyframes emergencyPulseDark {
+    0%,
+    100% {
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 120, 108, 0.08),
+        0 0 0 1px rgba(255, 90, 80, 0.18),
+        0 0 0 5px rgba(255, 90, 80, 0.08),
+        0 16px 32px rgba(255, 59, 48, 0.18);
+    }
+    50% {
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 120, 108, 0.12),
+        0 0 0 1px rgba(255, 90, 80, 0.28),
+        0 0 0 8px rgba(255, 90, 80, 0.14),
+        0 20px 42px rgba(255, 59, 48, 0.26);
     }
   }
 
   /* Respect reduced motion preference */
   @media (prefers-reduced-motion: reduce) {
-    .cta-btn--danger {
+    .cta-btn--danger,
+    .cta-btn--danger-dark,
+    .service-cta--yellow-ring {
       animation: none;
     }
   }
@@ -386,7 +503,7 @@ body {
 
 html,
 body {
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* iPad portrait ONLY: prevent hero logo/title from clipping */

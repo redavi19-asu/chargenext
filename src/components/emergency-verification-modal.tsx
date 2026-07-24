@@ -361,7 +361,7 @@ export function EmergencyVerificationModal({
                   <Button
                     onClick={handleUseCurrentLocation}
                     variant="secondary"
-                    className="rounded-xl h-12 text-sm font-medium"
+                    className="service-cta service-cta--yellow-ring rounded-xl h-12 text-sm font-medium"
                     disabled={isSendingCode || isVerifyingCode}
                   >
                     <RefreshCw className="h-4 w-4 mr-2" />
@@ -370,7 +370,7 @@ export function EmergencyVerificationModal({
                   <Button
                     onClick={() => setIsEditingLocation(!isEditingLocation)}
                     variant="secondary"
-                    className="rounded-xl h-12 text-sm font-medium"
+                    className="service-cta service-cta--yellow-ring rounded-xl h-12 text-sm font-medium"
                     disabled={isSendingCode || isVerifyingCode}
                   >
                     <MapPin className="h-4 w-4 mr-2" />
@@ -416,7 +416,7 @@ export function EmergencyVerificationModal({
                     <div className="flex gap-2">
                       <Button
                         onClick={handleSaveCorrectedLocation}
-                        className="flex-1 rounded-lg h-10 text-sm font-medium"
+                        className="service-cta service-cta--yellow-ring flex-1 rounded-lg h-12 text-sm font-medium"
                         disabled={isSendingCode || isVerifyingCode}
                       >
                         Save Changes
@@ -424,7 +424,7 @@ export function EmergencyVerificationModal({
                       <Button
                         onClick={() => setIsEditingLocation(false)}
                         variant="secondary"
-                        className="flex-1 rounded-lg h-10 text-sm font-medium"
+                        className="flex-1 rounded-lg h-12 text-sm font-medium"
                         disabled={isSendingCode || isVerifyingCode}
                       >
                         Cancel
@@ -519,7 +519,7 @@ export function EmergencyVerificationModal({
             <Button
               onClick={handleSendVerificationCode}
               disabled={isSendingCode || isVerifyingCode}
-              className="w-full sm:flex-1 rounded-xl h-12 text-base font-semibold"
+              className="service-cta service-cta--yellow-ring cta-btn--blue w-full sm:flex-1 rounded-xl h-12 text-base font-semibold"
             >
               {isSendingCode ? (
                 <>
@@ -537,7 +537,7 @@ export function EmergencyVerificationModal({
             <Button
               onClick={handleVerifyCode}
               disabled={isVerifyingCode || isSendingCode}
-              className="w-full sm:flex-1 rounded-xl h-12 text-base font-semibold"
+              className="service-cta service-cta--yellow-ring cta-btn--danger-dark w-full sm:flex-1 rounded-xl h-12 text-base font-semibold"
             >
               {isVerifyingCode ? (
                 <>

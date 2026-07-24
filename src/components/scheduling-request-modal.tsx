@@ -340,7 +340,7 @@ export function SchedulingRequestModal({ isOpen, onClose, defaultServiceType }: 
 
         <ModalFooter>
           <div className="flex flex-col gap-3 sm:flex-row-reverse">
-            <Button type="submit" disabled={isSubmitting} className="w-full rounded-xl h-12 text-base font-semibold sm:flex-1">
+            <Button type="submit" disabled={isSubmitting} className="service-cta service-cta--yellow-ring cta-btn--blue w-full rounded-xl h-12 text-base font-semibold sm:flex-1">
               {isSubmitting ? "Submitting..." : "Send Request"}
             </Button>
             <Button type="button" variant="secondary" onClick={handleClose} disabled={isSubmitting} className="w-full rounded-xl h-12 text-base font-semibold sm:flex-1">

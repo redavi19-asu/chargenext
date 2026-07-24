@@ -141,16 +141,16 @@ export default function EmergencyStatusClient() {
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <Button onClick={() => router.refresh()} className="rounded-xl px-5 py-3 text-sm">
+                <Button onClick={() => router.refresh()} className="service-cta service-cta--yellow-ring rounded-xl px-5 py-3 text-sm">
                   Refresh Status
                 </Button>
-                <Button variant="secondary" onClick={() => router.push("/")} className="rounded-xl px-5 py-3 text-sm">
+                <Button variant="secondary" onClick={() => router.push("/")} className="service-cta service-cta--yellow-ring rounded-xl px-5 py-3 text-sm">
                   Return Home
                 </Button>
                 <Button
                   variant="secondary"
                   onClick={() => window.open(CHARGENEXT_URLS.whatsappEmergency, "_blank", "noopener,noreferrer")}
-                  className="rounded-xl px-5 py-3 text-sm"
+                  className="service-cta service-cta--yellow-ring rounded-xl px-5 py-3 text-sm"
                 >
                   <MessageCircle className="h-4 w-4" />
                   WhatsApp Support
