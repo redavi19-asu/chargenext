@@ -1,17 +1,17 @@
 import { Suspense } from "react";
 
-import EmergencyStatusClient from "./emergency-status-client";
+import PaymentSuccessClient from "./payment-success-client";
 
-export default function EmergencyStatusPage() {
+export default function PaymentSuccessPage() {
   return (
     <Suspense
       fallback={
         <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4 text-white">
-          Loading request status...
+          Verifying payment...
         </div>
       }
     >
-      <EmergencyStatusClient />
+      <PaymentSuccessClient />
     </Suspense>
   );
 }
