@@ -676,7 +676,7 @@ function MobileMenu({ onSchedule, onEmergencyNow }: MobileMenuProps) {
       </button>
 
       {isOpen ? (
-        <div className="mt-2 w-[248px] rounded-2xl border border-blue-400/25 bg-slate-950/95 p-2.5 text-white shadow-2xl backdrop-blur-xl">
+        <div className="mt-2 w-[90vw] max-w-[320px] rounded-2xl border border-blue-400/25 bg-slate-950/95 p-2.5 text-white shadow-2xl backdrop-blur-xl">
           <nav className="space-y-1 text-[13px]">
             <a href="#top" onClick={closeMenu} className="block rounded-lg px-3 py-1.5 transition hover:bg-white/10">Home</a>
             <a href="#how-it-works" onClick={closeMenu} className="block rounded-lg px-3 py-1.5 transition hover:bg-white/10">How it works</a>
