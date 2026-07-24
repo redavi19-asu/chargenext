@@ -38,7 +38,7 @@ import { BatteryMeter } from "@/components/ui/battery-meter";
 import { FloatingEmergencyButton } from "@/components/ui/floating-button";
 import { StepOneMap } from "@/components/step-one-map";
 import { Footer } from "@/components/footer";
-import { ElectricNetworkBackground } from "../components/electric-network-background";
+import { ElectricNetworkBackground } from "@/components/electric-network-background";
 import { CHARGENEXT_URLS } from "@/lib/constants";
 import { type ServiceId, getService, getServiceMetadata } from "@/lib/services-config";
 import { createEmergencyCheckoutSession, verifyStripeCheckoutSession } from "@/lib/emergency-api";
