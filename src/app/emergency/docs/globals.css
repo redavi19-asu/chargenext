@@ -1,0 +1,1010 @@
+
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+:root {
+  --background: #ffffff;
+  --foreground: #0f172a;
+  --font-orbitron: "Orbitron", sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #f8fafc;
+  }
+}
+
+body {
+  background-color: #01040b;
+  color: #f8fafc;
+  font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+}
+
+html,
+body,
+#__next {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: clip;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+img,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+@layer utilities {
+  .bg-gradient-radial {
+    background-image: radial-gradient(circle, var(--tw-gradient-stops));
+  }
+
+  /* Futuristic Orbitron font */
+  .font-orbitron {
+    font-family: var(--font-orbitron);
+    letter-spacing: -0.02em;
+    font-weight: 900;
+  }
+
+  /* ===== PRICING / SERVICE CTA BUTTONS ===== */
+
+  .cta-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 18px;
+    font-weight: 700;
+    line-height: 1.15;
+    min-height: 48px;
+    max-width: 100%;
+    min-width: 0;
+    padding: 14px 18px;
+    background: #ffffff;
+    transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, filter 180ms ease, background-color 180ms ease;
+    width: 100%;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    white-space: normal;
+    touch-action: manipulation;
+  }
+
+  .cta-btn:hover {
+    transform: translateY(-1px);
+  }
+
+  @keyframes serviceRingPulse {
+    0%,
+    100% {
+      opacity: 0.72;
+      transform: scale(1);
+      box-shadow: 0 0 14px rgba(250, 204, 21, 0.28), 0 0 30px rgba(250, 204, 21, 0.16);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.018);
+      box-shadow: 0 0 20px rgba(250, 204, 21, 0.5), 0 0 42px rgba(250, 204, 21, 0.24);
+    }
+  }
+
+  .service-cta {
+    position: relative;
+    isolation: isolate;
+    overflow: visible;
+  }
+
+  .service-cta--yellow-ring::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    z-index: 3;
+    border: 2px solid rgba(250, 204, 21, 0.9);
+    border-radius: inherit;
+    pointer-events: none;
+    animation: serviceRingPulse 2.4s ease-in-out infinite;
+  }
+
+  .service-cta--yellow-ring:hover {
+    filter: brightness(1.04);
+  }
+
+  .service-cta--yellow-ring:focus-visible {
+    outline: 2px solid rgba(250, 204, 21, 0.95);
+    outline-offset: 5px;
+  }
+
+  .service-cta:disabled::after,
+  .service-cta[aria-disabled="true"]::after {
+    animation: none;
+    opacity: 0.28;
+  }
+
+  /* Blue neon ring + glow for non-emergency tiers */
+  .cta-btn--blue {
+    border: 1px solid rgba(125, 211, 252, 0.72);
+    color: #e0f2fe;
+    background: linear-gradient(135deg, rgba(2, 8, 23, 0.92), rgba(14, 116, 144, 0.72));
+    box-shadow:
+      0 0 0 1px rgba(125, 211, 252, 0.18),
+      0 0 0 5px rgba(59, 130, 246, 0.08),
+      0 14px 30px rgba(8, 47, 73, 0.25);
+  }
+
+  .cta-btn--blue:hover {
+    box-shadow:
+      0 0 0 1px rgba(186, 230, 253, 0.34),
+      0 0 0 6px rgba(59, 130, 246, 0.12),
+      0 18px 42px rgba(8, 47, 73, 0.3);
+  }
+
+  .cta-btn--blue:focus-visible {
+    outline: 2px solid rgba(125, 211, 252, 0.92);
+    outline-offset: 3px;
+  }
+
+  /* Emergency look: solid for light sections, inverted for dark sections */
+  .cta-btn--danger {
+    border: 1px solid rgba(255, 90, 80, 0.95);
+    color: #ffffff;
+    background: linear-gradient(135deg, #ff6258 0%, #e11d48 55%, #b91c1c 100%);
+    box-shadow:
+      0 0 0 1px rgba(255, 90, 80, 0.2),
+      0 0 0 5px rgba(255, 90, 80, 0.12),
+      0 16px 38px rgba(185, 28, 28, 0.28);
+    animation: emergencyPulse 1.15s ease-in-out infinite;
+  }
+
+  .cta-btn--danger-dark {
+    border: 1px solid rgba(255, 88, 80, 0.95);
+    color: #fff1f1;
+    background: linear-gradient(135deg, rgba(6, 8, 16, 0.9), rgba(61, 16, 16, 0.92));
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 120, 108, 0.08),
+      0 0 0 1px rgba(255, 90, 80, 0.18),
+      0 0 0 6px rgba(255, 90, 80, 0.1),
+      0 0 28px rgba(255, 59, 48, 0.3);
+    animation: emergencyPulseDark 1.15s ease-in-out infinite;
+  }
+
+  .cta-btn--danger-dark:hover,
+  .cta-btn--danger:hover {
+    filter: brightness(1.04);
+  }
+
+  @keyframes emergencyPulse {
+    0%, 100% {
+      box-shadow:
+        0 0 0 1px rgba(255, 90, 80, 0.18),
+        0 0 0 5px rgba(255, 90, 80, 0.1),
+        0 14px 32px rgba(185, 28, 28, 0.18);
+      filter: brightness(1);
+    }
+    50% {
+      box-shadow:
+        0 0 0 1px rgba(255, 120, 108, 0.32),
+        0 0 0 8px rgba(255, 90, 80, 0.16),
+        0 18px 44px rgba(185, 28, 28, 0.3);
+      filter: brightness(1.06);
+    }
+  }
+
+  @keyframes emergencyPulseDark {
+    0%,
+    100% {
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 120, 108, 0.08),
+        0 0 0 1px rgba(255, 90, 80, 0.18),
+        0 0 0 5px rgba(255, 90, 80, 0.08),
+        0 16px 32px rgba(255, 59, 48, 0.18);
+    }
+    50% {
+      box-shadow:
+        inset 0 0 0 1px rgba(255, 120, 108, 0.12),
+        0 0 0 1px rgba(255, 90, 80, 0.28),
+        0 0 0 8px rgba(255, 90, 80, 0.14),
+        0 20px 42px rgba(255, 59, 48, 0.26);
+    }
+  }
+
+  /* Respect reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    .cta-btn--danger,
+    .cta-btn--danger-dark {
+      animation: none;
+    }
+  }
+
+  /* ===== CHARGENEXT MOBILE-FIRST DARK DESIGN ===== */
+
+  .chargenext-page {
+    background:
+      radial-gradient(circle at 50% 0%, rgba(14, 116, 144, 0.1), transparent 28rem),
+      #01040b;
+  }
+
+  .chargenext-brand-lockup {
+    width: min(100%, 50rem);
+    min-width: 0;
+    container-type: inline-size;
+  }
+
+  .chargenext-logo-row {
+    display: flex;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    align-items: center;
+    justify-content: flex-start;
+    gap: clamp(0.28rem, 1.1vw, 0.7rem);
+    white-space: nowrap;
+  }
+
+  .chargenext-logo-word {
+    min-width: 0;
+    font-family: var(--font-orbitron);
+    font-size: clamp(2.15rem, 10.1vw, 6.4rem);
+    font-size: clamp(2.15rem, 11.7cqw, 6.4rem);
+    font-weight: 900;
+    letter-spacing: -0.075em;
+    line-height: 0.94;
+  }
+
+  .chargenext-logo-word--charge {
+    color: #f8fafc;
+    text-shadow: 0 0 20px rgba(125, 211, 252, 0.28), 0 0 48px rgba(14, 165, 233, 0.12);
+  }
+
+  .chargenext-logo-word--next {
+    background: linear-gradient(180deg, #7dd3fc 0%, #2589ff 45%, #1557dd 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 0 28px rgba(37, 137, 255, 0.24);
+  }
+
+  .chargenext-logo-core {
+    position: relative;
+    display: inline-grid;
+    width: clamp(1.25rem, 4.8vw, 3rem);
+    height: clamp(1.25rem, 4.8vw, 3rem);
+    width: clamp(1.25rem, 5.2cqw, 3rem);
+    height: clamp(1.25rem, 5.2cqw, 3rem);
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: 999px;
+    background: radial-gradient(circle, rgba(186, 230, 253, 1) 0%, rgba(59, 130, 246, 0.95) 36%, rgba(29, 78, 216, 0.28) 68%, transparent 76%);
+    filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.8));
+  }
+
+  .chargenext-logo-core span {
+    width: 42%;
+    height: 42%;
+    border-radius: inherit;
+    background: #60a5fa;
+    box-shadow: inset 0 0 8px rgba(255,255,255,.5), 0 0 12px rgba(59,130,246,.9);
+  }
+
+  .chargenext-scanner {
+    width: 100%;
+    margin-top: clamp(0.7rem, 2vw, 1.1rem);
+    transform-origin: center;
+  }
+
+  .chargenext-scanner-track {
+    position: relative;
+    width: 100%;
+    height: 0.7rem;
+    overflow: hidden;
+    border: 1px solid rgba(125, 211, 252, 0.45);
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(3, 9, 20, 0.98), rgba(7, 18, 35, 0.95));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.08), inset 0 -1px 0 rgba(59,130,246,.2), 0 0 18px rgba(14,165,233,.18);
+  }
+
+  .chargenext-scanner-track::after {
+    content: "";
+    position: absolute;
+    inset: auto 6% -0.55rem;
+    height: 0.65rem;
+    border-radius: 999px;
+    background: rgba(14, 165, 233, 0.28);
+    filter: blur(10px);
+  }
+
+  .chargenext-scanner-grid {
+    position: absolute;
+    inset: 0;
+    opacity: 0.3;
+    background: repeating-linear-gradient(90deg, transparent 0 22px, rgba(125,211,252,.18) 23px 24px);
+  }
+
+  .chargenext-scanner-beam {
+    position: absolute;
+    inset-block: 0;
+    left: 0;
+    width: 18%;
+    min-width: 3.2rem;
+    border-radius: inherit;
+    background: linear-gradient(90deg, transparent 0%, rgba(59,130,246,.18) 15%, rgba(96,165,250,.88) 46%, #dbeafe 55%, rgba(56,189,248,.82) 66%, transparent 100%);
+    box-shadow: 0 0 15px rgba(59,130,246,.9), 0 0 28px rgba(14,165,233,.55);
+  }
+
+  .chargenext-scanner-beam--still {
+    left: 42%;
+  }
+
+  .chargenext-mini-feature {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.7rem;
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 1rem;
+    background: rgba(2, 8, 23, 0.68);
+    padding: 0.75rem;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+    backdrop-filter: blur(10px);
+  }
+
+  .chargenext-mini-feature__icon {
+    display: grid;
+    width: 2.55rem;
+    height: 2.55rem;
+    flex: 0 0 auto;
+    place-items: center;
+    border: 1px solid rgba(56, 189, 248, 0.68);
+    border-radius: 999px;
+    color: #7dd3fc;
+    background: rgba(14, 165, 233, 0.1);
+    box-shadow: 0 0 18px rgba(14,165,233,.16);
+  }
+
+  .chargenext-mini-feature strong,
+  .chargenext-mini-feature small {
+    display: block;
+  }
+
+  .chargenext-mini-feature strong {
+    overflow-wrap: anywhere;
+    color: #f8fafc;
+    font-size: 0.78rem;
+    line-height: 1.15;
+  }
+
+  .chargenext-mini-feature small {
+    margin-top: 0.15rem;
+    color: #94a3b8;
+    font-size: 0.69rem;
+    line-height: 1.2;
+  }
+
+  .chargenext-hero-visual {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid rgba(56, 189, 248, 0.28);
+    border-radius: 1.75rem;
+    background: #061224;
+    box-shadow: 0 0 0 1px rgba(14,165,233,.04), 0 24px 80px rgba(0,0,0,.55), 0 0 48px rgba(2,132,199,.12);
+  }
+
+  .chargenext-visual-stat {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    border: 1px solid rgba(125, 211, 252, 0.22);
+    border-radius: 0.85rem;
+    background: rgba(2, 8, 23, 0.78);
+    padding: 0.55rem 0.35rem;
+    color: #7dd3fc;
+    backdrop-filter: blur(12px);
+  }
+
+  .chargenext-visual-stat span,
+  .chargenext-visual-stat strong,
+  .chargenext-visual-stat small {
+    display: block;
+    min-width: 0;
+  }
+
+  .chargenext-visual-stat strong {
+    color: #f8fafc;
+    font-size: 0.68rem;
+    line-height: 1;
+  }
+
+  .chargenext-visual-stat small {
+    margin-top: 0.15rem;
+    color: #94a3b8;
+    font-size: 0.6rem;
+    line-height: 1;
+  }
+
+  .chargenext-trustbar {
+    display: grid;
+    gap: 0.65rem;
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 1.2rem;
+    background: rgba(2, 8, 23, 0.76);
+    padding: 0.8rem;
+    box-shadow: 0 0 30px rgba(2,132,199,.1);
+    backdrop-filter: blur(14px);
+  }
+
+  .chargenext-trustbar > div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    color: #cbd5e1;
+    font-size: 0.78rem;
+    font-weight: 700;
+  }
+
+  .chargenext-story-card,
+  .chargenext-support-card,
+  .chargenext-emergency-banner {
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 1.6rem;
+    background: linear-gradient(145deg, rgba(5, 15, 31, 0.96), rgba(2, 8, 23, 0.96));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.025), 0 20px 60px rgba(0,0,0,.34);
+  }
+
+  .chargenext-section-kicker {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(56, 189, 248, 0.28);
+    border-radius: 999px;
+    background: rgba(14, 165, 233, 0.08);
+    padding: 0.42rem 0.78rem;
+    color: #7dd3fc;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .chargenext-feature-card {
+    min-width: 0;
+    border: 1px solid rgba(56, 189, 248, 0.18);
+    border-radius: 1.35rem;
+    background: linear-gradient(145deg, rgba(7, 20, 39, 0.94), rgba(3, 11, 25, 0.94));
+    padding: 1.25rem;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.025), 0 16px 44px rgba(0,0,0,.28);
+  }
+
+  .chargenext-feature-card__icon {
+    display: grid;
+    width: 3rem;
+    height: 3rem;
+    place-items: center;
+    border: 1px solid rgba(56, 189, 248, 0.5);
+    border-radius: 999px;
+    color: #7dd3fc;
+    background: rgba(14, 165, 233, 0.09);
+    box-shadow: 0 0 24px rgba(14,165,233,.14);
+  }
+
+  .chargenext-feature-card h4 {
+    margin-top: 1rem;
+    color: #f8fafc;
+    font-size: 1rem;
+    font-weight: 800;
+  }
+
+  .chargenext-feature-card p {
+    margin-top: 0.55rem;
+    color: #94a3b8;
+    font-size: 0.84rem;
+    line-height: 1.6;
+  }
+
+  .chargenext-service-card {
+    display: flex;
+    min-width: 0;
+    min-height: 100%;
+    flex-direction: column;
+    overflow: visible;
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 1.6rem;
+    background: linear-gradient(145deg, rgba(7, 20, 39, 0.98), rgba(2, 8, 23, 0.98));
+    padding: 1.35rem;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.025), 0 20px 56px rgba(0,0,0,.34);
+  }
+
+  .chargenext-service-card--emergency {
+    border-color: rgba(248, 113, 113, 0.52);
+    background: radial-gradient(circle at 88% 16%, rgba(239,68,68,.14), transparent 36%), linear-gradient(145deg, rgba(24, 9, 18, 0.98), rgba(5, 8, 18, 0.98));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.025), 0 20px 56px rgba(0,0,0,.34), 0 0 38px rgba(239,68,68,.08);
+  }
+
+  .chargenext-service-card--warm {
+    border-color: rgba(251, 146, 60, 0.28);
+  }
+
+  .chargenext-service-card--scheduled {
+    border-color: rgba(56, 189, 248, 0.4);
+    background: radial-gradient(circle at 86% 12%, rgba(14,165,233,.14), transparent 36%), linear-gradient(145deg, rgba(7, 20, 39, 0.98), rgba(2, 8, 23, 0.98));
+  }
+
+  .chargenext-service-card--green {
+    border-color: rgba(52, 211, 153, 0.25);
+  }
+
+  .chargenext-service-card--fleet {
+    border-color: rgba(167, 139, 250, 0.25);
+  }
+
+  .chargenext-emergency-banner {
+    border-color: rgba(248, 113, 113, 0.5);
+    background: radial-gradient(circle at 90% 18%, rgba(239,68,68,.15), transparent 34%), linear-gradient(145deg, rgba(24, 9, 18, 0.98), rgba(4, 9, 20, 0.98));
+    padding: 1.35rem;
+  }
+
+  .chargenext-support-card {
+    border-color: rgba(250, 204, 21, 0.26);
+    background: radial-gradient(circle at 10% 15%, rgba(250,204,21,.07), transparent 30%), linear-gradient(145deg, rgba(8, 17, 31, 0.98), rgba(2, 8, 23, 0.98));
+    padding: 1.35rem;
+  }
+
+  .chargenext-support-button {
+    border: 1px solid rgba(250, 204, 21, 0.45);
+    color: #fef3c7;
+    background: linear-gradient(135deg, rgba(10, 17, 28, 0.96), rgba(31, 25, 8, 0.92));
+    box-shadow: inset 0 0 18px rgba(250,204,21,.035), 0 10px 28px rgba(0,0,0,.2);
+  }
+
+  .chargenext-support-button:hover {
+    background: linear-gradient(135deg, rgba(18, 28, 42, 0.98), rgba(48, 37, 9, 0.95));
+  }
+
+  .chargenext-inline-support {
+    width: 100%;
+    justify-content: center;
+    border: 1px solid rgba(250, 204, 21, 0.45);
+    border-radius: 0.85rem;
+    background: rgba(250, 204, 21, 0.08);
+    padding: 0.75rem 1rem;
+    color: #92400e;
+    text-decoration: none;
+    transition: background-color 180ms ease, color 180ms ease;
+  }
+
+  .chargenext-inline-support:hover {
+    background: rgba(250, 204, 21, 0.16);
+    color: #78350f;
+  }
+
+  @media (min-width: 640px) {
+    .chargenext-trustbar {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 639px) {
+    .chargenext-mini-feature {
+      padding: 0.7rem;
+    }
+
+    .chargenext-hero-visual {
+      border-radius: 1.35rem;
+    }
+
+    .chargenext-story-card,
+    .chargenext-support-card,
+    .chargenext-emergency-banner,
+    .chargenext-service-card {
+      border-radius: 1.25rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .service-cta--yellow-ring::after {
+      animation: none;
+      opacity: 0.9;
+    }
+  }
+
+  /* ===== ENERGY CORE ANIMATIONS ===== */
+
+  /* Center energy core pulse - pre-impact */
+  @keyframes core-pulse {
+    0% {
+      box-shadow: 0 0 20px rgba(34, 211, 238, 0.4),
+                  0 0 40px rgba(56, 189, 248, 0.2),
+                  inset 0 0 30px rgba(34, 211, 238, 0.3);
+      transform: scale(1);
+    }
+    50% {
+      box-shadow: 0 0 30px rgba(34, 211, 238, 0.7),
+                  0 0 60px rgba(56, 189, 248, 0.4),
+                  inset 0 0 40px rgba(34, 211, 238, 0.5);
+      transform: scale(1.1);
+    }
+    100% {
+      box-shadow: 0 0 20px rgba(34, 211, 238, 0.4),
+                  0 0 40px rgba(56, 189, 248, 0.2),
+                  inset 0 0 30px rgba(34, 211, 238, 0.3);
+      transform: scale(1);
+    }
+  }
+
+  .core-pulse {
+    animation: core-pulse 2s ease-in-out infinite;
+  }
+
+  /* ===== IMPACT EFFECTS ===== */
+
+  /* Screen flash - lightning moment */
+  @keyframes screen-flash {
+    0% {
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    20% {
+      opacity: 0.4;
+    }
+    40% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .screen-flash {
+    animation: screen-flash 0.8s ease-out forwards;
+  }
+
+  /* Electric arc / lightning */
+  @keyframes lightning-strike {
+    0% {
+      opacity: 0;
+      stroke-dashoffset: 1000;
+    }
+    10% {
+      opacity: 1;
+      stroke-dashoffset: 1000;
+    }
+    30% {
+      opacity: 1;
+      stroke-dashoffset: 0;
+    }
+    40% {
+      opacity: 0.5;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .lightning-strike {
+    animation: lightning-strike 0.7s ease-out forwards;
+    stroke-dasharray: 1000;
+  }
+
+  /* Shockwave ring burst */
+  @keyframes shockwave {
+    0% {
+      transform: scale(0.1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(3);
+      opacity: 0;
+    }
+  }
+
+  .shockwave {
+    animation: shockwave 0.8s ease-out forwards;
+  }
+
+  /* Electric burst outward */
+  @keyframes electric-burst {
+    0% {
+      transform: scale(0.5);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(2.5);
+      opacity: 0;
+    }
+  }
+
+  .electric-burst {
+    animation: electric-burst 0.9s ease-out forwards;
+  }
+
+  /* Particle burst - sparks scatter */
+  @keyframes particle-burst {
+    0% {
+      opacity: 1;
+      transform: translate(0, 0) scale(1);
+      filter: blur(0px);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(var(--tx), var(--ty)) scale(0.2);
+      filter: blur(2px);
+    }
+  }
+
+  .particle-burst {
+    animation: particle-burst 1s ease-out forwards;
+  }
+
+  /* ===== POST-COLLISION GLOW ===== */
+
+  /* Residual electric glow - builds after impact */
+  @keyframes residual-glow {
+    0% {
+      opacity: 0;
+      filter: blur(0px);
+    }
+    20% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.25;
+      filter: blur(60px);
+    }
+  }
+
+  .residual-glow {
+    animation: residual-glow 2s ease-out forwards;
+  }
+
+  /* Post-collision pulse */
+  @keyframes post-collision-pulse {
+    0% {
+      box-shadow: 0 0 0px rgba(34, 211, 238, 0);
+    }
+    20% {
+      box-shadow: 0 0 20px rgba(34, 211, 238, 0.4),
+                  0 0 40px rgba(56, 189, 248, 0.2);
+    }
+    100% {
+      box-shadow: 0 0 15px rgba(34, 211, 238, 0.2),
+                  0 0 30px rgba(56, 189, 248, 0.1);
+    }
+  }
+
+  .post-collision-pulse {
+    animation: post-collision-pulse 1.5s ease-out forwards;
+    animation-delay: 1.5s;
+  }
+
+  /* Text electric glow */
+  @keyframes text-electric-shimmer {
+    0% {
+      text-shadow: 0 0 0px rgba(34, 211, 238, 0),
+                   0 0 0px rgba(56, 189, 248, 0);
+      filter: blur(0.3px);
+    }
+    50% {
+      text-shadow: 0 0 20px rgba(34, 211, 238, 0.8),
+                   0 0 40px rgba(56, 189, 248, 0.4);
+      filter: blur(0px);
+    }
+    100% {
+      text-shadow: 0 0 10px rgba(34, 211, 238, 0.3),
+                   0 0 20px rgba(56, 189, 248, 0.1);
+      filter: blur(0px);
+    }
+  }
+
+  .text-electric-shimmer {
+    animation: text-electric-shimmer 1.2s ease-out forwards;
+    animation-delay: 1.4s;
+  }
+
+  /* Idle glow after settling */
+  @keyframes idle-glow {
+    0%, 100% {
+      text-shadow: 0 0 10px rgba(34, 211, 238, 0.2),
+                   0 0 20px rgba(56, 189, 248, 0.1);
+    }
+    50% {
+      text-shadow: 0 0 15px rgba(34, 211, 238, 0.3),
+                   0 0 25px rgba(56, 189, 248, 0.15);
+    }
+  }
+
+  .idle-glow {
+    animation: idle-glow 3s ease-in-out infinite;
+    animation-delay: 2.5s;
+  }
+
+  /* ===== LEGACY ANIMATIONS (KEPT FOR COMPATIBILITY) ===== */
+
+  @keyframes charging-glow {
+    0%, 100% {
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0), 0 0 40px rgba(34, 197, 94, 0);
+    }
+    50% {
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.3), 0 0 40px rgba(34, 197, 94, 0.15);
+    }
+  }
+
+  .charging-glow {
+    animation: charging-glow 3s ease-in-out infinite;
+  }
+
+  /* Hero collision flash effect */
+  @keyframes impact-flash {
+    0% {
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.3;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  .impact-flash {
+    animation: impact-flash 0.6s ease-out forwards;
+  }
+
+  /* Lightning spark effect */
+  @keyframes electric-spark {
+    0% {
+      opacity: 1;
+      transform: translate(0, 0) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(var(--tx), var(--ty)) scale(0);
+    }
+  }
+
+  .electric-spark {
+    animation: electric-spark 0.7s ease-out forwards;
+  }
+
+  /* Electric text glow effect */
+  @keyframes text-electric-glow {
+    0% {
+      text-shadow: 0 0 0px rgba(34, 211, 238, 0),
+                   0 0 0px rgba(56, 189, 248, 0);
+    }
+    50% {
+      text-shadow: 0 0 20px rgba(34, 211, 238, 0.8),
+                   0 0 40px rgba(56, 189, 248, 0.4);
+    }
+    100% {
+      text-shadow: 0 0 10px rgba(34, 211, 238, 0.4),
+                   0 0 20px rgba(56, 189, 248, 0.2);
+    }
+  }
+
+  .text-electric-glow {
+    animation: text-electric-glow 1.5s ease-out forwards;
+    animation-delay: 1.2s;
+  }
+}
+
+/* ===== RESPONSIVE OVERFLOW FIXES ===== */
+
+html,
+body {
+  overflow-x: clip;
+}
+
+/* iPad portrait ONLY: prevent hero logo/title from clipping */
+@media (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+  .hero,
+  .hero * {
+    max-width: 100%;
+  }
+
+  .hero-title, 
+  .brand-title,
+  .logo-text {
+    font-size: 64px;      /* adjust if needed */
+    line-height: 1.05;
+    letter-spacing: 0;
+    transform: none;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: center;
+  }
+
+  .hero {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+@keyframes wa-alert-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(245, 158, 11, 0.2), 0 10px 24px rgba(15, 23, 42, 0.16);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(245, 158, 11, 0.38), 0 12px 28px rgba(15, 23, 42, 0.2);
+  }
+}
+
+.wa-alert-banner {
+  animation: wa-alert-pulse 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wa-alert-banner {
+    animation: none;
+  }
+}
+
+/* ===== CHARGENEXT CINEMATIC ELECTRIC NETWORK HERO ===== */
+.chargenext-network-hero { isolation: isolate; }
+.chargenext-network-root { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; background: #01030a; }
+.chargenext-network-sky { position: absolute; inset: 0; background: radial-gradient(circle at 72% 18%, rgba(8,76,150,.33), transparent 24%), radial-gradient(circle at 54% 34%, rgba(2,132,199,.18), transparent 32%), linear-gradient(180deg,#01030a 0%,#020817 42%,#00152b 65%,#01030a 100%); }
+.chargenext-network-clouds { position: absolute; inset: -15% -10% 35%; opacity: .75; filter: blur(18px); background: radial-gradient(ellipse at 72% 48%, rgba(23,86,158,.36), transparent 24%), radial-gradient(ellipse at 54% 34%, rgba(8,47,107,.48), transparent 28%), radial-gradient(ellipse at 88% 30%, rgba(4,25,67,.72), transparent 28%), radial-gradient(ellipse at 35% 48%, rgba(3,18,48,.9), transparent 40%); animation: chargenext-network-cloud-drift 18s ease-in-out infinite alternate; }
+.chargenext-network-horizon-glow { position:absolute; left:25%; right:-10%; top:31%; height:30%; background:radial-gradient(ellipse at center,rgba(14,165,233,.3),rgba(3,105,161,.08) 45%,transparent 72%); filter:blur(22px); animation:chargenext-network-horizon 5s ease-in-out infinite alternate; }
+.chargenext-network-scene { position:absolute; inset:0; width:100%; height:100%; transform-origin:center bottom; }
+.chargenext-network-skyline { opacity:0; animation:chargenext-network-reveal 1.4s .45s forwards; filter:drop-shadow(0 0 14px rgba(14,165,233,.28)); }
+.chargenext-network-grid { opacity:0; animation:chargenext-network-reveal 1.3s 1.05s forwards; }
+.chargenext-network-paths { opacity:0; animation:chargenext-network-reveal 1.4s 1.3s forwards; }
+.chargenext-network-nodes { opacity:0; animation:chargenext-network-reveal 1.2s 1.65s forwards; }
+.chargenext-network-powerup { stroke-dasharray:16 1800; stroke-dashoffset:1816; opacity:0; animation:chargenext-network-powerup 2.2s .8s cubic-bezier(.2,.7,.2,1) forwards; }
+.chargenext-network-travel { stroke-dashoffset:0; animation:chargenext-network-travel 5.8s linear infinite; }
+.chargenext-network-travel-2 { animation-duration:7.4s; animation-delay:-2.1s; }
+.chargenext-network-travel-3 { animation-duration:9s; animation-delay:-4.6s; }
+.chargenext-network-node { transform-box:fill-box; transform-origin:center; animation:chargenext-network-node-pulse 3.8s ease-in-out infinite; }
+.chargenext-network-node-2 { animation-delay:-.8s; }.chargenext-network-node-3{animation-delay:-1.9s}.chargenext-network-node-4{animation-delay:-2.7s}
+.chargenext-network-fog { position:absolute; left:-15%; width:130%; height:22%; border-radius:50%; filter:blur(32px); opacity:.3; }
+.chargenext-network-fog-one { bottom:18%; background:linear-gradient(90deg,transparent,rgba(14,165,233,.28),rgba(37,99,235,.18),transparent); animation:chargenext-network-fog 12s ease-in-out infinite alternate; }
+.chargenext-network-fog-two { bottom:2%; background:linear-gradient(90deg,rgba(0,0,0,.2),rgba(2,132,199,.18),rgba(0,0,0,.35)); animation:chargenext-network-fog 16s ease-in-out -5s infinite alternate-reverse; }
+.chargenext-network-vignette { position:absolute; inset:0; background:radial-gradient(ellipse at 68% 54%,transparent 24%,rgba(0,0,0,.12) 56%,rgba(0,0,0,.76) 100%); }
+.chargenext-network-lightning { position:absolute; top:8%; width:3px; height:31%; opacity:0; transform-origin:top; background:linear-gradient(180deg,transparent 0%,#e0f2fe 12%,#38bdf8 34%,transparent 100%); filter:drop-shadow(0 0 10px #38bdf8) drop-shadow(0 0 24px #2563eb); clip-path:polygon(45% 0,100% 0,61% 38%,100% 38%,29% 100%,45% 53%,0 53%); animation:chargenext-network-lightning 19s linear infinite; }
+.chargenext-network-lightning-one { left:73%; transform:rotate(7deg); }.chargenext-network-lightning-two{left:57%; top:14%; height:24%; transform:rotate(-5deg) scale(.72); animation-delay:-11s}
+.chargenext-network-particles span { position:absolute; width:2px; height:2px; border-radius:999px; background:#7dd3fc; box-shadow:0 0 8px #38bdf8; opacity:.3; animation:chargenext-network-particle calc(5s + var(--particle-index) * 0.15s) ease-in-out infinite alternate; animation-delay:calc(var(--particle-index) * -.35s); }
+.chargenext-network-primary { color:white!important; border:1px solid rgba(125,211,252,.9)!important; background:linear-gradient(135deg,rgba(14,165,233,.95),rgba(29,78,216,.96))!important; box-shadow:inset 0 0 20px rgba(224,242,254,.22),0 0 8px #7dd3fc,0 0 28px rgba(14,165,233,.8),0 0 55px rgba(37,99,235,.35)!important; }
+.chargenext-network-primary:hover { filter:brightness(1.13); transform:translateY(-2px); }
+.chargenext-network-secondary { border:1px solid rgba(14,165,233,.62)!important; background:linear-gradient(135deg,rgba(2,8,23,.91),rgba(3,15,35,.88))!important; box-shadow:inset 0 0 22px rgba(14,165,233,.06),0 0 20px rgba(2,132,199,.12)!important; }
+.chargenext-network-secondary:hover { border-color:rgba(125,211,252,.95)!important; background:rgba(3,20,45,.96)!important; }
+@keyframes chargenext-network-reveal { from{opacity:0} to{opacity:1} }
+@keyframes chargenext-network-powerup { 0%{opacity:0;stroke-dashoffset:1816} 15%{opacity:1} 80%{opacity:1} 100%{opacity:0;stroke-dashoffset:0} }
+@keyframes chargenext-network-travel { to{stroke-dashoffset:-1000} }
+@keyframes chargenext-network-node-pulse { 0%,100%{opacity:.62;transform:scale(.9)} 50%{opacity:1;transform:scale(1.18)} }
+@keyframes chargenext-network-cloud-drift { to{transform:translate3d(-2.5%,1.8%,0) scale(1.06)} }
+@keyframes chargenext-network-horizon { to{opacity:.72;transform:scaleX(1.08)} }
+@keyframes chargenext-network-fog { to{transform:translateX(7%) scaleY(1.3);opacity:.48} }
+@keyframes chargenext-network-lightning { 0%,88%,91%,94%,100%{opacity:0} 89%{opacity:.9} 90%{opacity:.08} 92%{opacity:.65} 93%{opacity:0} }
+@keyframes chargenext-network-particle { from{transform:translateY(8px) scale(.65);opacity:.12} to{transform:translateY(-18px) scale(1.35);opacity:.65} }
+@media (max-width:1023px){ .chargenext-network-scene{left:-43%;width:165%;opacity:.78}.chargenext-network-root:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,2,8,.1),rgba(0,3,12,.3) 42%,rgba(0,3,12,.82) 100%)} }
+@media (max-width:640px){ .chargenext-network-scene{left:-67%;width:205%}.chargenext-network-clouds{opacity:.5}.chargenext-network-lightning{display:none} }
+@media (prefers-reduced-motion:reduce){ .chargenext-network-root *{animation:none!important}.chargenext-network-skyline,.chargenext-network-grid,.chargenext-network-paths,.chargenext-network-nodes{opacity:1}.chargenext-network-powerup{display:none} }
