@@ -4,6 +4,9 @@ import type { EmergencyLocation } from "@/lib/emergency-flow";
 
 const API_BASE = process.env.NEXT_PUBLIC_CHARGENEXT_API_BASE || "https://chargenext-api.ryanedavis.workers.dev";
 
+// Keep the Stripe integration in place, but prevent customer checkout until launch.
+const PAYMENTS_ENABLED = false;
+
 type JsonRecord = Record<string, unknown>;
 
 async function postJson<T>(path: string, body: JsonRecord) {
@@ -62,6 +65,10 @@ export async function createEmergencyCheckoutSession(params: {
   amount?: number;
   metadata?: Record<string, string>;
 }) {
+  if (!PAYMENTS_ENABLED) {
+    throw new Error("Online payments are coming soon. No payment was created.");
+  }
+
   return postJson<{ url?: string; session_id?: string; id?: string }>("/checkout", {
     tier: params.tier || "Emergency Boost",
     amount: params.amount ?? 59,
