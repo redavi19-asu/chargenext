@@ -1,16 +1,16 @@
 /* Charge Next hero orbital energy mark.
-   This replaces the old horizontal scanner visually while preserving the hero layout. */
+   The large rotating mark now replaces the small pulsing dot between the Charge and Next wordmarks. */
 
 @keyframes chargenext-orb-pulse {
   0%, 100% {
     transform: scale(1);
-    opacity: 0.68;
-    box-shadow: 0 0 12px rgba(56, 189, 248, 0.28), 0 0 34px rgba(37, 99, 235, 0.18);
+    opacity: 0.66;
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.3), 0 0 36px rgba(37, 99, 235, 0.2);
   }
   50% {
     transform: scale(1.1);
     opacity: 1;
-    box-shadow: 0 0 26px rgba(56, 189, 248, 0.86), 0 0 58px rgba(37, 99, 235, 0.42);
+    box-shadow: 0 0 30px rgba(56, 189, 248, 0.9), 0 0 68px rgba(37, 99, 235, 0.5);
   }
 }
 
@@ -19,129 +19,130 @@
 }
 
 @keyframes chargenext-orb-dot {
-  0%, 100% { transform: translate(-50%, -50%) scale(0.78); opacity: 0.58; }
-  50% { transform: translate(-50%, -50%) scale(1.35); opacity: 1; }
+  0%, 100% { transform: translate(-50%, -50%) scale(0.76); opacity: 0.58; }
+  50% { transform: translate(-50%, -50%) scale(1.38); opacity: 1; }
 }
 
 @keyframes chargenext-orb-sweep {
   to { transform: rotate(360deg); }
 }
 
-/* The wrapper directly below the Charge Next wordmark. */
-.chargenext-network-hero .mb-5.block.w-full[class*="max-w-[42rem]"] > .mt-1.flex.w-full.justify-center {
-  position: relative !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  width: 100% !important;
-  min-height: 148px !important;
-  margin-top: -6px !important;
-  padding: 8px 0 14px !important;
-  overflow: visible !important;
-}
-
-/* Reuse the scanner's inner shell as the orbital-mark canvas. */
-.chargenext-network-hero .mb-5.block.w-full[class*="max-w-[42rem]"] > .mt-1.flex.w-full.justify-center > div {
-  position: relative !important;
-  width: 122px !important;
-  max-width: none !important;
-  height: 122px !important;
-  padding: 0 !important;
-  overflow: visible !important;
-  flex: 0 0 auto !important;
-}
-
-/* Outer breathing energy field. */
-.chargenext-network-hero .mb-5.block.w-full[class*="max-w-[42rem]"] > .mt-1.flex.w-full.justify-center > div > div:first-child {
-  position: absolute !important;
-  inset: 0 !important;
-  width: 122px !important;
-  height: 122px !important;
-  margin: 0 !important;
-  transform: none;
-  border-radius: 9999px !important;
-  border: 1px solid rgba(125, 211, 252, 0.72) !important;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.14) 0%, rgba(37, 99, 235, 0.06) 48%, transparent 72%) !important;
-  filter: none !important;
-  animation: chargenext-orb-pulse 2.2s ease-in-out infinite !important;
-}
-
-/* Rotating bright ring. */
-.chargenext-network-hero .mb-5.block.w-full[class*="max-w-[42rem]"] > .mt-1.flex.w-full.justify-center > div > div:nth-child(2) {
-  position: absolute !important;
-  inset: 11px !important;
-  width: auto !important;
-  height: auto !important;
-  overflow: visible !important;
-  border-radius: 9999px !important;
-  border: 1px solid rgba(125, 211, 252, 0.24) !important;
-  border-top: 3px solid rgba(224, 242, 254, 0.96) !important;
-  border-right: 2px solid rgba(125, 211, 252, 0.88) !important;
-  background: radial-gradient(circle, rgba(14, 165, 233, 0.08), transparent 68%) !important;
-  box-shadow: inset 0 0 22px rgba(56, 189, 248, 0.12), 0 0 20px rgba(56, 189, 248, 0.14) !important;
-  backdrop-filter: none !important;
-  animation: chargenext-orb-spin 3.6s linear infinite !important;
-}
-
-/* Central electric core. */
-.chargenext-network-hero .mb-5.block.w-full[class*="max-w-[42rem]"] > .mt-1.flex.w-full.justify-center > div > div:nth-child(2) > div:first-child {
-  position: absolute !important;
-  left: 50% !important;
-  top: 50% !important;
-  inset: auto !important;
-  width: 19px !important;
-  height: 19px !important;
-  border-radius: 9999px !important;
-  background: radial-gradient(circle, rgb(224 242 254) 0%, rgb(103 232 249) 38%, rgb(14 165 233) 72%, rgba(37, 99, 235, 0.4) 100%) !important;
-  box-shadow: 0 0 14px rgba(103, 232, 249, 0.96), 0 0 32px rgba(56, 189, 248, 0.7) !important;
-  animation: chargenext-orb-dot 1.25s ease-in-out infinite !important;
-}
-
-/* Sweeping energy beam. */
-.chargenext-network-hero .mb-5.block.w-full[class*="max-w-[42rem]"] > .mt-1.flex.w-full.justify-center > div > div:nth-child(2) > div:nth-child(2) {
-  position: absolute !important;
-  left: 12px !important;
-  right: 12px !important;
-  top: 50% !important;
-  bottom: auto !important;
-  width: auto !important;
-  height: 1px !important;
-  border-radius: 9999px !important;
-  transform-origin: center !important;
-  background: linear-gradient(90deg, transparent, rgba(207, 250, 254, 0.92), transparent) !important;
-  box-shadow: 0 0 9px rgba(103, 232, 249, 0.62) !important;
-  animation: chargenext-orb-sweep 4.8s linear infinite !important;
-}
-
-/* The old moving scanner beam is no longer rendered visually. */
-.chargenext-network-hero .mb-5.block.w-full[class*="max-w-[42rem]"] > .mt-1.flex.w-full.justify-center > div > div:nth-child(2) > div:nth-child(n+3) {
+/* Remove the old scanner/orb row beneath the Charge Next logo entirely. */
+.chargenext-network-hero .mb-5.block.w-full[class*="max-w-[42rem]"] {
   display: none !important;
 }
 
-@media (min-width: 640px) {
-  .chargenext-network-hero .mb-5.block.w-full[class*="max-w-[42rem]"] > .mt-1.flex.w-full.justify-center {
-    min-height: 174px !important;
-    padding-bottom: 18px !important;
+/* Give the wordmark room for the larger center mark. */
+.chargenext-network-hero .inline-flex.items-center.justify-center.whitespace-nowrap {
+  gap: clamp(10px, 1.7vw, 28px) !important;
+  overflow: visible !important;
+}
+
+/* The original little center dot becomes the full orbital energy mark. */
+.chargenext-network-hero .inline-flex.items-center.justify-center.whitespace-nowrap > h1 + span.relative.inline-flex {
+  position: relative !important;
+  width: clamp(84px, 10vw, 176px) !important;
+  height: clamp(84px, 10vw, 176px) !important;
+  min-width: clamp(84px, 10vw, 176px) !important;
+  min-height: clamp(84px, 10vw, 176px) !important;
+  margin-inline: clamp(4px, 0.7vw, 12px) !important;
+  flex: 0 0 auto !important;
+  border-radius: 9999px !important;
+  transform: none !important;
+  filter: drop-shadow(0 0 18px rgba(59, 130, 246, 0.72)) drop-shadow(0 0 40px rgba(14, 165, 233, 0.28)) !important;
+  background: radial-gradient(circle, rgba(125, 211, 252, 0.12) 0%, rgba(59, 130, 246, 0.06) 48%, transparent 72%) !important;
+  box-shadow: inset 0 0 28px rgba(56, 189, 248, 0.08) !important;
+  overflow: visible !important;
+}
+
+/* Rotating bright outer ring. */
+.chargenext-network-hero .inline-flex.items-center.justify-center.whitespace-nowrap > h1 + span.relative.inline-flex::before {
+  content: "";
+  position: absolute;
+  inset: 9%;
+  z-index: 2;
+  border-radius: 9999px;
+  border: 1px solid rgba(125, 211, 252, 0.25);
+  border-top: 4px solid rgba(224, 242, 254, 0.98);
+  border-right: 2px solid rgba(125, 211, 252, 0.9);
+  background: radial-gradient(circle, rgba(14, 165, 233, 0.08), transparent 68%);
+  box-shadow: inset 0 0 24px rgba(56, 189, 248, 0.13), 0 0 22px rgba(56, 189, 248, 0.18);
+  animation: chargenext-orb-spin 3.6s linear infinite;
+}
+
+/* Sweeping energy beam. */
+.chargenext-network-hero .inline-flex.items-center.justify-center.whitespace-nowrap > h1 + span.relative.inline-flex::after {
+  content: "";
+  position: absolute;
+  left: 17%;
+  right: 17%;
+  top: 50%;
+  z-index: 3;
+  height: 2px;
+  border-radius: 9999px;
+  transform-origin: center;
+  background: linear-gradient(90deg, transparent, rgba(207, 250, 254, 0.98), transparent);
+  box-shadow: 0 0 11px rgba(103, 232, 249, 0.72);
+  animation: chargenext-orb-sweep 4.8s linear infinite;
+}
+
+/* Breathing energy field supplied by the first existing inner span. */
+.chargenext-network-hero .inline-flex.items-center.justify-center.whitespace-nowrap > h1 + span.relative.inline-flex > span:first-child {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 1 !important;
+  width: auto !important;
+  height: auto !important;
+  border-radius: 9999px !important;
+  border: 1px solid rgba(125, 211, 252, 0.68) !important;
+  background: radial-gradient(circle, rgba(125, 211, 252, 0.28) 0%, rgba(59, 130, 246, 0.13) 34%, rgba(29, 78, 216, 0.04) 58%, transparent 76%) !important;
+  animation: chargenext-orb-pulse 2.2s ease-in-out infinite !important;
+}
+
+/* Electric center core supplied by the second existing inner span. */
+.chargenext-network-hero .inline-flex.items-center.justify-center.whitespace-nowrap > h1 + span.relative.inline-flex > span:last-child {
+  position: absolute !important;
+  inset: auto !important;
+  left: 50% !important;
+  top: 50% !important;
+  z-index: 4 !important;
+  width: clamp(16px, 1.8vw, 28px) !important;
+  height: clamp(16px, 1.8vw, 28px) !important;
+  border-radius: 9999px !important;
+  background: radial-gradient(circle, rgb(240 249 255) 0%, rgb(165 243 252) 28%, rgb(56 189 248) 58%, rgb(37 99 235) 82%, rgba(29, 78, 216, 0.5) 100%) !important;
+  box-shadow: 0 0 16px rgba(165, 243, 252, 0.98), 0 0 36px rgba(56, 189, 248, 0.78), 0 0 58px rgba(37, 99, 235, 0.4) !important;
+  animation: chargenext-orb-dot 1.25s ease-in-out infinite !important;
+}
+
+/* Let the center mark breathe without crowding the following hero copy. */
+.chargenext-network-hero .mt-1.flex.w-full.justify-center {
+  margin-bottom: clamp(8px, 1.2vw, 18px) !important;
+  overflow: visible !important;
+}
+
+@media (max-width: 639px) {
+  .chargenext-network-hero .inline-flex.items-center.justify-center.whitespace-nowrap {
+    gap: 7px !important;
   }
 
-  .chargenext-network-hero .mb-5.block.w-full[class*="max-w-[42rem]"] > .mt-1.flex.w-full.justify-center > div,
-  .chargenext-network-hero .mb-5.block.w-full[class*="max-w-[42rem]"] > .mt-1.flex.w-full.justify-center > div > div:first-child {
-    width: 148px !important;
-    height: 148px !important;
+  .chargenext-network-hero .inline-flex.items-center.justify-center.whitespace-nowrap > h1 + span.relative.inline-flex {
+    width: 82px !important;
+    height: 82px !important;
+    min-width: 82px !important;
+    min-height: 82px !important;
+    margin-inline: 2px !important;
   }
 
-  .chargenext-network-hero .mb-5.block.w-full[class*="max-w-[42rem]"] > .mt-1.flex.w-full.justify-center > div > div:nth-child(2) {
-    inset: 13px !important;
-  }
-
-  .chargenext-network-hero .mb-5.block.w-full[class*="max-w-[42rem]"] > .mt-1.flex.w-full.justify-center > div > div:nth-child(2) > div:first-child {
-    width: 22px !important;
-    height: 22px !important;
+  .chargenext-network-hero .inline-flex.items-center.justify-center.whitespace-nowrap > h1 + span.relative.inline-flex::before {
+    border-top-width: 3px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .chargenext-network-hero .mb-5.block.w-full[class*="max-w-[42rem]"] > .mt-1.flex.w-full.justify-center * {
+  .chargenext-network-hero .inline-flex.items-center.justify-center.whitespace-nowrap > h1 + span.relative.inline-flex,
+  .chargenext-network-hero .inline-flex.items-center.justify-center.whitespace-nowrap > h1 + span.relative.inline-flex::before,
+  .chargenext-network-hero .inline-flex.items-center.justify-center.whitespace-nowrap > h1 + span.relative.inline-flex::after,
+  .chargenext-network-hero .inline-flex.items-center.justify-center.whitespace-nowrap > h1 + span.relative.inline-flex > span {
     animation: none !important;
   }
 }
