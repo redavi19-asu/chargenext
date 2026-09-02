@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Orbitron } from "next/font/google";
 import "./globals.css";
 import "./motion-polish.css";
+import "./orbital-mark.css";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import { HeroMotionPolish } from "@/components/hero-motion-polish";
 
