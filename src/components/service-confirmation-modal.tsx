@@ -193,14 +193,13 @@ export function ServiceConfirmationModal({
           </div>
           <div>
             <h2 className="text-2xl font-bold text-slate-900">Confirm Service</h2>
-            <p className="text-sm text-slate-500">Review your selection before proceeding</p>
+            <p className="text-sm text-slate-500">Preview service details — online payments coming soon</p>
           </div>
         </div>
       </ModalHeader>
 
       <ModalBody>
         <div className="space-y-6">
-          {/* Service Summary Card */}
           <div className="rounded-xl border border-slate-200 bg-white p-6">
             <div className="mb-6 flex items-start justify-between gap-4">
               <div>
@@ -209,11 +208,10 @@ export function ServiceConfirmationModal({
               </div>
               <div className="text-right">
                 <p className="text-3xl font-bold text-sky-600">{service.displayPrice}</p>
-                <p className="text-xs text-slate-500">one-time charge</p>
+                <p className="text-xs text-slate-500">preview pricing</p>
               </div>
             </div>
 
-            {/* Service Details Grid */}
             <div className="grid gap-4 md:grid-cols-3 mb-6">
               {service.estimatedDuration && (
                 <div className="rounded-lg bg-slate-50 p-4">
@@ -235,7 +233,6 @@ export function ServiceConfirmationModal({
               )}
             </div>
 
-            {/* Service Highlights */}
             <div className="space-y-3">
               <p className="text-xs font-semibold text-slate-700 uppercase">What&apos;s Included</p>
               <ul className="space-y-2">
@@ -259,7 +256,6 @@ export function ServiceConfirmationModal({
             )}
           </div>
 
-          {/* Location Summary */}
           <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
             <div className="flex items-start gap-3">
               <MapPin className="mt-0.5 h-5 w-5 flex-shrink-0 text-slate-600" />
@@ -374,10 +370,16 @@ export function ServiceConfirmationModal({
             intro={`Here&apos;s what happens when you request ${service.name.toLowerCase()}:`}
           />
 
-          {/* Legal Notice */}
+          <div className="rounded-lg border border-sky-200 bg-sky-50 p-4 text-sm text-sky-900">
+            <p className="font-semibold">Online payments are coming soon.</p>
+            <p className="mt-1 text-xs text-sky-800">
+              The Stripe integration is being kept in place for launch, but checkout is disabled and no payment can be submitted right now.
+            </p>
+          </div>
+
           <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 text-xs text-slate-600">
             <p>
-              By confirming, you agree to our{" "}
+              Service information is currently available for preview. Before launch, checkout will require agreement to our{" "}
               <a href="/terms" target="_blank" rel="noopener noreferrer" className="text-sky-600 hover:text-sky-700 font-semibold">
                 Terms of Service
               </a>
@@ -385,7 +387,7 @@ export function ServiceConfirmationModal({
               <a href="/privacy" target="_blank" rel="noopener noreferrer" className="text-sky-600 hover:text-sky-700 font-semibold">
                 Privacy Policy
               </a>
-              . Payment is processed securely through Stripe.
+              .
             </p>
           </div>
         </div>
@@ -395,20 +397,11 @@ export function ServiceConfirmationModal({
         <div className="flex flex-col gap-3 sm:flex-row-reverse">
           <Button
             onClick={onConfirm}
-            disabled={isProcessing || !currentLocation || isResolvingAddress}
-            className="service-cta service-cta--yellow-ring cta-btn--blue w-full sm:flex-1 rounded-xl h-12 text-base font-semibold"
+            disabled
+            className="w-full sm:flex-1 rounded-xl h-12 text-base font-semibold bg-slate-200 text-slate-500 cursor-not-allowed"
           >
-            {isProcessing ? (
-              <>
-                <Zap className="h-5 w-5 mr-2 animate-pulse" />
-                Processing...
-              </>
-            ) : (
-              <>
-                <Zap className="h-5 w-5 mr-2" />
-                Continue to Secure Payment
-              </>
-            )}
+            <Zap className="h-5 w-5 mr-2" />
+            Online Payments Coming Soon
           </Button>
 
           <Button
@@ -417,7 +410,7 @@ export function ServiceConfirmationModal({
             variant="secondary"
             className="w-full sm:flex-1 rounded-xl h-12 text-base font-semibold"
           >
-            Cancel
+            Close
           </Button>
         </div>
       </ModalFooter>
