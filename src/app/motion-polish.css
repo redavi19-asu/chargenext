@@ -1,0 +1,29 @@
+/* ChargeNext hero motion polish
+   Keeps the cinematic look while removing the dead-feeling startup pause
+   around the logo/scanner and giving the moving light its own compositor layer. */
+
+.chargenext-network-hero div.mt-1.flex.w-full.justify-center {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.chargenext-network-hero div[class*="w-[18%]"] {
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+
+.chargenext-network-hero [class*="drop-shadow"] {
+  backface-visibility: hidden;
+}
+
+.chargenext-network-hero {
+  contain: paint;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chargenext-network-hero div[class*="w-[18%]"] {
+    will-change: auto;
+    transform: none;
+  }
+}
