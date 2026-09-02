@@ -66,35 +66,38 @@ const STORAGE_KEYS = {
   pendingVerification: "chargenext:emergency:pending-payment-verification",
 } as const;
 
-function readStorageValue(key: string) {
-  if (typeof window === "undefined") {
-    return null;
-  }
-
+function readSessionStorageValue(key: string) {
+  if (typeof window === "undefined") return null;
   return window.sessionStorage.getItem(key);
 }
 
-function writeStorageValue(key: string, value: string) {
-  if (typeof window === "undefined") {
-    return;
-  }
-
+function writeSessionStorageValue(key: string, value: string) {
+  if (typeof window === "undefined") return;
   window.sessionStorage.setItem(key, value);
 }
 
-function removeStorageValue(key: string) {
-  if (typeof window === "undefined") {
-    return;
-  }
-
+function removeSessionStorageValue(key: string) {
+  if (typeof window === "undefined") return;
   window.sessionStorage.removeItem(key);
 }
 
-function parseJson<T>(value: string | null): T | null {
-  if (!value) {
-    return null;
-  }
+function readLocalStorageValue(key: string) {
+  if (typeof window === "undefined") return null;
+  return window.localStorage.getItem(key);
+}
 
+function writeLocalStorageValue(key: string, value: string) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(key, value);
+}
+
+function removeLocalStorageValue(key: string) {
+  if (typeof window === "undefined") return;
+  window.localStorage.removeItem(key);
+}
+
+function parseJson<T>(value: string | null): T | null {
+  if (!value) return null;
   try {
     return JSON.parse(value) as T;
   } catch {
@@ -107,49 +110,48 @@ export function saveEmergencyCheckoutDraft(location: EmergencyLocation | null) {
     location,
     capturedAt: new Date().toISOString(),
   };
-
-  writeStorageValue(STORAGE_KEYS.draft, JSON.stringify(draft));
+  writeSessionStorageValue(STORAGE_KEYS.draft, JSON.stringify(draft));
 }
 
 export function readEmergencyCheckoutDraft() {
-  return parseJson<EmergencyCheckoutDraft>(readStorageValue(STORAGE_KEYS.draft));
+  return parseJson<EmergencyCheckoutDraft>(readSessionStorageValue(STORAGE_KEYS.draft));
 }
 
 export function clearEmergencyCheckoutDraft() {
-  removeStorageValue(STORAGE_KEYS.draft);
+  removeSessionStorageValue(STORAGE_KEYS.draft);
 }
 
 export function saveCheckoutSessionId(sessionId: string) {
-  if (!sessionId) {
-    return;
-  }
-
-  writeStorageValue(STORAGE_KEYS.checkoutSessionId, sessionId);
+  if (!sessionId) return;
+  writeSessionStorageValue(STORAGE_KEYS.checkoutSessionId, sessionId);
 }
 
 export function readCheckoutSessionId() {
-  return readStorageValue(STORAGE_KEYS.checkoutSessionId) || null;
+  return readSessionStorageValue(STORAGE_KEYS.checkoutSessionId) || null;
 }
 
 export function saveVerificationRequestId(requestId: string) {
-  if (!requestId) {
-    return;
-  }
-
-  writeStorageValue(STORAGE_KEYS.verificationRequestId, requestId);
+  if (!requestId) return;
+  writeSessionStorageValue(STORAGE_KEYS.verificationRequestId, requestId);
 }
 
 export function readVerificationRequestId() {
-  return readStorageValue(STORAGE_KEYS.verificationRequestId) || null;
+  return readSessionStorageValue(STORAGE_KEYS.verificationRequestId) || null;
 }
 
 export function saveVerifiedEmergencyRequest(record: EmergencyVerificationRecord) {
-  writeStorageValue(STORAGE_KEYS.verificationRecord, JSON.stringify(record));
+  // Keep the verified tracking record available after a browser restart on the
+  // same device. Checkout/payment verification data remains session-scoped.
+  writeLocalStorageValue(STORAGE_KEYS.verificationRecord, JSON.stringify(record));
   void syncVerifiedEmergencyRequestToDispatchOS(record);
 }
 
 export function readVerifiedEmergencyRequest() {
-  return parseJson<EmergencyVerificationRecord>(readStorageValue(STORAGE_KEYS.verificationRecord));
+  return parseJson<EmergencyVerificationRecord>(readLocalStorageValue(STORAGE_KEYS.verificationRecord));
+}
+
+export function clearVerifiedEmergencyRequest() {
+  removeLocalStorageValue(STORAGE_KEYS.verificationRecord);
 }
 
 export function saveDetectedEmergencyLocation(location: EmergencyLocation | null) {
@@ -161,47 +163,34 @@ export function clearDetectedEmergencyLocation() {
 }
 
 export function formatEmergencyCoordinates(location: EmergencyLocation | null) {
-  if (!location) {
-    return "Location unavailable";
-  }
-
+  if (!location) return "Location unavailable";
   const latDirection = location.lat >= 0 ? "N" : "S";
   const lngDirection = location.lng >= 0 ? "E" : "W";
-
   return `${Math.abs(location.lat).toFixed(6)}°${latDirection}, ${Math.abs(location.lng).toFixed(6)}°${lngDirection}`;
 }
 
 export function buildEmergencyMapsUrl(location: EmergencyLocation | null) {
-  if (!location) {
-    return "https://www.google.com/maps";
-  }
-
+  if (!location) return "https://www.google.com/maps";
   const query = `${location.lat},${location.lng}`;
   return `https://www.google.com/maps?q=${encodeURIComponent(query)}`;
 }
 
 export function buildEmergencyMapsEmbedUrl(location: EmergencyLocation | null) {
-  if (!location) {
-    return "https://www.google.com/maps?output=embed&q=Washington%2C%20DC";
-  }
-
+  if (!location) return "https://www.google.com/maps?output=embed&q=Washington%2C%20DC";
   return `https://www.google.com/maps?output=embed&q=${location.lat},${location.lng}`;
 }
 
 export function getEmergencyLocationLabel(location: EmergencyLocation | null) {
-  if (!location) {
-    return "Awaiting GPS confirmation";
-  }
-
+  if (!location) return "Awaiting GPS confirmation";
   return location.address || location.label || formatEmergencyCoordinates(location);
 }
 
 export function readPendingPaymentVerificationState() {
-  return parseJson<PendingPaymentVerificationState>(readStorageValue(STORAGE_KEYS.pendingVerification));
+  return parseJson<PendingPaymentVerificationState>(readSessionStorageValue(STORAGE_KEYS.pendingVerification));
 }
 
 export function savePendingPaymentVerificationState(state: PendingPaymentVerificationState) {
-  writeStorageValue(STORAGE_KEYS.pendingVerification, JSON.stringify({
+  writeSessionStorageValue(STORAGE_KEYS.pendingVerification, JSON.stringify({
     ...state,
     updatedAt: new Date().toISOString(),
   }));
@@ -211,20 +200,16 @@ export function updatePendingPaymentVerificationState(
   patch: Partial<PendingPaymentVerificationState>
 ) {
   const current = readPendingPaymentVerificationState();
-  if (!current) {
-    return null;
-  }
-
+  if (!current) return null;
   const nextState = {
     ...current,
     ...patch,
     updatedAt: new Date().toISOString(),
   } satisfies PendingPaymentVerificationState;
-
   savePendingPaymentVerificationState(nextState);
   return nextState;
 }
 
 export function clearPendingPaymentVerificationState() {
-  removeStorageValue(STORAGE_KEYS.pendingVerification);
+  removeSessionStorageValue(STORAGE_KEYS.pendingVerification);
 }
