@@ -1,5 +1,7 @@
 "use client";
 
+import { syncVerifiedEmergencyRequestToDispatchOS } from "@/lib/dispatchos-bridge";
+
 export type EmergencyLocation = {
   lat: number;
   lng: number;
@@ -143,6 +145,7 @@ export function readVerificationRequestId() {
 
 export function saveVerifiedEmergencyRequest(record: EmergencyVerificationRecord) {
   writeStorageValue(STORAGE_KEYS.verificationRecord, JSON.stringify(record));
+  void syncVerifiedEmergencyRequestToDispatchOS(record);
 }
 
 export function readVerifiedEmergencyRequest() {
