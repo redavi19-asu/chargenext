@@ -6,9 +6,9 @@ type ServiceProcessCardProps = {
 };
 
 const defaultSteps = [
-  "Confirm your emergency location",
-  "Continue to secure Stripe payment",
-  "Return to ChargeNext after payment",
+  "Confirm your service location",
+  "Review the service and preview pricing",
+  "Online checkout will be available at launch",
   "Verify your phone number with SMS code",
   "Location and job information are sent to the provider",
   "Track the provider and job status in the customer dashboard",
