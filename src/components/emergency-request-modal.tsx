@@ -1,6 +1,6 @@
 "use client";
 
-import { MapPin, RefreshCw, ShieldCheck, Smartphone } from "lucide-react";
+import { MapPin, RefreshCw, ShieldCheck } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Modal, ModalBody, ModalFooter, ModalHeader } from "@/components/ui/modal";
@@ -32,9 +32,7 @@ export function EmergencyRequestModal({
   hasSubmitted,
   onUseCurrentLocation,
   onCancel,
-  onContinue,
 }: EmergencyRequestModalProps) {
-  const continueDisabled = isDetectingLocation || isProcessing || hasSubmitted;
   const embedUrl = buildEmergencyMapsEmbedUrl(location);
   const mapsUrl = buildEmergencyMapsUrl(location);
 
@@ -55,16 +53,15 @@ export function EmergencyRequestModal({
           </div>
           <div>
             <h2 className="text-2xl font-bold text-slate-900">Emergency Charging Request</h2>
-            <p className="text-sm text-slate-500">6-step process before payment</p>
+            <p className="text-sm text-slate-500">Online payments coming soon</p>
           </div>
         </div>
       </ModalHeader>
 
       <ModalBody>
         <div className="space-y-8">
-          {/* Main Description */}
           <p className="text-base text-slate-600 leading-relaxed">
-            Here&apos;s what happens when you request emergency charging:
+            You can preview the emergency request flow and confirm your location. Online checkout is temporarily disabled while ChargeNext prepares for launch.
           </p>
 
           <ServiceProcessCard
@@ -72,17 +69,14 @@ export function EmergencyRequestModal({
             intro="Here&apos;s what happens when you request emergency charging:"
           />
 
-          {/* Important Notice */}
           <div className="rounded-xl border border-amber-200 bg-amber-50 p-6">
-            <p className="text-sm font-semibold text-amber-900 mb-2">Important Notice</p>
+            <p className="text-sm font-semibold text-amber-900 mb-2">Coming Soon</p>
             <p className="text-sm text-amber-800 leading-relaxed">
-              Payment does not immediately guarantee provider availability. ChargeNext will begin locating an available provider after your payment, phone number, and emergency location have been verified.
+              Stripe checkout is currently disabled. No card will be charged and no payment session can be created from this page.
             </p>
           </div>
 
-          {/* Location & Payment Details Grid */}
           <div className="grid gap-6 lg:grid-cols-2">
-            {/* Left Column - Location */}
             <div className="space-y-6">
               <div>
                 <label className="text-sm font-semibold text-slate-900 mb-3 block">
@@ -141,9 +135,7 @@ export function EmergencyRequestModal({
               </div>
             </div>
 
-            {/* Right Column - Map Preview & Payment Info */}
             <div className="space-y-6">
-              {/* Map Preview */}
               <div className="space-y-3">
                 <label className="text-sm font-semibold text-slate-900">
                   <MapPin className="mr-2 inline h-4 w-4" />
@@ -161,11 +153,10 @@ export function EmergencyRequestModal({
                 </div>
               </div>
 
-              {/* Payment Notice */}
-              <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
-                <p className="text-xs font-semibold text-emerald-700 uppercase mb-2">Secure Payment</p>
-                <p className="text-sm text-emerald-900 leading-relaxed">
-                  Stripe Checkout keeps your card details secure. You&apos;ll return to ChargeNext after payment to complete verification.
+              <div className="rounded-xl border border-sky-200 bg-sky-50 p-5">
+                <p className="text-xs font-semibold text-sky-700 uppercase mb-2">Payment Status</p>
+                <p className="text-sm text-sky-900 leading-relaxed">
+                  Online payment is coming soon. The Stripe integration is being kept in place for launch, but checkout is disabled right now.
                 </p>
               </div>
             </div>
@@ -176,21 +167,11 @@ export function EmergencyRequestModal({
       <ModalFooter>
         <div className="flex flex-col gap-3 sm:flex-row-reverse">
           <Button
-            onClick={onContinue}
-            className="service-cta service-cta--yellow-ring cta-btn--danger-dark w-full sm:flex-1 rounded-xl h-12 text-base font-semibold"
-            disabled={continueDisabled}
+            type="button"
+            className="w-full sm:flex-1 rounded-xl h-12 text-base font-semibold bg-slate-200 text-slate-500 cursor-not-allowed"
+            disabled
           >
-            {isProcessing ? (
-              <>
-                <ShieldCheck className="h-5 w-5 mr-2 animate-pulse" />
-                Creating Session...
-              </>
-            ) : (
-              <>
-                <Smartphone className="h-5 w-5 mr-2" />
-                Continue to Secure Payment
-              </>
-            )}
+            Online Payments Coming Soon
           </Button>
 
           <Button
@@ -199,14 +180,8 @@ export function EmergencyRequestModal({
             className="w-full sm:flex-1 rounded-xl h-12 text-base font-semibold"
             disabled={isProcessing}
           >
-            Cancel Request
+            Close
           </Button>
-
-          {hasSubmitted && (
-            <p className="col-span-full text-xs text-slate-500 text-center">
-              Payment session created. Redirecting to Stripe Checkout...
-            </p>
-          )}
         </div>
       </ModalFooter>
     </Modal>
