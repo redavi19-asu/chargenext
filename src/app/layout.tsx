@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Orbitron } from "next/font/google";
 import "./globals.css";
 import "./motion-polish.css";
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
+import { HeroMotionPolish } from "@/components/hero-motion-polish";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -42,6 +43,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${orbitron.variable} bg-white text-slate-900 antialiased`}
       >
+        <HeroMotionPolish />
         {children}
         <CookieConsentBanner />
       </body>
