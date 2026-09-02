@@ -17,6 +17,8 @@ import {
   type EmergencyVerificationRecord,
 } from "@/lib/emergency-flow";
 
+const basePath = () => (process.env.NODE_ENV === "production" ? "/chargenext" : "");
+
 export default function PaymentSuccessClient() {
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
@@ -44,7 +46,6 @@ export default function PaymentSuccessClient() {
     }
 
     saveCheckoutSessionId(sessionId);
-
     let isMounted = true;
 
     const loadVerification = async () => {
@@ -55,9 +56,7 @@ export default function PaymentSuccessClient() {
           throw new Error("The Stripe checkout session could not be verified.");
         }
 
-        if (!isMounted) {
-          return;
-        }
+        if (!isMounted) return;
 
         setStripeSessionId(response.stripeSessionId || sessionId);
         setPaymentStatus(response.paymentStatus || "paid");
@@ -69,15 +68,10 @@ export default function PaymentSuccessClient() {
           saveDetectedEmergencyLocation(response.location);
         }
       } catch (verificationError) {
-        if (!isMounted) {
-          return;
-        }
-
+        if (!isMounted) return;
         setError(verificationError instanceof Error ? verificationError.message : "Unable to verify payment.");
       } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+        if (isMounted) setIsLoading(false);
       }
     };
 
@@ -89,7 +83,13 @@ export default function PaymentSuccessClient() {
   }, [searchParams]);
 
   const handleVerified = (record: EmergencyVerificationRecord) => {
+    // Saving the verified record also starts the best-effort DispatchOS bridge.
     saveVerifiedEmergencyRequest(record);
+
+    // Keep customers inside ChargeNext. DispatchOS runs behind the scenes while
+    // the customer gets a dedicated live-service tracking experience here.
+    const requestId = encodeURIComponent(record.requestId || record.stripeSessionId);
+    window.location.assign(`${basePath()}/status?request_id=${requestId}`);
   };
 
   return (
@@ -137,7 +137,7 @@ export default function PaymentSuccessClient() {
                 requestTimestamp={requestTimestamp}
                 initialLocation={paymentLocation}
                 paymentStatus={paymentStatus}
-                onClose={() => window.location.assign("/")}
+                onClose={() => window.location.assign(`${basePath()}/`)}
                 onVerified={handleVerified}
               />
             ) : null}
