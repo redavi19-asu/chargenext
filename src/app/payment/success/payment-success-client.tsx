@@ -83,10 +83,10 @@ export default function PaymentSuccessClient() {
   }, [searchParams]);
 
   const handleVerified = (record: EmergencyVerificationRecord) => {
-    // Saving the verified record also starts the best-effort DispatchOS bridge.
+    // Saving the verified record also starts the best-effort Urban Carrier OS bridge.
     saveVerifiedEmergencyRequest(record);
 
-    // Keep customers inside ChargeNext. DispatchOS runs behind the scenes while
+    // Keep customers inside ChargeNext. Urban Carrier OS runs behind the scenes while
     // the customer gets a dedicated live-service tracking experience here.
     const requestId = encodeURIComponent(record.requestId || record.stripeSessionId);
     window.location.assign(`${basePath()}/status?request_id=${requestId}`);
