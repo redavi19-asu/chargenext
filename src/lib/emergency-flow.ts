@@ -1,6 +1,6 @@
 "use client";
 
-import { syncVerifiedEmergencyRequestToDispatchOS } from "@/lib/dispatchos-bridge";
+import { syncVerifiedEmergencyRequestToUrban Carrier OS } from "@/lib/dispatchos-bridge";
 
 export type EmergencyLocation = {
   lat: number;
@@ -143,7 +143,7 @@ export function saveVerifiedEmergencyRequest(record: EmergencyVerificationRecord
   // Keep the verified tracking record available after a browser restart on the
   // same device. Checkout/payment verification data remains session-scoped.
   writeLocalStorageValue(STORAGE_KEYS.verificationRecord, JSON.stringify(record));
-  void syncVerifiedEmergencyRequestToDispatchOS(record);
+  void syncVerifiedEmergencyRequestToUrban Carrier OS(record);
 }
 
 export function readVerifiedEmergencyRequest() {
