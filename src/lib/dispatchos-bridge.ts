@@ -25,16 +25,16 @@ type DispatchOSSyncResult = {
 const DISPATCHOS_INTAKE_URL = process.env.NEXT_PUBLIC_DISPATCHOS_INTAKE_URL?.trim();
 
 /**
- * Best-effort bridge from a verified ChargeNext emergency request into DispatchOS.
+ * Best-effort bridge from a verified ChargeNext emergency request into Urban Carrier OS.
  *
- * The browser never contains a DispatchOS secret. The configured intake URL must
+ * The browser never contains a Urban Carrier OS secret. The configured intake URL must
  * point to a server-side/public-intake endpoint that performs its own validation,
- * tenant resolution and rate limiting before creating a DispatchOS job.
+ * tenant resolution and rate limiting before creating a Urban Carrier OS job.
  *
  * Until that endpoint is configured, this function safely does nothing so the
  * current ChargeNext customer flow keeps working exactly as it does today.
  */
-export async function syncVerifiedEmergencyRequestToDispatchOS(
+export async function syncVerifiedEmergencyRequestToUrban Carrier OS(
   record: DispatchOSEmergencyRecord
 ): Promise<DispatchOSSyncResult> {
   if (!DISPATCHOS_INTAKE_URL || typeof window === "undefined") {
@@ -71,13 +71,13 @@ export async function syncVerifiedEmergencyRequestToDispatchOS(
     });
 
     if (!response.ok) {
-      console.warn("ChargeNext DispatchOS sync failed", response.status);
+      console.warn("ChargeNext Urban Carrier OS sync failed", response.status);
       return { ok: false, status: response.status };
     }
 
     return { ok: true, status: response.status };
   } catch (error) {
-    console.warn("ChargeNext DispatchOS sync unavailable", error);
+    console.warn("ChargeNext Urban Carrier OS sync unavailable", error);
     return { ok: false };
   }
 }
