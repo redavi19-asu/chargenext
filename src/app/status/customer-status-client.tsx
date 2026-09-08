@@ -114,7 +114,7 @@ export default function CustomerStatusClient() {
             <h1 className="mt-5 text-3xl font-bold">ChargeNext Customer Tracking</h1>
             <p className="mt-3 text-white/60">{error || "We could not open this service request."}</p>
             <p className="mt-4 text-sm leading-6 text-white/45">
-              Emergency customers do not need a DispatchOS login. Tracking stays inside ChargeNext while DispatchOS runs the operation behind the scenes.
+              Emergency customers do not need a Urban Carrier OS login. Tracking stays inside ChargeNext while Urban Carrier OS runs the operation behind the scenes.
             </p>
             <Link href={`${basePath()}/`} className="mt-6 inline-flex rounded-xl bg-cyan-400 px-5 py-3 font-semibold text-slate-950 hover:bg-cyan-300">
               Return to ChargeNext
@@ -134,7 +134,7 @@ export default function CustomerStatusClient() {
               <p className="text-xs font-bold uppercase tracking-[0.26em] text-cyan-300">ChargeNext Live Service</p>
               <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">Your charging provider is being coordinated now.</h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-white/65">
-                This page is your customer view. ChargeNext handles your request here while the dispatch team operates through DispatchOS behind the scenes.
+                This page is your customer view. ChargeNext handles your request here while the dispatch team operates through Urban Carrier OS behind the scenes.
               </p>
             </div>
             <div className="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
@@ -178,7 +178,7 @@ export default function CustomerStatusClient() {
           <div className="flex items-start gap-3">
             <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0" />
             <p>
-              <span className="font-semibold">No DispatchOS account is required.</span> Your verified ChargeNext service session is remembered on this device so you can return to this tracking screen while the job is active.
+              <span className="font-semibold">No Urban Carrier OS account is required.</span> Your verified ChargeNext service session is remembered on this device so you can return to this tracking screen while the job is active.
             </p>
           </div>
         </div>
